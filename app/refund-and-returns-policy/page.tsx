@@ -3,6 +3,7 @@
 import Head from 'next/head';
 import Script from 'next/script';
 import styles from './Returns.module.css';
+import Breadcrumbs from '../../components/Breadcrumbs';
 
 // SEO Schema ডেটা
 const faqSchema = {
@@ -63,7 +64,8 @@ export default function RefundAndReturnsPolicyPage() {
       <Script id="org-schema" type="application/ld+json">
         {JSON.stringify(organizationSchema)}
       </Script>
-      
+      <div>
+            <Breadcrumbs />
       <div className={styles.gobikePolicyPage}>
         <div className={styles.policyContainer}>
 
@@ -131,6 +133,7 @@ export default function RefundAndReturnsPolicyPage() {
             </div>
 
         </div>
+      </div>
       </div>
     </>
   );

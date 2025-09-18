@@ -7,6 +7,7 @@ import styles from './SparePartsPage.module.css'; // নিশ্চিত ক�
 import ProductCard from '../products/ProductCard';
 import PaginationControls from '../products/PaginationControls';
 import Image from 'next/image';
+import Breadcrumbs from '../../components/Breadcrumbs'; 
 
 const PRODUCTS_PER_PAGE = 12;
 
@@ -95,6 +96,8 @@ export default async function BikesPage({ searchParams }: {
   );
 
   return (
+    <div>
+          <Breadcrumbs />
     <div className={styles.pageContainer}>
        <header className={styles.header}>
         <div className={styles.heroContent}>
@@ -160,6 +163,7 @@ export default async function BikesPage({ searchParams }: {
           <Link href="/faq" className={styles.internalLink}>Find Answers (FAQ)</Link>
         </div>
       </section>
+    </div>
     </div>
   );
 }

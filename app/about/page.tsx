@@ -1,10 +1,12 @@
 import Link from 'next/link';
 import styles from './AboutPage.module.css';
+import Breadcrumbs from '../../components/Breadcrumbs';
 
 export default function AboutPage() {
   return (
+    <div>
+      <Breadcrumbs />
     <div className={styles['about-us-page-wrapper']}>
-
       {/* Section 1: Main Header */}
       <div className={styles['section-container']}>
         <h1>Our Story: More Than Just a kids eBike</h1>
@@ -101,5 +103,6 @@ export default function AboutPage() {
       </div>
 
     </div>
+   </div>
   );
 }

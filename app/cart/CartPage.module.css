@@ -1,14 +1,15 @@
 /* app/cart/CartPage.module.css */
 .container {
   max-width: 1200px;
-  margin: 2rem auto;
-  padding: 2rem;
+  margin: 0 auto;
+  padding: 1rem 0 2rem 2rem;
 }
 
 .title {
   text-align: center;
   margin-bottom: 2rem;
   font-size: 2.5rem;
+  font-weight: 600;
 }
 
 .continueShopping {
@@ -117,8 +118,8 @@
   display: block; /* Link কে বাটন হিসেবে দেখানোর জন্য */
   text-align: center;
   width: 100%;
-  padding: 1rem;
-  font-size: 1.1rem;
+  padding: .5rem;
+  font-size: 1.5rem;
   background-color: #030303;
   color: white;
   text-decoration: none; /* Link এর আন্ডারলাইন সরানোর জন্য */
@@ -127,7 +128,9 @@
   cursor: pointer;
   font-weight: bold;
 }
-
+.checkoutButton :hover{
+  background-color: #ccc;
+}
 /* --- রেসপন্সিভ ডিজাইনের জন্য নতুন কোড --- */
 
 @media (max-width: 900px) {

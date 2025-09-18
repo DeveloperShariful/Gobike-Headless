@@ -4,6 +4,7 @@ import { useState, FormEvent, ChangeEvent } from 'react';
 import styles from './ContactPage.module.css'; // <-- নিশ্চিত করুন এই CSS ফাইলটি আছে
 import toast from 'react-hot-toast';
 import Image from 'next/image'; // <-- Image কম্পোনেন্ট ইম্পোর্ট করা হয়েছে
+import Breadcrumbs from '../../components/Breadcrumbs';
 
 export default function ContactPage() {
   // --- কার্যকরী সমাধান: State Management-কে একটি অবজেক্টে রাখা হয়েছে ---
@@ -54,6 +55,8 @@ export default function ContactPage() {
   };
 
   return (
+    <div>
+          <Breadcrumbs />
     <div className={styles.gobikeContactPageWrapper}>
       <div className={styles.contactContainer}>
         {/* Top Section: Intro */}
@@ -110,6 +113,7 @@ export default function ContactPage() {
             </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

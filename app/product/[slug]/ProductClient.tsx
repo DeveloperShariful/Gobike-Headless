@@ -8,6 +8,7 @@ import ReviewForm from './ReviewForm';
 import ProductCard from '../../products/ProductCard';
 import { gtmViewItem } from '../../../lib/gtm';
 import { klaviyoTrackViewedProduct } from '../../../lib/klaviyo';
+import Breadcrumbs from '../../../components/Breadcrumbs';
 
 // --- ইন্টারফেসগুলো নতুন ডেটা স্ট্রাকচার অনুযায়ী আপডেট করা হয়েছে ---
 interface ImageNode { sourceUrl: string; }
@@ -140,6 +141,7 @@ export default function ProductClient({ product }: { product: Product }) {
         
     return (
         <div className={styles.container}>
+            <Breadcrumbs />
         <div className={styles.productLayout}>
             <div className={styles.galleryContainer}>
                 {mainImage && <img src={mainImage} alt={product.name} className={styles.mainImage} />}

@@ -7,6 +7,7 @@ import styles from './BikesPage.module.css'; // নিশ্চিত করু�
 import ProductCard from '../products/ProductCard';
 import PaginationControls from '../products/PaginationControls';
 import Image from 'next/image';
+import Breadcrumbs from '../../components/Breadcrumbs';
 
 const PRODUCTS_PER_PAGE = 12;
 
@@ -96,7 +97,10 @@ export default async function BikesPage({ searchParams }: {
   );
 
   return (
+    <div>
+       <Breadcrumbs />
     <div className={styles.pageContainer}>
+      
       <header className={styles.header}>
         <div className={styles.heroContent}>
           <h1 className={styles.heroTitle}>Australia's Top-Rated Electric Bikes for Kids</h1>
@@ -162,6 +166,7 @@ export default async function BikesPage({ searchParams }: {
           <Link href="/faq" className={styles.internalLink}>Find Answers (FAQ)</Link>
         </div>
       </section>
+    </div>
     </div>
   );
 }

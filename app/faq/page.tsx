@@ -1,4 +1,5 @@
 import styles from './FaqPage.module.css';
+import Breadcrumbs from '../../components/Breadcrumbs';
 
 // SEO এর জন্য সম্পূর্ণ JSON-LD ডেটা
 const jsonLdData = {
@@ -30,9 +31,10 @@ const jsonLdData = {
 
 export default function FaqPage() {
   return (
+    <div>
+          <Breadcrumbs />
     <>
       <div className={styles.faqPageContainer}>
-        
         <header className={styles.faqPageHeader}>
             <h1 className={styles.faqPageMainTitle}>GoBike FAQ | Australia&apos;s Top Questions Answered</h1>
             <p className={styles.faqPageIntro}>Welcome to the GoBike Help Centre! Here you&apos;ll find clear answers to all your questions about our <strong>kids electric bikes</strong>—from safety and sizing to battery life and delivery across Australia.</p>
@@ -186,5 +188,6 @@ export default function FaqPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
       />
     </>
+  </div>
   );
 }

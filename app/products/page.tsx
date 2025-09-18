@@ -6,6 +6,7 @@ import styles from './products.module.css';
 import ProductFilters from './ProductFilters';
 import PaginationControls from './PaginationControls';
 import ProductsGrid from './ProductsGrid'; // <-- নতুন ক্লায়েন্ট গ্রিড ইম্পোর্ট করা হচ্ছে
+import Breadcrumbs from '../../components/Breadcrumbs';
 
 const PRODUCTS_PER_PAGE = 12;
 
@@ -101,6 +102,8 @@ export default async function ProductsPage({ searchParams }: {
   );
 
   return (
+    <div>
+          <Breadcrumbs />
     <div className={styles.pageContainer}>
       <header className={styles.header}>
         <h1>Our Exclusive Collection</h1>
@@ -116,6 +119,7 @@ export default async function ProductsPage({ searchParams }: {
           <PaginationControls pageInfo={pageInfo} />
         </div>
       </main>
+    </div>
     </div>
   );
 }

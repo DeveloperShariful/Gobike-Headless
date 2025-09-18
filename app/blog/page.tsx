@@ -5,6 +5,7 @@ import matter from 'gray-matter';
 import Link from 'next/link';
 import Image from 'next/image';
 import styles from './BlogListPage.module.css'; // <-- নতুন CSS ফাইল ইম্পোর্ট করা হয়েছে
+import Breadcrumbs from '../../components/Breadcrumbs';
 
 export default function BlogPage() {
   const blogDir = 'blogs';
@@ -23,6 +24,8 @@ export default function BlogPage() {
   }).sort((a, b) => new Date(b.frontmatter.date).getTime() - new Date(a.frontmatter.date).getTime());
 
   return (
+    <div>
+          <Breadcrumbs />
     <div className={styles.pageContainer}>
       <header className={styles.pageHeader}>
         {/* --- কার্যকরী সমাধান: নতুন SEO-বান্ধব শিরোনাম --- */}
@@ -62,5 +65,6 @@ export default function BlogPage() {
           ))}
         </div>
       </main>
+    </div>
     </div>
   );
