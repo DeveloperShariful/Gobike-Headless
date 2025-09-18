@@ -102,24 +102,31 @@ export default async function ProductsPage({ searchParams }: {
   );
 
   return (
+    // --- কার্যকরী সমাধান: এখানে একটি প্যারেন্ট div যোগ করা হয়েছে ---
     <div>
-          <Breadcrumbs />
-    <div className={styles.pageContainer}>
+      <Breadcrumbs pageTitle="Products" />
+    <div className={styles.pageWrapper}>
       <header className={styles.header}>
         <h1>Our Exclusive Collection</h1>
         <p>Explore our curated selection of high-quality products. Find exactly what you are looking for.</p>
       </header>
+      
+      <ProductFilters categories={categories} />
+      
       <main className={styles.mainContent}>
-        <aside className={styles.filtersContainer}>
-          <ProductFilters categories={categories} />
-        </aside>
-        <div className={styles.productsGridContainer}>
-          {/* --- মূল সমাধান: সার্ভার থেকে ক্লায়েন্ট কম্পוננטকে ডেটা পাস করা হচ্ছে --- */}
+        {products.length > 0 ? (
           <ProductsGrid products={products} />
-          <PaginationControls pageInfo={pageInfo} />
-        </div>
+        ) : (
+          <p className={styles.noProductsFound}>No products found in this category.</p>
+        )}
       </main>
+      
+      <div className={styles.paginationWrapper}>
+          <PaginationControls pageInfo={pageInfo} basePath="/products" />
+      </div>
     </div>
     </div>
+    // -----------------------------------------------------------
+    
   );
 }

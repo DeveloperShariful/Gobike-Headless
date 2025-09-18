@@ -141,7 +141,7 @@ export default function ProductClient({ product }: { product: Product }) {
         
     return (
         <div className={styles.container}>
-            <Breadcrumbs />
+            <Breadcrumbs pageTitle={product.name} />
         <div className={styles.productLayout}>
             <div className={styles.galleryContainer}>
                 {mainImage && <img src={mainImage} alt={product.name} className={styles.mainImage} />}
