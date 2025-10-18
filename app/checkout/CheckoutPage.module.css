@@ -1,0 +1,22 @@
+.pageContainer {
+  width: 100%;
+  padding: 1rem;
+  background-color: #f8f9fa;
+}
+
+.container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  
+  /* ★★★ চূড়ান্ত এবং স্থায়ী সমাধান ★★★ */
+  /* এই দুটি লাইনই আপনার মূল সমস্যার সমাধান করবে */
+  position: relative;
+  overflow-x: hidden;
+}
+
+@media (min-width: 768px) {
+  .pageContainer {
+    padding: 2rem;
+  }
+}

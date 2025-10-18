@@ -78,7 +78,7 @@ export default function Footer() {
   <h3>Follow Us</h3>
   <ul>
     <li>
-      <a href="https://www.facebook.com/gobikeoz" target="_blank" rel="noopener noreferrer">
+      <a href="https://www.facebook.com/Go-Bike-104997195659873" target="_blank" rel="noopener noreferrer">
         <FaFacebookF className={styles['final-footer-social-icon-v1']} />
         <span>Facebook</span>
       </a>
@@ -90,7 +90,7 @@ export default function Footer() {
       </a>
     </li>
     <li>
-      <a href="https://www.youtube.com/@GobikeAustralia" target="_blank" rel="noopener noreferrer">
+      <a href="https://www.youtube.com/@Gobike-r7b" target="_blank" rel="noopener noreferrer">
         <FaYoutube className={styles['final-footer-social-icon-v3']} />
         <span>Youtube</span>
       </a>

@@ -1,3 +1,4 @@
+// components/MiniCart.tsx
 'use client';
 
 import { useEffect } from 'react';
@@ -30,27 +31,6 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
     const price = parsePrice(item.price);
     return total + price * item.quantity;
   }, 0);
-
-  // --- মূল সমাধান: ডাইনামিক চেকআউট URL তৈরি করার ফাংশন ---
-const generateCheckoutUrl = () => {
-    if (cartItems.length === 0) return '#';
-    
-    // কার্ট আইটেমগুলোকে শুধুমাত্র id এবং quantity সহ একটি নতুন অ্যারেতে পরিণত করা হচ্ছে
-    const itemsForUrl = cartItems.map(item => ({
-      id: item.databaseId,
-      quantity: item.quantity
-    }));
-    
-    // অ্যারেটিকে JSON স্ট্রিং-এ পরিণত করা হচ্ছে
-    const cartJson = JSON.stringify(itemsForUrl);
-    
-    // URL-এর জন্য স্ট্রিংটিকে এনকোড করা হচ্ছে
-    const encodedCart = encodeURIComponent(cartJson);
-    
-    // চূড়ান্ত URL তৈরি করা হচ্ছে
-    return `https://gobikes.au/cart/?cart_items=${encodedCart}`;
-  }; 
-
   if (!isOpen) return null;
 
   return (
@@ -99,13 +79,13 @@ const generateCheckoutUrl = () => {
               <Link href="/cart" className={`${styles.actionButton} ${styles.viewCart}`} onClick={onClose}>
                 View Cart
               </Link>
-                 <a 
-                href={generateCheckoutUrl()}
+              <Link 
+                href="/checkout"
                 className={`${styles.actionButton} ${styles.checkout}`}
                 onClick={onClose}
               >
                 Checkout
-              </a>
+              </Link>
             </div>
           </footer>
         )}

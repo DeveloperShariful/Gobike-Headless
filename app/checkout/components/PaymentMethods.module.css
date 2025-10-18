@@ -1,0 +1,318 @@
+.paymentContainer {
+  width: 100%;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden; /* Ensures borders look clean inside */
+}
+
+.gatewayList {
+  display: flex;
+  flex-direction: column;
+}
+
+.gatewayWrapper {
+  border-bottom: 1px solid #e0e0e0;
+}
+.gatewayWrapper:last-child {
+  border-bottom: none;
+}
+
+.gatewayOption {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  cursor: pointer;
+  background-color: #f9f9f9;
+  transition: background-color 0.2s;
+}
+
+.gatewayOption:hover {
+  background-color: #f0f0f0;
+}
+
+.gatewayOption input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.gatewayOption label {
+  font-weight: 600;
+  font-size: 16px;
+  flex-grow: 1;
+  cursor: pointer;
+}
+
+.gatewayIcon {
+  height: 24px;
+  width: auto;
+  margin-left: 15px;
+}
+
+/* This is the content area that opens up */
+.gatewayDetails {
+  padding: 20px;
+  background-color: #ffffff;
+  border-top: 1px solid #e0e0e0;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Sub-component Specific Styles --- */
+.stripeWrapper, .paypalContainer, .offlinePayment {
+  width: 100%;
+}
+
+.orSeparator {
+  text-align: center;
+  color: #6b7280;
+  font-weight: 500;
+  margin-top: 10px;
+}
+
+.placeOrderButton {
+  width: 100%;
+  padding: 14px;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.placeOrderButton:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.errorText, .loader {
+  padding: 20px;
+  text-align: center;
+  color: #d92c2c;
+}
+/* --- Main Container --- */
+.paymentContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Express checkout এবং Accordion লিস্টের মধ্যে ফাঁকা জায়গা */
+}
+
+/* --- Express Checkout Section --- */
+.expressCheckoutContainer {
+  width: 100%;
+}
+.expressCheckoutLoader {
+  height: 48px;
+  width: 100%;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+.orSeparator {
+  text-align: center;
+  color: #6b7280;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* --- Accordion List --- */
+.accordionList {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden; /* Ensures borders look clean inside */
+}
+
+.gatewayWrapper {
+  border-bottom: 1px solid #e0e0e0;
+}
+.gatewayWrapper:last-child {
+  border-bottom: none;
+}
+
+.gatewayOption {
+  display: flex;
+  align-items: center;
+  padding: 18px 20px;
+  cursor: pointer;
+  background-color: #f9f9f9;
+  transition: background-color 0.2s;
+}
+.gatewayOption:hover {
+  background-color: #f0f0f0;
+}
+
+.gatewayOption input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  margin-right: 15px;
+  flex-shrink: 0;
+  accent-color: #ff0000; /* Makes the selected radio dot black */
+}
+
+.gatewayOption label {
+  font-weight: 600;
+  font-size: 16px;
+  flex-grow: 1;
+  cursor: pointer;
+}
+
+.gatewayIcon {
+  height: 24px;
+  width: auto;
+  margin-left: 15px;
+}
+
+/* This is the content area that opens up */
+.gatewayDetails {
+  padding: 20px;
+  background-color: #ffffff;
+  border-top: 1px solid #e0e0e0;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Sub-component Specific Styles --- */
+.paypalContainer {
+  min-height: 150px; /* Ensures space for buttons to render */
+}
+.offlinePayment p {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* --- Common Place Order Button (Outside the accordion) --- */
+.commonButtonContainer {
+  width: 100%;
+  margin-top: 10px; /* Accordion থেকে সামান্য নিচে */
+}
+
+.commonPlaceOrderButton {
+  width: 100%;
+  padding: 14px;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, opacity 0.2s;
+}
+.commonPlaceOrderButton:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+.commonPlaceOrderButton:hover:not(:disabled) {
+  background-color: #333333;
+}
+
+/* --- Utility Styles --- */
+.errorText {
+  color: #d92c2c;
+  font-size: 14px;
+}
+.loader {
+  padding: 20px;
+  text-align: center;
+  color: #555;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+@keyframes pulse {
+  0% { background-color: #f0f0f0; }
+  50% { background-color: #e0e0e0; }
+  100% { background-color: #f0f0f0; }
+}
+.cardIcons {
+  display: flex;
+  align-items: center;
+  gap: 4px; 
+}
+@media (max-width: 768px) {
+.cardIcons {
+  display: flex;
+  align-items: center;
+  gap: 4px; 
+}
+.cardIcons img {
+  height: 20px; 
+  width: 20px;
+  border-radius: 2px;
+}
+}
+.cardIcons img {
+  height: 25px; 
+  width: 30px;
+  border-radius: 2px;
+}
+/* ... আপনার অন্যান্য স্টাইলের পর ... */
+
+.gatewayDetails {
+  padding: 10px 5px 5px 5px; /* কন্টেইনারের জন্য প্যাডিং */
+  background-color: #f9f9f9;
+  border-top: 1px solid #e0e0e0;
+}
+
+.cardElementContainer {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: white;
+}
+
+.paymentMethodInfo p {
+  margin: 0;
+  font-size: 14px;
+  color: #555;
+}
+/* ... আপনার অন্যান্য স্টাইলের পর ... */
+
+.redirectInfoBox {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.infoText {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 14px;
+  color: #333;
+}
+
+.infoText small {
+  font-size: 12px;
+  color: #777;
+}
+
+.infoText a {
+    text-decoration: underline;
+    color: #007bff;
+}
+.paypalMessageContainer {
+  margin-bottom: 1rem; /* ایکسپریس বাটনগুলো থেকে সামান্য দূরত্ব তৈরি করে */
+  text-align: center;
+  padding-left: 10px; /* টেক্সটকে মাঝখানে আনে */
+}

@@ -1,22 +1,13 @@
+//app/order-success/Page.tsx
 import { Suspense } from 'react';
-import OrderSuccessClient from './OrderSuccessClient';
-import styles from './OrderSuccessPage.module.css';
+import Confirmation from './Confirmation'; // নতুন ক্লায়েন্ট কম্পোনেন্টটি ইমপোর্ট করুন
+import styles from './OrderSuccessPage.module.css'; // লোডারের জন্য স্টাইল
 
-function LoadingFallback() {
-  return (
-    <div className={styles.container}>
-      <div className={styles.successBox}>
-        <div className={styles.loadingSpinner}></div>
-        <h1 className={styles.title}>Processing Your Order...</h1>
-        <p className={styles.message}>Please wait while we confirm your purchase.</p>
-      </div>
-    </div>
-  );
-}
 export default function OrderSuccessPage() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
-      <OrderSuccessClient />
+    // এটি একটি সার্ভার কম্পোনেন্ট, যা ক্লায়েন্ট কম্পোনেন্ট লোড হওয়ার আগ পর্যন্ত fallback দেখাবে
+    <Suspense fallback={<div className={styles.container}><div className={styles.loader}>Loading confirmation...</div></div>}>
+      <Confirmation />
     </Suspense>
   );
 }

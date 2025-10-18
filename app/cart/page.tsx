@@ -12,17 +12,6 @@ import Image from 'next/image';
 function CheckoutButton() {
     const { cartItems } = useCart();
 
-    const generateCheckoutUrl = () => {
-        if (cartItems.length === 0) return '#';
-        const itemsForUrl = cartItems.map(item => ({
-            id: item.databaseId,
-            quantity: item.quantity
-        }));
-        const cartJson = JSON.stringify(itemsForUrl);
-        const encodedCart = encodeURIComponent(cartJson);
-        return `https://gobikes.au/cart/?cart_items=${encodedCart}`;
-    };
-
     const handleCheckout = () => {
         if (cartItems.length > 0) {
             const gtmItems = cartItems.map(item => {
@@ -39,18 +28,15 @@ function CheckoutButton() {
     };
 
     return (
-        <a
-            href={generateCheckoutUrl()}
+        <Link 
+            href="/checkout" 
             className={styles.checkoutButton}
             onClick={handleCheckout}
         >
             Proceed to Checkout
-        </a>
+        </Link>
     );
 }
-// -----------------------------------------------------------
-
-
 export default function CartPage() {
   const { cartItems, updateQuantity, removeFromCart, loading } = useCart();
 
@@ -120,22 +106,17 @@ export default function CartPage() {
                 </div>
               ))}
             </div>
-
             <div className={styles.cartSummary}>
               <h2>Order Summary</h2>
               <div className={styles.summaryRow}>
                 <span>Subtotal</span>
                 <span>${subtotal.toFixed(2)}</span>
               </div>
-              
-              {/* --- কার্যকরী সমাধান: নতুন CheckoutButton কম্পוננטটি এখানে ব্যবহার করা হয়েছে --- */}
               <CheckoutButton />
-              {/* ---------------------------------------------------------------------- */}
             </div>
           </div>
         </>
       )}
-
       <CartCrossSell />
     </div>
     </>

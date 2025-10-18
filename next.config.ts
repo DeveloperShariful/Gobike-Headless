@@ -35,6 +35,16 @@ const nextConfig = {
         hostname: 'i.ytimg.com',
         pathname: '/**', // <-- समाधान: pathname যোগ করা হয়েছে
       },
+      {
+        protocol: 'https',
+        hostname: 'x.klarnacdn.net',
+        pathname: '/**', // Klarna-এর লোগোর জন্য
+      },
+      {
+        protocol: 'https',
+        hostname: 'static.afterpay.com',
+        pathname: '/**', // Afterpay-এর লোগোর জন্য
+      },
     ],
   },
   
