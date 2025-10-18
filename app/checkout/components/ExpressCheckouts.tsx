@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, ExpressCheckoutElement, useStripe } from '@stripe/react-stripe-js';
+import { Elements, ExpressCheckoutElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import styles from './PaymentMethods.module.css';
 import toast from 'react-hot-toast';
 
@@ -29,14 +29,31 @@ interface ExpressCheckoutsProps {
 
 const CheckoutForm = ({ onOrderPlace, clientSecret }: { onOrderPlace: ExpressCheckoutsProps['onOrderPlace'], clientSecret: string }) => {
   const stripe = useStripe();
+  const elements = useElements(); // এই লাইনটি যোগ করুন
 
   const onConfirm = async () => {
-    if (!stripe) {
+    // stripe অথবা elements লোড না হলে কিছুই করবেন না
+    if (!stripe || !elements) {
+      toast.error("Stripe.js has not loaded yet.");
       return;
     }
-    const { paymentIntent } = await stripe.retrievePaymentIntent(clientSecret);
 
-    if (paymentIntent && paymentIntent.status === 'succeeded') {
+    // retrievePaymentIntent এর পরিবর্তে confirmPayment ব্যবহার করুন
+    const { error, paymentIntent } = await stripe.confirmPayment({
+      elements,
+      clientSecret,
+      confirmParams: {
+
+        return_url: `${window.location.origin}/order-success`,
+      },
+      redirect: 'if_required',
+    });
+
+    if (error) {
+      // যদি কোনো তাৎক্ষণিক এরর হয় (যেমন নেটওয়ার্ক সমস্যা)
+      toast.error(error.message || 'An unexpected error occurred.');
+    } else if (paymentIntent?.status === 'succeeded') {
+      // পেমেন্ট সফল হলে!
       toast.success('Payment Successful!');
 
       const stripeAddress = paymentIntent.shipping;
@@ -51,20 +68,21 @@ const CheckoutForm = ({ onOrderPlace, clientSecret }: { onOrderPlace: ExpressChe
         email: paymentIntent.receipt_email || '', 
       };
       
+      // আপনার সিস্টেমে অর্ডার তৈরি করার জন্য onOrderPlace কল করুন
       await onOrderPlace({ 
         transaction_id: paymentIntent.id,
         shippingAddress: shippingDetails 
       });
 
-    } else {
-      const errorMessage = paymentIntent?.last_payment_error?.message || 'Payment failed. Please try another method.';
+    } else if (paymentIntent) {
+      // যদি পেমেন্ট অন্য কোনো কারণে ফেইল হয়
+      const errorMessage = paymentIntent.last_payment_error?.message || 'Payment failed. Please try another method.';
       toast.error(errorMessage);
     }
   };
 
   return <ExpressCheckoutElement onConfirm={onConfirm} />;
 }
-
 export default function ExpressCheckouts({ total, onOrderPlace }: ExpressCheckoutsProps) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
