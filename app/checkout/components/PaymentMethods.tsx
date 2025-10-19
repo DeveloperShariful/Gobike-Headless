@@ -1,5 +1,3 @@
-//app/checkout/components/PaymentMethods.tsx
-
 'use client';
 import Image from 'next/image';
 import React, { useRef } from 'react';
@@ -44,9 +42,11 @@ interface PaymentMethodsProps {
   onPlaceOrder: (paymentData?: { 
     transaction_id?: string; 
     shippingAddress?: Partial<ShippingFormData>; 
-    redirect_needed?: boolean; 
+    redirect_needed?: boolean;
+    paymentMethodId?: string; // আগের সমাধান থেকে এটি এখানে রয়ে গেছে
   }) => Promise<{ orderId: number; orderKey: string } | void | null>;
   isPlacingOrder: boolean;
+  // ★★★ পরিবর্তন: isShippingSelected prop-টি এখানে যোগ করা হয়েছে ★★★
   isShippingSelected: boolean;
   total: number;
   customerInfo: CustomerInfo;
@@ -60,6 +60,7 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
     total, 
     onPlaceOrder, 
     isPlacingOrder, 
+    // ★★★ পরিবর্তন: isShippingSelected prop-টি এখানে Destructure করা হয়েছে ★★★
     isShippingSelected,
     customerInfo 
   } = props;
@@ -75,22 +76,16 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
     components: "buttons,messages,googlepay",
   };
 
-  // ★★★ চূড়ান্ত সংশোধিত getGatewayIcon ফাংশন (অরিজিনাল ব্র্যান্ড লোগো সহ) ★★★
   const getGatewayIcon = (id: string): React.ReactNode => {
-    // PayPal
     if (id.includes('ppcp-gateway')) {
       return <Image src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal" width={80} height={20} className={styles.gatewayIcon} unoptimized />;
     }
-    // Klarna
     if (id.includes('klarna')) {
       return <Image src="https://x.klarnacdn.net/payment-method/assets/badges/generic/klarna.svg" alt="Klarna" width={50} height={20} className={styles.gatewayIcon} />;
     }
-    // Afterpay
     if (id.includes('afterpay')) {
       return <Image src="https://static.afterpay.com/integration/logo-afterpay-colour.svg" alt="Afterpay" width={80} height={20} className={styles.gatewayIcon} unoptimized />;
     }
-    // Link
-    // Card
     if (id.includes('stripe')) {
       return (
         <span className={styles.cardIcons}>
@@ -109,7 +104,6 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
       onPlaceOrder();
     }
   };
-  //const isGooglePaySelected = selectedPaymentMethod === 'ppcp-google-pay';
 
   const isPayPalSelected = selectedPaymentMethod.includes('ppcp-gateway');
   const filteredGateways = gateways.filter(gateway => gateway.id !== 'stripe_link');
@@ -117,7 +111,8 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
   return (
     <PayPalScriptProvider options={initialOptions}>
       <div className={styles.paymentContainer}>
-      <ExpressCheckouts total={total} onOrderPlace={onPlaceOrder } />
+      {/* ★★★ পরিবর্তন: isShippingSelected prop-টি ExpressCheckouts-এ পাস করা হয়েছে ★★★ */}
+      <ExpressCheckouts total={total} onOrderPlace={onPlaceOrder } isShippingSelected={isShippingSelected} />
       <PayPalMessage total={total} />
       <div className={styles.gatewayList}>
         {filteredGateways.map(gateway => (
@@ -142,16 +137,15 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
       </div>
       <div className={styles.finalActionArea}>
         {isPayPalSelected ? (
-          // ★ যখন PayPal সিলেক্ট করা হবে, তখন PayPalPaymentGateway দেখানো হবে
           <div className={styles.paypalContainer}>
             <PayPalPaymentGateway
               total={total}
               isPlacingOrder={isPlacingOrder}
               onPlaceOrder={onPlaceOrder}
+              isShippingSelected={isShippingSelected}
             />
           </div>
         ) : (
-          // ★ অন্য কোনো পেমেন্ট পদ্ধতি সিলেক্ট করা থাকলে সাধারণ "Place Order" বাটন দেখানো হবে
           selectedPaymentMethod && (
             <button
               onClick={handlePlaceOrderClick}

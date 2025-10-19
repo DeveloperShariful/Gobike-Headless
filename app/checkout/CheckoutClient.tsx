@@ -1,5 +1,3 @@
-//app/checkout/components/CheckoutClient.tsx
-
 'use client';
 
 import { Elements } from '@stripe/react-stripe-js';
@@ -45,7 +43,6 @@ const REMOVE_COUPON_MUTATION = gql` mutation RemoveCoupons($input: RemoveCoupons
 const UPDATE_CUSTOMER_MUTATION = gql`mutation UpdateCustomerForCheckout($input: UpdateCustomerInput!) { updateCustomer(input: $input) { customer { id } } }`;
 const UPDATE_SHIPPING_METHOD_MUTATION = gql`mutation UpdateShippingMethod($input: UpdateShippingMethodInput!) { updateShippingMethod(input: $input) { cart { total } } }`;
 
-// ★ নতুন সংযোজন: GraphQL দিয়ে অর্ডার তৈরির জন্য Checkout মিউটেশন
 const CHECKOUT_MUTATION = gql`
   mutation Checkout($input: CheckoutInput!) {
     checkout(input: $input) {
@@ -73,7 +70,6 @@ type State = {
   loading: { cart: boolean; shipping: boolean; applyingCoupon: boolean; removingCoupon: boolean; order: boolean; }; 
 };
 
-// ★★★ পরিবর্তন: Action টাইপকে আরও সুনির্দিষ্ট করা হয়েছে ★★★
 type Action = 
   | { type: 'SET_CUSTOMER_INFO'; payload: Partial<ShippingFormData> }
   | { type: 'SET_SHIPPING_INFO'; payload: Partial<ShippingFormData> }
@@ -154,8 +150,6 @@ const getErrorMessage = (error: unknown): string => {
   return 'An unexpected error occurred.'; 
 };
 
-
-// ★★★ Stripe Context সহ মূল ক্লায়েন্ট কম্পোনেন্ট ★★★
 function CheckoutClientComponent({ paymentGateways }: { paymentGateways: PaymentGateway[] }) {
   const router = useRouter();
   const { cartItems, loading: isCartContextLoading, clearCart } = useCart();
@@ -168,14 +162,10 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
   const shippingInfoRef = useRef(shippingInfo);
   useEffect(() => { shippingInfoRef.current = shippingInfo; }, [shippingInfo]);
 
-  /*---
-  const stripe = useStripe();
-  const elements = useElements(); --*/
-
   const refetchCartData = useCallback(async () => { dispatch({ type: 'SET_LOADING', key: 'cart', payload: true }); try { const { data } = await client.query<{ cart: CartData }>({ query: GET_CHECKOUT_DATA, fetchPolicy: 'network-only' }); if (data?.cart) { dispatch({ type: 'SET_CHECKOUT_DATA', payload: { cart: data.cart } }); } } catch (err) {console.error("Error updating customer address:", err); toast.error('Could not refresh cart data.'); } finally { dispatch({ type: 'SET_LOADING', key: 'cart', payload: false }); } }, []);
   useEffect(() => { if (!isCartContextLoading && cartItems.length === 0) router.push('/cart'); else refetchCartData(); }, [isCartContextLoading, cartItems.length, router, refetchCartData]);
   const handleAddressChange = useCallback(async (address: Partial<ShippingFormData>) => { dispatch({ type: 'SET_CUSTOMER_INFO', payload: address }); if (!addressInputStarted) { dispatch({ type: 'SET_ADDRESS_INPUT_STARTED', payload: true });} const updatedCustomerInfo = { ...customerInfoRef.current, ...address }; if (updatedCustomerInfo.city && updatedCustomerInfo.postcode && updatedCustomerInfo.state) { dispatch({ type: 'SET_LOADING', key: 'shipping', payload: true }); try { await client.mutate({ mutation: UPDATE_CUSTOMER_MUTATION, variables: { input: { shipping: updatedCustomerInfo, billing: updatedCustomerInfo } } }); await refetchCartData(); } catch (err) {  console.error("Error refetching cart data:", err); toast.error('Could not calculate shipping.'); } finally { dispatch({ type: 'SET_LOADING', key: 'shipping', payload: false }); } } }, [addressInputStarted, refetchCartData]);
-  const handleApplyCoupon = async (couponCode: string) => { dispatch({ type: 'SET_LOADING', key: 'applyingCoupon', payload: true }); toast.loading('Applying coupon...'); try { await client.mutate({ mutation: APPLY_COUPON_MUTATION, variables: { input: { code: couponCode } } }); await refetchCartData(); toast.dismiss(); toast.success('Coupon applied!'); } catch (error) { toast.dismiss(); toast.error(getErrorMessage(error)); } finally { dispatch({ type: 'SET_LOADING', key: 'applyingCoupon', payload: false }); } };
+  const handleApplyCoupon = async (couponCode: string) => { if (cartData?.appliedCoupons && cartData.appliedCoupons.length > 0) { toast.error("Only one coupon can be applied per order."); return; } dispatch({ type: 'SET_LOADING', key: 'applyingCoupon', payload: true }); toast.loading('Applying coupon...'); try { await client.mutate({ mutation: APPLY_COUPON_MUTATION, variables: { input: { code: couponCode } } }); await refetchCartData(); toast.dismiss(); toast.success('Coupon applied!'); } catch (error) { toast.dismiss(); toast.error(getErrorMessage(error)); } finally { dispatch({ type: 'SET_LOADING', key: 'applyingCoupon', payload: false }); } };
   const handleRemoveCoupon = async (couponCode: string) => { if (loading.removingCoupon) return; dispatch({ type: 'SET_LOADING', key: 'removingCoupon', payload: true }); toast.loading('Removing coupon...'); try { await client.mutate({ mutation: REMOVE_COUPON_MUTATION, variables: { input: { codes: [couponCode] } } }); await refetchCartData(); toast.dismiss(); toast.success('Coupon removed.'); } catch (error) { toast.dismiss(); toast.error(getErrorMessage(error)); } finally { dispatch({ type: 'SET_LOADING', key: 'removingCoupon', payload: false }); } };
   const handleShippingSelect = (rateId: string) => {  dispatch({ type: 'SET_SELECTED_SHIPPING', payload: rateId }); const selectedRate = shippingRates.find(rate => rate.id === rateId); if (cartData && selectedRate) { const subtotal = parseFloat(cartData.subtotal.replace(/[^0-9.]/g, '')) || 0; const discount = parseFloat(cartData.discountTotal.replace(/[^0-9.]/g, '')) || 0; const shippingCost = parseFloat(selectedRate.cost) || 0; const newTotal = (subtotal - discount) + shippingCost; dispatch({ type: 'UPDATE_TOTALS', payload: { shippingTotal: `$${shippingCost.toFixed(2)}`, total: `$${newTotal.toFixed(2)}` } }); } client.mutate({ mutation: UPDATE_SHIPPING_METHOD_MUTATION, variables: { input: { shippingMethods: [rateId] } }, }).catch(err => { console.error("Failed to sync shipping method with server:", err); toast.error("Could not save shipping preference."); }); };
   
@@ -183,10 +173,12 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
     dispatch({ type: 'SET_SHIPPING_INFO', payload: address });
   }, []);
 
+// ★★★ পরিবর্তন: paymentData অবজেক্টে paymentMethodId যোগ করা হয়েছে ★★★
 const handlePlaceOrder = async (paymentData?: { 
     transaction_id?: string; 
     shippingAddress?: Partial<ShippingFormData>; 
     redirect_needed?: boolean;
+    paymentMethodId?: string;
   }) => {
     
     const isExpressCheckout = !!paymentData?.shippingAddress;
@@ -207,13 +199,8 @@ const handlePlaceOrder = async (paymentData?: {
 
     const isRedirectMethodByStripeGateway = selectedPaymentMethod === 'stripe_klarna' || selectedPaymentMethod === 'stripe_afterpay_clearpay';
 
-    // ★★★ কেস ১: Klarna/Afterpay (এবং অন্যান্য Redirect) - REST API ব্যবহার করে অর্ডার তৈরি ★★★
-    // (এখানে redirect_needed চেক করা হচ্ছে, যা StripePaymentGateway থেকে আসবে)
     if (paymentData?.redirect_needed && isRedirectMethodByStripeGateway) {
-        // StripePaymentGateway এখন শুধুমাত্র একটি সিগন্যাল পাঠাবে, অর্ডার তৈরির মূল লজিক এখানেই থাকবে।
-        // যেহেতু এটি একটি redirect ফ্লো, onPlaceOrder একটি Promise রিটার্ন করবে যা StripePaymentGateway ব্যবহার করবে।
         try {
-            // REST API-এর জন্য ডেটা প্রস্তুত করার আগে ভ্যালিডেশন
             if (!cartData) {
                 throw new Error("Cart data is not available.");
             }
@@ -279,7 +266,6 @@ const handlePlaceOrder = async (paymentData?: {
             
             const newOrder = await response.json();
             
-            // ★★★ StripePaymentGateway-কে অর্ডার আইডি এবং কী রিটার্ন করুন ★★★
             if (newOrder.id && newOrder.order_key) {
                 return { orderId: newOrder.id, orderKey: newOrder.order_key };
             } else {
@@ -290,11 +276,10 @@ const handlePlaceOrder = async (paymentData?: {
             toast.dismiss();
             toast.error(getErrorMessage(error));
             dispatch({ type: 'SET_LOADING', key: 'order', payload: false });
-            return null; // ব্যর্থ হলে null রিটার্ন করুন
+            return null;
         }
     }
     
-    // ★★★ কেস ২: Card/PayPal/GPay ইত্যাদি - বিদ্যমান GraphQL মিউটেশন ব্যবহার ★★★
     else {
       try {
         const billingDetails = paymentData?.shippingAddress && paymentData.shippingAddress.address1
@@ -312,11 +297,12 @@ const handlePlaceOrder = async (paymentData?: {
         
         const shippingDetails = shipToDifferentAddress ? shippingInfoRef.current : billingDetails;
     
+        // ★★★ পরিবর্তন: এখানে শর্তসাপেক্ষ লজিক ব্যবহার করে সঠিক paymentMethod নির্ধারণ করা হচ্ছে ★★★
         const mutationInput = {
           clientMutationId: `checkout-${Date.now()}`,
           billing: billingDetails,
           shipping: shippingDetails,
-          paymentMethod: selectedPaymentMethod,
+          paymentMethod: paymentData?.paymentMethodId || selectedPaymentMethod,
           shippingMethod: selectedShipping,
           customerNote: orderNotes,
           transactionId: paymentData?.transaction_id || '',
@@ -341,6 +327,32 @@ const handlePlaceOrder = async (paymentData?: {
         if (result.success && result.order?.id) {
             toast.dismiss();
             toast.success('Order placed successfully!');
+            if (mutationInput.transactionId) {
+              const queryResponse = mutationInput.transactionId.startsWith('pi_')
+                ? null
+                : await client.query<
+                    { order: { transactionId: string | null } | null }
+                  >({ 
+                    query: gql`query GetOrder($id: ID!) { order(id: $id, idType: DATABASE_ID) { transactionId } }`,
+                    variables: { id: result.order.id }
+                  });
+              
+              // ★★★ পরিবর্তন: এখানে Optional Chaining (`?.`) ব্যবহার করা হয়েছে ★★★
+              const paymentIntentId = mutationInput.transactionId.startsWith('pi_')
+                ? mutationInput.transactionId
+                : queryResponse?.data?.order?.transactionId;
+
+              if (paymentIntentId && paymentIntentId.startsWith('pi_')) {
+                fetch('/api/update-payment-intent', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    paymentIntentId: paymentIntentId,
+                    orderId: result.order.id,
+                  }),
+                }).catch(err => console.error("Failed to update payment intent description:", err));
+              }
+            }
             router.push(`/order-success?order_id=${result.order.id}&key=${result.order.orderKey}`);
             if (typeof clearCart === 'function') await clearCart();
         } else {
@@ -356,13 +368,13 @@ const handlePlaceOrder = async (paymentData?: {
     }
   };
   const total = cartData?.total ? parseFloat(cartData.total.replace(/[^0-9.]/g, '')) : 0;
+  const isShippingSelected = !!selectedShipping;
   if (loading.cart && !cartData) { return ( <div className={styles.pageLoader}><h1 className={styles.loaderTitle}>Checkout</h1></div> ); }
 
   return (
     <div className={styles.checkoutLayout}>
       <div className={styles.leftColumn}>
         <ShippingForm
-            // ★★★ পরিবর্তন: শিরোনামটি এখন শর্তসাপেক্ষ (Conditional) ★★★
             title={shipToDifferentAddress ? "Billing Details" : "Billing & Shipping Details"}
             onAddressChange={handleAddressChange}
             defaultValues={customerInfo}
@@ -413,7 +425,7 @@ const handlePlaceOrder = async (paymentData?: {
           onPlaceOrder={handlePlaceOrder} 
           isPlacingOrder={loading.order} 
           total={total} 
-          isShippingSelected={!!selectedShipping} 
+          isShippingSelected={isShippingSelected} 
           customerInfo={customerInfoRef.current}
         />
       </div>
@@ -421,7 +433,6 @@ const handlePlaceOrder = async (paymentData?: {
   );
 }
 
-// ★★★ Stripe Elements Provider দিয়ে মূল কম্পোনেন্টকে র‍্যাপ করা ★★★
 export default function CheckoutClient(props: { paymentGateways: PaymentGateway[] }) {
     const [stripePromise] = useState(() => 
         process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 

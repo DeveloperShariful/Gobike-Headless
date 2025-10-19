@@ -35,6 +35,7 @@ interface StripePaymentGatewayProps {
     transaction_id?: string;
     shippingAddress?: Partial<ShippingFormData>; 
     redirect_needed?: boolean;
+    paymentMethodId?: string;
   }) => Promise<{ orderId: number, orderKey: string } | void | null>;
   customerInfo: CustomerInfo;
   total: number;
@@ -90,7 +91,8 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
             body: JSON.stringify({
               amount: Math.round(total * 100),
               payment_method_types: [paymentMethodType],
-              metadata: { order_id: orderDetails.orderId }
+              metadata: { order_id: orderDetails.orderId },
+              orderId: orderDetails.orderId 
             }),
           });
           const { clientSecret: redirectClientSecret, error: piError } = await res.json();

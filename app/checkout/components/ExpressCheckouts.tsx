@@ -23,37 +23,35 @@ interface ExpressCheckoutsProps {
   total: number;
   onOrderPlace: (paymentData: { 
     transaction_id: string; 
-    shippingAddress?: Partial<ShippingFormData>; 
-  }) => Promise<{ orderId: number; orderKey: string } | void | null>; 
+    shippingAddress?: Partial<ShippingFormData>;
+    paymentMethodId?: string; // আগের সমাধান থেকে এটি এখানে রয়ে গেছে
+  }) => Promise<{ orderId: number; orderKey: string } | void | null>;
+  // ★★★ পরিবর্তন: isShippingSelected prop-টি এখানে যোগ করা হয়েছে ★★★
+  isShippingSelected: boolean;
 }
 
 const CheckoutForm = ({ onOrderPlace, clientSecret }: { onOrderPlace: ExpressCheckoutsProps['onOrderPlace'], clientSecret: string }) => {
   const stripe = useStripe();
-  const elements = useElements(); // এই লাইনটি যোগ করুন
+  const elements = useElements();
 
   const onConfirm = async () => {
-    // stripe অথবা elements লোড না হলে কিছুই করবেন না
     if (!stripe || !elements) {
       toast.error("Stripe.js has not loaded yet.");
       return;
     }
 
-    // retrievePaymentIntent এর পরিবর্তে confirmPayment ব্যবহার করুন
     const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       clientSecret,
       confirmParams: {
-
         return_url: `${window.location.origin}/order-success`,
       },
       redirect: 'if_required',
     });
 
     if (error) {
-      // যদি কোনো তাৎক্ষণিক এরর হয় (যেমন নেটওয়ার্ক সমস্যা)
       toast.error(error.message || 'An unexpected error occurred.');
     } else if (paymentIntent?.status === 'succeeded') {
-      // পেমেন্ট সফল হলে!
       toast.success('Payment Successful!');
 
       const stripeAddress = paymentIntent.shipping;
@@ -68,14 +66,13 @@ const CheckoutForm = ({ onOrderPlace, clientSecret }: { onOrderPlace: ExpressChe
         email: paymentIntent.receipt_email || '', 
       };
       
-      // আপনার সিস্টেমে অর্ডার তৈরি করার জন্য onOrderPlace কল করুন
       await onOrderPlace({ 
         transaction_id: paymentIntent.id,
-        shippingAddress: shippingDetails 
+        shippingAddress: shippingDetails,
+        paymentMethodId: 'stripe'
       });
 
     } else if (paymentIntent) {
-      // যদি পেমেন্ট অন্য কোনো কারণে ফেইল হয়
       const errorMessage = paymentIntent.last_payment_error?.message || 'Payment failed. Please try another method.';
       toast.error(errorMessage);
     }
@@ -83,10 +80,10 @@ const CheckoutForm = ({ onOrderPlace, clientSecret }: { onOrderPlace: ExpressChe
 
   return <ExpressCheckoutElement onConfirm={onConfirm} />;
 }
-export default function ExpressCheckouts({ total, onOrderPlace }: ExpressCheckoutsProps) {
+// ★★★ পরিবর্তন: isShippingSelected prop-টি এখানে Destructure করা হয়েছে ★★★
+export default function ExpressCheckouts({ total, onOrderPlace, isShippingSelected }: ExpressCheckoutsProps) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
-
   const [remountKey, setRemountKey] = useState(0);
 
   useEffect(() => {
@@ -104,7 +101,6 @@ export default function ExpressCheckouts({ total, onOrderPlace }: ExpressCheckou
           if (data.clientSecret) {
             setClientSecret(data.clientSecret);
             setPaymentIntentId(data.clientSecret.split('_secret_')[0]);
-
             setRemountKey(prevKey => prevKey + 1);
           }
         } catch (error) {
@@ -132,7 +128,6 @@ export default function ExpressCheckouts({ total, onOrderPlace }: ExpressCheckou
     return <div className={styles.expressCheckoutLoader}></div>;
   }
 
-  // 👇 START: পরিবর্তন এখানে করা হয়েছে
   const options = {
     clientSecret,
     paymentMethods: {
@@ -140,11 +135,24 @@ export default function ExpressCheckouts({ total, onOrderPlace }: ExpressCheckou
       applePay: 'always',
     },
   };
-  // 👆 END: পরিবর্তন শেষ
 
   return (
-    <div className={styles.expressCheckoutContainer}>
-      {/* 👇 options অবজেক্টটি এখানে পাস করা হয়েছে */}
+    // ★★★ পরিবর্তন: এখানে একটি Relative কন্টেইনার এবং শর্তসাপেক্ষ Overlay যোগ করা হয়েছে ★★★
+    <div className={styles.expressCheckoutContainer} style={{ position: 'relative' }}>
+      {!isShippingSelected && (
+        <div
+          onClick={() => toast.error('Please select a shipping option first.')}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            zIndex: 10,
+            cursor: 'not-allowed',
+          }}
+        />
+      )}
       <Elements key={remountKey} options={options} stripe={stripePromise}>
         <CheckoutForm onOrderPlace={onOrderPlace} clientSecret={clientSecret} />
       </Elements>
