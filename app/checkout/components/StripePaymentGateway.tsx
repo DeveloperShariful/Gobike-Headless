@@ -1,5 +1,3 @@
-// app/checkout/components/StripePaymentGateway.tsx
-
 import React, { useState, forwardRef, useEffect } from 'react';
 import Image from 'next/image';
 import { loadStripe } from '@stripe/stripe-js';
@@ -31,11 +29,13 @@ interface ShippingFormData {
 
 interface StripePaymentGatewayProps {
   selectedPaymentMethod: string;
+  // ★★★ পরিবর্তন: onPlaceOrder এর টাইপ-এ 'is_embedded_redirect' যোগ করা হয়েছে ★★★
   onPlaceOrder: (paymentData?: { 
     transaction_id?: string;
     shippingAddress?: Partial<ShippingFormData>; 
     redirect_needed?: boolean;
     paymentMethodId?: string;
+    is_embedded_redirect?: boolean;
   }) => Promise<{ orderId: number, orderKey: string } | void | null>;
   customerInfo: CustomerInfo;
   total: number;
@@ -48,7 +48,6 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
     const [isProcessing, setIsProcessing] = useState(false);
     const [internalStripeMethod, setInternalStripeMethod] = useState<string>('card');
 
-    // ★★★ কোড আপডেট করা হয়েছে ★★★
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       if (isProcessing || !stripe || !elements) return;
@@ -69,22 +68,24 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
           }
       };
 
-      // --- চূড়ান্ত সিদ্ধান্ত গ্রহণকারী লজিক ---
       const isStandaloneRedirect = selectedPaymentMethod === 'stripe_klarna' || selectedPaymentMethod === 'stripe_afterpay_clearpay';
       const isRedirectFromElement = selectedPaymentMethod === 'stripe' && (internalStripeMethod === 'klarna' || internalStripeMethod === 'afterpay_clearpay');
       const isRedirectFlow = isStandaloneRedirect || isRedirectFromElement;
 
-      // ★★★ পথ ১: Redirect ফ্লো (Klarna/Afterpay - উভয় উৎস থেকে) ★★★
       if (isRedirectFlow) {
         try {
-          // ধাপ ১: REST API দিয়ে পেন্ডিং অর্ডার তৈরি করুন
-          const orderDetails = await onPlaceOrder({ redirect_needed: true });
+          // ★★★ পরিবর্তন: onPlaceOrder কল করার সময় শর্তসাপেক্ষে is_embedded_redirect পাঠানো হচ্ছে ★★★
+          const orderDetails = await onPlaceOrder({ 
+            redirect_needed: true,
+            is_embedded_redirect: isRedirectFromElement // <-- শুধুমাত্র PaymentElement এর ভেতরের ফ্লো-এর জন্য true হবে
+          });
+
           if (!orderDetails || !orderDetails.orderId || !orderDetails.orderKey) {
             throw new Error("Could not create a pending order.");
           }
 
-          // ধাপ ২: Payment Intent তৈরি করুন
           const paymentMethodType = isStandaloneRedirect ? selectedPaymentMethod.replace('stripe_', '') : internalStripeMethod;
+          
           const res = await fetch('/api/create-payment-intent', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -92,13 +93,12 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
               amount: Math.round(total * 100),
               payment_method_types: [paymentMethodType],
               metadata: { order_id: orderDetails.orderId },
-              orderId: orderDetails.orderId 
+              orderId: orderDetails.orderId
             }),
           });
           const { clientSecret: redirectClientSecret, error: piError } = await res.json();
           if (piError) { throw new Error(piError.message || "Could not create payment intent."); }
 
-          // ধাপ ৩: Redirect করুন
           const returnUrl = `${window.location.origin}/order-confirmation?order_id=${orderDetails.orderId}&key=${orderDetails.orderKey}`;
           let confirmationResult;
 
@@ -117,16 +117,14 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
           if (confirmationResult?.error) {
             throw new Error(confirmationResult.error.message);
           }
-          // সফল রিডাইরেক্টের পর এখানে কোড এক্সিকিউট হবে না, তাই isProcessing রিসেট করার দরকার নেই।
           
-        } catch (error: unknown) { // ধাপ ১: টাইপকে unknown হিসেবে ঘোষণা করুন
+        } catch (error: unknown) {
           toast.dismiss();
   
           let errorMessage = "An unexpected error occurred.";
 
-          // ধাপ ২: error আসলেই একটি Error অবজেক্ট কিনা তা পরীক্ষা করুন
           if (error instanceof Error) {
-            errorMessage = error.message; // এখন error.message ব্যবহার করা নিরাপদ
+            errorMessage = error.message;
           }
   
           toast.error(errorMessage);
@@ -134,13 +132,12 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
         }
       } 
       
-      // ★★★ পথ ২: Direct Payment ফ্লো (Card, Link, GPay, Zip ইত্যাদি) ★★★
       else if (selectedPaymentMethod === 'stripe') {
         if (!clientSecret) {
           toast.dismiss();
           toast.error("Could not initialize payment. Please try again.");
           setIsProcessing(false);
-          return; // clientSecret না থাকলে এখানেই শেষ
+          return;
         }
 
         const { error: submitError } = await elements.submit();
@@ -165,12 +162,11 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
           toast.error(error.message || "An unexpected error occurred.");
         } else if (paymentIntent?.status === 'succeeded') {
           toast.success('Payment confirmed!');
-          await onPlaceOrder({ transaction_id: paymentIntent.id });
+          await onPlaceOrder({ transaction_id: paymentIntent.id, paymentMethodId: 'stripe' });
         }
         setIsProcessing(false);
       }
       
-      // ★★★ যদি কোনো সমর্থিত মেথড না হয় ★★★
       else {
         toast.dismiss();
         toast.error("This payment method is not configured correctly.");
@@ -236,7 +232,6 @@ const StripePaymentGateway = forwardRef<HTMLFormElement, StripePaymentGatewayPro
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     amount: Math.round(props.total * 100),
-                    
                 })
             })
             .then(res => res.json())

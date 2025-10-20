@@ -179,6 +179,7 @@ const handlePlaceOrder = async (paymentData?: {
     shippingAddress?: Partial<ShippingFormData>; 
     redirect_needed?: boolean;
     paymentMethodId?: string;
+    is_embedded_redirect?: boolean;
   }) => {
     
     const isExpressCheckout = !!paymentData?.shippingAddress;
@@ -197,9 +198,10 @@ const handlePlaceOrder = async (paymentData?: {
   
     dispatch({ type: 'SET_LOADING', key: 'order', payload: true });
 
-    const isRedirectMethodByStripeGateway = selectedPaymentMethod === 'stripe_klarna' || selectedPaymentMethod === 'stripe_afterpay_clearpay';
+    const isStandaloneRedirect = selectedPaymentMethod === 'stripe_klarna' || selectedPaymentMethod === 'stripe_afterpay_clearpay';
+    const isEmbeddedRedirect = paymentData?.is_embedded_redirect === true;
 
-    if (paymentData?.redirect_needed && isRedirectMethodByStripeGateway) {
+    if (paymentData?.redirect_needed && (isStandaloneRedirect || isEmbeddedRedirect)) {
         try {
             if (!cartData) {
                 throw new Error("Cart data is not available.");
@@ -211,8 +213,8 @@ const handlePlaceOrder = async (paymentData?: {
             if (!selectedRate) { throw new Error("Selected shipping rate not found."); }
 
             const getPaymentMethodTitle = (methodId: string): string => {
-              if (methodId === 'stripe_klarna') return 'Klarna';
-              if (methodId === 'stripe_afterpay_clearpay') return 'Afterpay';
+              if (methodId.includes('klarna')) return 'Klarna';
+              if (methodId.includes('afterpay_clearpay')) return 'Afterpay';
               return 'Redirect Payment';
             };
 

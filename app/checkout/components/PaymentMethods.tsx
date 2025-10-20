@@ -60,7 +60,6 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
     total, 
     onPlaceOrder, 
     isPlacingOrder, 
-    // ★★★ পরিবর্তন: isShippingSelected prop-টি এখানে Destructure করা হয়েছে ★★★
     isShippingSelected,
     customerInfo 
   } = props;
@@ -106,7 +105,15 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
   };
 
   const isPayPalSelected = selectedPaymentMethod.includes('ppcp-gateway');
-  const filteredGateways = gateways.filter(gateway => gateway.id !== 'stripe_link');
+  const availableGateways = gateways.filter(gateway => {
+    if (gateway.id === 'stripe_link') {
+      return false;
+    }
+    if (gateway.id.includes('afterpay_clearpay') && total > 2000) {
+      return false;
+    }
+    return true;
+  });
 
   return (
     <PayPalScriptProvider options={initialOptions}>
@@ -115,7 +122,7 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
       <ExpressCheckouts total={total} onOrderPlace={onPlaceOrder } isShippingSelected={isShippingSelected} />
       <PayPalMessage total={total} />
       <div className={styles.gatewayList}>
-        {filteredGateways.map(gateway => (
+        {availableGateways.map(gateway => (
           <div key={gateway.id} className={styles.gatewayWrapper}>
             <div className={styles.gatewayOption} onClick={() => onPaymentMethodChange(gateway.id)}>
               <input type="radio" id={gateway.id} name="payment_method" value={gateway.id} checked={selectedPaymentMethod === gateway.id} readOnly />
