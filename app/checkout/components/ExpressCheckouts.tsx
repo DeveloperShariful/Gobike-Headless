@@ -134,6 +134,11 @@ export default function ExpressCheckouts({ total, onOrderPlace, isShippingSelect
       googlePay: 'always',
       applePay: 'always',
     },
+    layout: {
+      wallets: {
+        layout: 'grid', 
+      },
+    },
   };
 
   return (
