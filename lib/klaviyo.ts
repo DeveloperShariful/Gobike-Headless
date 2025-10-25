@@ -1,3 +1,4 @@
+// lib/klaviyo.ts
 // --- টাইপ ডেফিনিশন ---
 type KlaviyoItem = {
     ProductID: string | number;
@@ -71,3 +72,39 @@ export const klaviyoTrackAddedToCart = (cart: {
         }
     }]);
 }
+// lib/klaviyo.ts
+
+// ... আপনার বিদ্যমান কোড এবং interface ...
+
+/**
+ * Placed Order ইভেন্ট ট্র্যাক করে।
+ */
+export const klaviyoTrackPlacedOrder = (order: {
+  order_id: string;
+  value: number;
+  item_names: string[];
+  checkout_url: string;
+  items: KlaviyoItem[];
+}) => {
+  window._learnq = window._learnq || [];
+
+  const eventData = {
+    '$event_id': order.order_id, // ডুপ্লিকেট অর্ডার এড়ানোর জন্য
+    '$value': order.value,
+    'ItemNames': order.item_names,
+    'CheckoutURL': order.checkout_url,
+    'Items': order.items,
+  };
+
+  window._learnq.push(['track', 'Placed Order', eventData]);
+
+  // প্রতিটি কেনা প্রোডাক্টের জন্য আলাদা 'Ordered Product' ইভেন্ট পাঠানো
+  order.items.forEach(item => {
+    const itemEventData = {
+      '$event_id': `${order.order_id}-${item.ProductID}`, // ডুপ্লিকেট এড়ানোর জন্য
+      '$value': item.RowTotal,
+      ...item // KlaviyoItem-এর সমস্ত প্রপার্টি যোগ করা হচ্ছে
+    };
+    window._learnq.push(['track', 'Ordered Product', itemEventData]);
+  });
+};

@@ -1,3 +1,5 @@
+//app/cart/page.tsx
+
 "use client";
 import Breadcrumbs from '../../components/Breadcrumbs';
 import { useCart } from '../../context/CartContext';
@@ -8,7 +10,6 @@ import { gtmViewCart, gtmBeginCheckout } from '../../lib/gtm';
 import { useEffect } from 'react'; // <-- useEffect ইম্পোর্ট করা হয়েছে
 import Image from 'next/image';
 
-// --- কার্যকরী সমাধান: একটি নতুন ক্লায়েন্ট কম্পוננט তৈরি করা হয়েছে ---
 function CheckoutButton() {
     const { cartItems } = useCart();
 

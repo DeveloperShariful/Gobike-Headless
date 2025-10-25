@@ -6,22 +6,30 @@ import { useCart } from '../../context/CartContext';
 import styles from './OrderSuccessClient.module.css';
 import Image from 'next/image';
 import Link from 'next/link';
+// --- ★★★ পরিবর্তন: GTM এবং Klaviyo ফাংশন ইম্পোর্ট করা হচ্ছে ★★★ ---
+import { gtmPurchase } from '../../lib/gtm';
+import { klaviyoIdentify, klaviyoTrackPlacedOrder } from '../../lib/klaviyo';
 
 // ====================================================================
-// TypeScript ইন্টারফেস (API রেসপন্স অনুযায়ী আপডেট করা)
+// TypeScript ইন্টারফেস (ট্র্যাকিংয়ের জন্য প্রয়োজনীয় ডেটা সহ আপডেট করা হয়েছে)
 // ====================================================================
+interface OrderItemNode {
+  databaseId: number;
+  slug: string;
+  name: string;
+  image: {
+    sourceUrl: string | null;
+  } | null;
+}
+
 interface OrderItem {
   product: {
-    node: {
-      name: string;
-      image: {
-        sourceUrl: string | null;
-      } | null;
-    };
+    node: OrderItemNode;
   };
   quantity: number;
   total: string;
 }
+
 interface Address {
   firstName: string | null;
   lastName: string | null;
@@ -34,10 +42,13 @@ interface Address {
   email?: string | null;
   phone?: string | null;
 }
+
 interface OrderData {
   databaseId: number;
   date: string;
   total: string;
+  shippingTotal: string | null; // <-- শিপিং খরচ
+  discountTotal: string | null; // <-- ডিসকাউন্ট
   status: string;
   paymentMethodTitle: string;
   lineItems: {
@@ -45,14 +56,22 @@ interface OrderData {
   };
   billing: Address;
   shipping: Address;
-  customerNote: string | null; // <-- অর্ডার নোটের জন্য
+  customerNote: string | null;
+  // WooCommerce থেকে এই ডেটা API রেসপন্সে যোগ করতে হতে পারে
+  appliedCoupons?: {
+    nodes: { code: string }[];
+  } | null;
 }
+// ====================================================================
 
 export default function OrderSuccessClient({ orderId, orderKey }: { orderId: string; orderKey: string; }) {
   const { clearCart } = useCart();
   const [order, setOrder] = useState<OrderData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // --- ★★★ পরিবর্তন: ডুপ্লিকেট ট্র্যাকিং প্রতিরোধের জন্য স্টেট ★★★ ---
+  const [trackingFired, setTrackingFired] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -92,6 +111,66 @@ export default function OrderSuccessClient({ orderId, orderKey }: { orderId: str
     
     return () => { isMounted = false; };
   }, [orderId, orderKey, clearCart]);
+
+  // --- ★★★ পরিবর্তন: GTM এবং Klaviyo ট্র্যাকিংয়ের জন্য নতুন useEffect ★★★ ---
+  useEffect(() => {
+    // শর্ত: অর্ডার ডেটা থাকতে হবে এবং ট্র্যাকিং আগে হয়নি
+    if (order && !trackingFired) {
+      // Helper ফাংশন: প্রাইস স্ট্রিং থেকে নম্বর বের করার জন্য
+      const parsePrice = (priceStr: string | null | undefined): number => {
+        if (!priceStr) return 0;
+        return parseFloat(priceStr.replace(/[^0-9.]/g, ''));
+      };
+
+      // Klaviyo-তে ব্যবহারকারীকে শনাক্ত করা হচ্ছে
+      if (order.billing.email) {
+        klaviyoIdentify({
+          email: order.billing.email,
+          first_name: order.billing.firstName || '',
+          last_name: order.billing.lastName || '',
+        });
+      }
+
+      // GTM 'purchase' ইভেন্টের জন্য আইটেম তালিকা প্রস্তুত করা হচ্ছে
+      const gtmItems = order.lineItems.nodes.map(item => ({
+        item_name: item.product.node.name,
+        item_id: item.product.node.databaseId,
+        price: parsePrice(item.total) / item.quantity, // প্রতি আইটেমের মূল্য
+        quantity: item.quantity,
+      }));
+
+      // GTM 'purchase' ইভেন্ট পাঠানো হচ্ছে
+      gtmPurchase({
+        transaction_id: order.databaseId.toString(),
+        value: parsePrice(order.total),
+        tax: 0, // আপনার ট্যাক্স ডেটা থাকলে এখানে যোগ করুন
+        shipping: parsePrice(order.shippingTotal),
+        currency: 'AUD',
+        coupon: order.appliedCoupons?.nodes[0]?.code || '',
+        items: gtmItems,
+      });
+
+      // Klaviyo 'Placed Order' ইভেন্ট পাঠানো হচ্ছে
+      klaviyoTrackPlacedOrder({
+        order_id: order.databaseId.toString(),
+        value: parsePrice(order.total),
+        item_names: order.lineItems.nodes.map(item => item.product.node.name),
+        checkout_url: window.location.href,
+        items: order.lineItems.nodes.map(item => ({
+          ProductID: item.product.node.databaseId,
+          ProductName: item.product.node.name,
+          Quantity: item.quantity,
+          ItemPrice: parsePrice(item.total) / item.quantity,
+          RowTotal: parsePrice(item.total),
+          ProductURL: `${window.location.origin}/product/${item.product.node.slug}`,
+          ImageURL: item.product.node.image?.sourceUrl || '',
+        })),
+      });
+
+      // স্টেট আপডেট করে দেওয়া হচ্ছে যাতে এই ইভেন্ট আর না পাঠানো হয়
+      setTrackingFired(true);
+    }
+  }, [order, trackingFired]); // এই useEffect-টি order বা trackingFired পরিবর্তন হলে রান হবে
 
   if (loading) { return <div className={styles.loader}>Loading your order details...</div>; }
   if (error) { return <div className={styles.error}>{error}</div>; }

@@ -1,10 +1,11 @@
+//app/layout.tsx
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import DelayedScripts from '../components/DelayedScripts';
-import { ClientProviders } from "./providers"; // <-- নতুন Provider কম্পোনেন্টটি import করা হয়েছে
+import { ClientProviders } from "./providers";
 
 // --- ফন্ট কনফিগারেশন ---
 const geistSans = Geist({
@@ -19,7 +20,6 @@ const geistMono = Geist_Mono({
 
 // --- SEO: মেটাডেটা অবজেক্ট ---
 export const metadata: Metadata = {
-  // metadataBase ব্যবহার করা হয়েছে যাতে সব URL স্বয়ংক্রিয়ভাবে সঠিক হয়
   metadataBase: new URL('https://gobike.au'),
   
   title: {
@@ -31,11 +31,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'GoBike - Kids Electric Bikes Australia',
     description: "Australia's top-rated electric balance bikes for kids.",
-    url: '/', // metadataBase থাকার কারণে শুধু '/' দিলেই হবে
+    url: '/',
     siteName: 'GoBike Australia',
     images: [
       {
-        url: '/og-image.png', // স্বয়ংক্রিয়ভাবে https://gobike.au/og-image.png হবে
+        url: '/', 
         width: 1200,
         height: 630,
         alt: 'A child riding a GoBike electric bike.',
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'GoBike - Kids Electric Bikes Australia',
     description: "Australia's top-rated electric balance bikes for kids.",
-    images: ['/og-image.png'], // স্বয়ংক্রিয়ভাবে https://gobike.au/og-image.png হবে
+    images: ['/'], 
   },
 
   keywords: ['kids electric bike','kids ebike', 'electric bike','electric bike for kids','electric balance bike', 'ebike for kids', 'GoBike','childrens electric motorbike','toddler electric bike','buy kids ebike online','GoBike Australia'],
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
   },
   
   alternates: {
-    canonical: '/', // এটি প্রতিটি পেজে আলাদাভাবে override করা হবে
+    canonical: '/', 
   },
 };
 

@@ -1,3 +1,4 @@
+//app/bikes/page.tsx
 import { gql } from '@apollo/client';
 import Link from 'next/link';
 import Image from 'next/image';

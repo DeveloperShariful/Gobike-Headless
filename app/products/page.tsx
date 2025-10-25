@@ -1,3 +1,5 @@
+//app/products/page.tsx
+
 import { gql } from '@apollo/client';
 import type { Metadata } from 'next';
 

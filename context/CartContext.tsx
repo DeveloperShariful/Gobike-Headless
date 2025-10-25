@@ -1,3 +1,4 @@
+//context/CartContext.tsx
 "use client";
 
 import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback } from 'react';
@@ -21,7 +22,10 @@ const ADD_TO_CART_MUTATION = gql`
 const UPDATE_CART_ITEM_QUANTITIES_MUTATION = gql`
   mutation UpdateCartItemQuantities($items: [CartItemQuantityInput]!) {
     updateItemQuantities(input: { items: $items }) {
-      refreshedCart { contents { nodes { key quantity total product { node { price(format: FORMATTED) } } } } }
+      updated {
+        key
+        quantity
+      }
     }
   }
 `;

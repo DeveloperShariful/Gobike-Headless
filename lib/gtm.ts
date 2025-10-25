@@ -1,4 +1,4 @@
-// --- টাইপ ডেফিনিশন ---
+// lib/gtm.ts
 // এটি নিশ্চিত করে যে window অবজেক্টের উপর dataLayer থাকলেও TypeScript কোনো এরর দেবে না
 type WindowWithDataLayer = Window & {
   dataLayer: Record<string, unknown>[];
@@ -165,4 +165,33 @@ export const gtmBeginCheckout = (items: GTMProduct[]) => {
             }
         });
     }
+};
+// lib/gtm.ts
+
+// ... আপনার বিদ্যমান কোড এবং interface ...
+
+/**
+ * যখন কোনো ব্যবহারকারী সফলভাবে একটি কেনাকাটা সম্পন্ন করেন।
+ * @param data - অর্ডারের বিস্তারিত তথ্য
+ */
+export const gtmPurchase = (data: {
+  transaction_id: string;
+  value: number;
+  tax?: number;
+  shipping?: number;
+  currency: string;
+  coupon?: string;
+  items: GTMProduct[];
+}) => {
+  if (typeof window.dataLayer !== "undefined") {
+    window.dataLayer.push({
+      event: 'purchase',
+      ecommerce: data
+    });
+  } else {
+    console.log({
+      event: 'purchase',
+      ecommerce: data
+    });
+  }
 };

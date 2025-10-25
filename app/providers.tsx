@@ -1,4 +1,5 @@
-"use client"; // <-- এটি একটি ক্লায়েন্ট কম্পোনেন্ট
+//app/providers.tsx
+"use client"; 
 
 import { CartProvider } from "../context/CartContext";
 import ProgressBarWrapper from "../components/ProgressBarWrapper";
