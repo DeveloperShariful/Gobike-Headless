@@ -2,6 +2,7 @@ import styles from './FaqPage.module.css';
 import Breadcrumbs from '../../components/Breadcrumbs';
 import Image from 'next/image';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Frequently Asked Questions (FAQ) | GoBike Australia',
   description: 'Find answers to common questions about our kids electric bikes, shipping, warranty, safety, and more. Get all the information you need before you buy.',
@@ -185,7 +186,12 @@ export default function FaqPage() {
         {/* Final Call to Action */}
         <div className={styles.faqCtaContainer}>
             <h3 className={styles.faqCtaTitle}>Still Have Questions?</h3>
-            <a href="https://gobike.au/contact-us-ebike-expertin-australia-kids-electric-bike/" className={styles.faqCtaButton} target="_blank" rel="noopener noreferrer">Contact Our Friendly Team</a>
+            <Link 
+          href="/contact" // <-- পরিবর্তন: এখন এটি একটি ইন্টারনাল পাথ
+          className={styles.seeMoreButton}
+        >
+          See More FAQs
+        </Link>
         </div>
 
       </div>

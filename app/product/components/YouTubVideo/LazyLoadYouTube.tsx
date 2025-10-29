@@ -1,10 +1,9 @@
-// app/product/[slug]/LazyLoadYouTube.tsx
-
+// ফাইল পাথ: app/product/components/YouTubeVideo/LazyLoadYouTube.tsx
 'use client';
 
 import { useState } from 'react';
 import Image from 'next/image';
-import styles from './LazyLoadYouTube.module.css'; // স্টাইল ফাইলও একই ফোল্ডারে থাকবে
+import styles from './LazyLoadYouTube.module.css';
 
 const LazyLoadYouTube = ({ videoId, title }: { videoId: string; title: string }) => {
   const [showVideo, setShowVideo] = useState(false);
@@ -29,13 +28,16 @@ const LazyLoadYouTube = ({ videoId, title }: { videoId: string; title: string })
 
   return (
     <div className={styles.thumbnailContainer} onClick={() => setShowVideo(true)}>
-      <Image
+      <Image 
         src={thumbnailUrl}
         alt={`Play button for ${title} video`}
-        layout="fill"
-        objectFit="cover"
+        // === মূল পরিবর্তন এখানে ===
+        fill // 'layout' prop এর পরিবর্তে 'fill' ব্যবহার করা হয়েছে
+        style={{ objectFit: 'cover' }} // 'objectFit' prop এখন style এর ভেতরে চলে গেছে
+        // ========================
         className={styles.thumbnailImage}
-        priority
+        sizes="(max-width: 768px) 100vw, 70vw" // ছবির সাইজ সম্পর্কে ব্রাউজারকে힌্ট দেওয়া
+        priority // ছবিটি দ্রুত লোড করার জন্য
       />
       <div className={styles.playButton}>
         <svg height="100%" version="1.1" viewBox="0 0 68 48" width="100%">

@@ -94,7 +94,7 @@ async function getProductData(slug: string): Promise<Product | null> {
         const { data } = await getClient().query<QueryData>({ 
             query: GET_PRODUCT_QUERY, 
             variables: { slug }, 
-            context: { fetchOptions: { next: { revalidate: 50000 } } } // 1 hour cache
+            context: { fetchOptions: { next: { revalidate: 0 } } } // 1 hour cache
         });
         
         if (!data || !data.product) {

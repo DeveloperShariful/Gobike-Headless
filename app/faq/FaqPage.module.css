@@ -11,6 +11,11 @@
 .promiseList li { display: flex; align-items: flex-start; margin-bottom: 15px; font-size: 16px; }
 .promiseListIcon { color: #007bff; margin-right: 15px; font-size: 22px; line-height: 1.5; }
 .faqCategoryTitle { margin-top: 50px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #e2e8f0; color: #2d3748; font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 600; }
+@media (max-width: 768){
+    .faqCategoryTitle{
+        text-align: center;
+    }
+}
 .premiumFaqItem { background-color: #ffffff; margin-bottom: 15px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; }
 .premiumFaqQuestion { width: 100%; padding: 25px; background: none; border: none; text-align: left; font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 500; color: #2d3748; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
 .faqIcon { font-size: 20px; font-weight: bold; color: #007bff; transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
@@ -28,4 +33,21 @@
 .faqCtaTitle { font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 600; color: #000; margin-bottom: 15px; }
 .faqCtaButton { display: inline-block; padding: 14px 30px; background-color: #000; color: #ffffff; font-family: 'Poppins', sans-serif; font-size: 16px; text-decoration: none; border-radius: 50px; transition: all 0.3s ease;  }
 .faqCtaButton:hover { transform: translateY(-3px); color: #ffffff; }
-@media (max-width: 768px) { .ourPromiseSection { flex-direction: column; padding: 25px; } }
+@media (max-width: 768px) { .ourPromiseSection { flex-direction: column; padding: 25px; } } .seeMoreButton {
+  display: inline-block;
+  padding: 12px 28px;
+  background-color: #000000; /* আপনার ব্র্যান্ডের মূল রং ব্যবহার করতে পারেন */
+  color: #ffffff;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.seeMoreButton:hover {
+  background-color: #333333; /* Hover করলে রং পরিবর্তন হবে */
+  transform: translateY(-2px); /* হালকা উপরে উঠবে */
+}

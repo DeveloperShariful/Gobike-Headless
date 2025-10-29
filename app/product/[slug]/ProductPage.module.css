@@ -398,3 +398,17 @@
   color: #d9534f;
 }
 
+/* ফাইল পাথ: app/product/[slug]/ProductPage.module.css */
+.infoTabsSection {
+    width: 100%;
+    max-width: 1200px; /* আপনার কন্টেইনারের প্রস্থের সাথে মেলান */
+    margin: 3rem auto 0 auto;
+    border-top: 1px solid #e5e5e5;
+}
+.tabItem {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.25rem 0; border-bottom: 1px solid #e5e5e5; cursor: pointer;
+    font-size: 0.9rem; font-weight: 600; letter-spacing: 0.5px;
+    color: #333; transition: color 0.2s ease;
+}
+.tabItem:hover { color: #007bff; }

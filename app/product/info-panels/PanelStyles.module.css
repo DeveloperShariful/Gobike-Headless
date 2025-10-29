@@ -1,0 +1,66 @@
+/* 
+  ফাইল পাথ: app/product/info-panels/PanelStyles.module.css
+  এটি Technical Specifications, WhatsInTheBox, এবং PaymentMethods-এর জন্য কমন স্টাইল ফাইল।
+*/
+
+/* === Technical Specifications এর চূড়ান্ত ডিজাইন === */
+.specTableContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.specRow {
+    /* === মূল পরিবর্তন এখানে: Flexbox এর পরিবর্তে CSS Grid ব্যবহার করা হয়েছে === */
+    display: grid;
+    /* প্রথম কলাম (Label) ৩৫% এবং বাকিটা দ্বিতীয় কলাম (Value) নেবে */
+    grid-template-columns: 30% 1fr; 
+    gap: 1rem; /* দুটি কলামের মধ্যে সুন্দর স্পেস তৈরি করবে */
+    align-items: center; /* লেখাগুলোকে উল্লম্বভাবে মাঝখানে রাখবে */
+    
+    padding: .6rem 0 .6rem 0;
+    border-bottom: 1px solid #eeeeee;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.specRow:last-child {
+    border-bottom: none;
+}
+
+.specLabel {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #000000;
+    text-align: left; /* === লেবেলগুলোকে ডান দিকে অ্যালাইন করবে === */
+}
+
+.specValue {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #000000;
+    text-align: left; /* === ভ্যালুগুলোকে বাম দিকে অ্যালাইন করবে === */
+}
+
+
+/* === WhatsInTheBox এবং PaymentMethods এর স্টাইল (অপরিবর্তিত) === */
+.boxGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+.boxItem {
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center; gap: 0.75rem; font-size: 0.9rem;
+    padding: 1rem; border: 1px solid #f0f0f0; border-radius: 8px;
+}
+.boxImageWrapper {
+    display: flex; justify-content: center; align-items: center; width: 100px; height: 100px;
+}
+.paymentContainer h4 {
+    font-size: 1.2rem; margin-bottom: 0.5rem;
+}
+.paymentContainer p {
+    font-size: 0.95rem; color: #555; line-height: 1.6; margin-bottom: 1.5rem;
+}
+.paymentGrid {
+    width: 100%;
+}

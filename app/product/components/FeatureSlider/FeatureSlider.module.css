@@ -1,0 +1,81 @@
+/* ফাইল পাথ: app/product/components/FeatureSlider/FeatureSlider.module.css */
+.sliderComponent {
+    width: 100%;
+}
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+    padding: 0 0.5rem; /* সামান্য প্যাডিং */
+}
+.title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a202c;
+}
+.navArrows { display: flex; gap: 0.5rem; }
+.arrow {
+    background-color: #f1f5f9; border: 1px solid #e2e8f0;
+    border-radius: 50%; width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 18px; color: #475569;
+    transition: all 0.2s ease;
+}
+.arrow:hover { background-color: #e2e8f0; color: #1a202c; }
+
+.sliderContainer {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+.sliderTrack {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+.slide {
+    box-sizing: border-box;
+    padding: 0 0.5rem; /* আইটেমগুলোর মধ্যে স্পেস */
+}
+.card {
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0; /* হালকা বর্ডার */
+}
+.imageWrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 60%;
+    background-color: #f8fafc;
+}
+.contentWrapper { padding: 1.5rem; }
+.featureTitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: #1e293b;
+}
+.description {
+    font-size: 0.95rem;
+    color: #64748b;
+    line-height: 1.6;
+    margin: 0;
+}
+.progressBarContainer {
+    width: calc(100% - 1rem); /* প্যাডিং এর সাথে অ্যাডজাস্ট করা */
+    height: 4px;
+    background-color: #e2e8f0;
+    border-radius: 2px;
+    margin: 2rem auto 0 auto;
+}
+.progressFill {
+    height: 100%;
+    background-color: #0ea5e9;
+    border-radius: 2px;
+    transition: width 0.3s ease-in-out;
+}
+
+@media (max-width: 768px) {
+    .title { font-size: 1.5rem; }
+}

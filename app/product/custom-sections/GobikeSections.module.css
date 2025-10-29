@@ -1,0 +1,129 @@
+/* 
+  ফাইল পাথ: app/product/custom-sections/GobikeSections.module.css
+  এটি সব কাস্টম সেকশনের জন্য কমন এবং চূড়ান্ত স্টাইল ফাইল।
+*/
+
+/* === বেসিক সেকশন কন্টেইনার === */
+.sectionContainer {
+    width: 100%;
+    padding: 2rem 1%; /* সেকশনগুলোর মধ্যে দূরত্ব এবং সাইড প্যাডিং */
+    box-sizing: border-box;
+}
+
+.coloredBackground {
+    background-color: #f7fafc; /* হালকা ধূসর/নীল রঙ */
+}
+
+/* === সেকশনের হেডার (যেমন: "More Key Features", "FAQ") === */
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto 2.5rem auto;
+    max-width: 1200px;
+}
+.sectionHeader:has(+ div > .accordion) {
+    justify-content: center;
+    max-width: 800px;
+}
+.sectionTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a202c;
+    text-align: center;
+}
+
+/* === Overview সেকশনের জন্য বিশেষ স্টাইল === */
+.overviewGrid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 3rem;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.overviewText {
+    padding-right: 2rem;
+}
+
+.mainTitle {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    color: #1a202c;
+    text-align: left;
+}
+
+.mainDescription {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: #4a5568;
+    text-align: left;
+}
+
+
+/* === Responsive Design === */
+
+/* --- ট্যাবলেট এবং বড় স্ক্রিনের জন্য --- */
+@media (min-width: 769px) {
+    /* কোনো বিশেষ পরিবর্তনের প্রয়োজন নেই, ডেস্কটপ স্টাইলই কাজ করবে */
+}
+
+/* --- ট্যাবলেট ভিউ --- */
+@media (max-width: 1024px) {
+    .overviewGrid {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+    }
+    .overviewText {
+        padding-right: 0;
+        text-align: center;
+    }
+    .mainTitle, .mainDescription {
+        text-align: center;
+    }
+}
+
+/* --- মোবাইল ভিউ (সবচেয়ে গুরুত্বপূর্ণ পরিবর্তন) --- */
+@media (max-width: 768px) {
+    .sectionContainer {
+        padding: 3rem 5%;
+    }
+    .mainTitle {
+        font-size: 2.2rem;
+    }
+    .sectionTitle {
+        font-size: 1.5rem;
+    }
+    .overviewGrid .mainTitle, 
+    .overviewGrid .mainDescription {
+        text-align: center;
+    }
+}
+.seeMoreContainer {
+  margin-top: 2.5rem; /* Accordion থেকে বাটনের দূরত্ব */
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.seeMoreButton {
+  display: inline-block;
+  padding: 12px 28px;
+  background-color: #000000; /* আপনার ব্র্যান্ডের মূল রং ব্যবহার করতে পারেন */
+  color: #ffffff;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.seeMoreButton:hover {
+  background-color: #333333; /* Hover করলে রং পরিবর্তন হবে */
+  transform: translateY(-2px); /* হালকা উপরে উঠবে */
+}

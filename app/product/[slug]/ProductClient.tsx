@@ -3,10 +3,10 @@
 
 // ... আপনার অন্যান্য import ...
 import { productVideoMap } from '../productVideos';
-import LazyLoadYouTube from './LazyLoadYouTube';
+import LazyLoadYouTube from '../components/YouTubVideo/LazyLoadYouTube';
 import StickyAddToCart from './StickyAddToCart';
 // ... বাকি কোড ...
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, ComponentType } from 'react';
 import styles from './ProductPage.module.css';
 import Image from 'next/image';
 import QuantityAddToCart from '../../../components/QuantityAddToCart';
@@ -14,6 +14,11 @@ import ReviewForm from './ReviewForm';
 import ProductCard from '../../products/ProductCard';
 import { gtmViewItem } from '../../../lib/gtm';
 import { klaviyoTrackViewedProduct } from '../../../lib/klaviyo';
+
+import { productLayoutMap } from '../productLayoutMap';
+import { productInfoPanelsMap } from '../productInfoPanelsMap';
+import SlideOutPanel from '../components/SlideOutPanel/SlideOutPanel'
+
 
 // --- ইন্টারফেসগুলো নতুন ডেটা স্ট্রাকচার অনুযায়ী আপডেট করা হয়েছে ---
 interface ImageNode { sourceUrl: string; }
@@ -86,7 +91,6 @@ const StarRating = ({ rating }: { rating: number }) => {
     );
 };
 
-// FormattedDate কম্পোনেন্ট (ক্লায়েন্ট-সাইড রেন্ডারিং সহ, অপরিবর্তিত)
 const FormattedDate = ({ dateString }: { dateString: string }) => {
     const [formattedDate, setFormattedDate] = useState<string | null>(null);
 
@@ -112,6 +116,14 @@ export default function ProductClient({ product }: { product: Product }) {
     const [isStickyVisible, setStickyVisible] = useState(false);
     const INITIAL_REVIEWS_TO_SHOW = 5;
     const [visibleReviews, setVisibleReviews] = useState(INITIAL_REVIEWS_TO_SHOW);
+        // --- নতুন state এবং ভ্যারিয়েবল যোগ করা হয়েছে ---
+    const [activePanel, setActivePanel] = useState<string | null>(null);
+    const CustomSections = productLayoutMap[product.slug] || [];
+    const panelConfigs = productInfoPanelsMap[product.slug] || [];
+    const activePanelConfig = panelConfigs.find(p => p.id === activePanel);
+    const PanelContentComponent = activePanelConfig?.component as ComponentType<{ product: Product }> | undefined;
+
+
 
     const regularPriceNum = parsePrice(product.regularPrice);
     const salePriceNum = parsePrice(product.salePrice);
@@ -123,10 +135,6 @@ export default function ProductClient({ product }: { product: Product }) {
             ([entry]) => {
                 // --- এখানে নতুন এবং উন্নত লজিক যোগ করা হয়েছে ---
                 const isAboveViewport = entry.boundingClientRect.top < 0;
-                
-                // স্টিকি বারটি তখনই দেখাও যখন:
-                // ১. মূল বাটনটি স্ক্রিনে দেখা যাচ্ছে না (isIntersecting is false)
-                // ২. এবং এটি স্ক্রিনের উপরে চলে গেছে (isAboveViewport is true)
                 if (!entry.isIntersecting && isAboveViewport) {
                     setStickyVisible(true);
                 } else {
@@ -272,6 +280,26 @@ export default function ProductClient({ product }: { product: Product }) {
         </div>
         </div>
     </div>
+    {/* === ইনফো ট্যাব সেকশন (সঠিক জায়গায়) === */}
+        {panelConfigs.length > 0 && (
+            <div className={styles.infoTabsSection}>
+                {panelConfigs.map((panel) => (
+                    <div key={panel.id} className={styles.tabItem} onClick={() => setActivePanel(panel.id)}>
+                        <span>{panel.label}</span>
+                        <span>&gt;</span>
+                    </div>
+                ))}
+            </div>
+        )}
+
+        {/* === কাস্টম কনটেন্ট সেকশন === */}
+        {CustomSections.length > 0 && (
+            <div className={styles.customSectionsWrapper}>
+                {CustomSections.map((SectionComponent, index) => (
+                    <SectionComponent key={`custom-section-${index}`} />
+                ))}
+            </div>
+        )}
     {videoId && (
         <section className={styles.productInfoSection}>
             <h2 className={styles.sectionTitle}>From Wobbles to Woo-hoos!</h2>
@@ -401,6 +429,13 @@ export default function ProductClient({ product }: { product: Product }) {
         </div>
         </div>
     )}
+    <SlideOutPanel
+            isOpen={!!activePanelConfig}
+            onClose={() => setActivePanel(null)}
+            title={activePanelConfig?.label || ''}
+        >
+            {PanelContentComponent && <PanelContentComponent product={product} />}
+        </SlideOutPanel>
     <StickyAddToCart product={productForCart} isVisible={isStickyVisible} />
     </div>
     
