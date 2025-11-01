@@ -16,7 +16,7 @@ export default function PowerSection() {
       
         {/* === সেকশন ১: পাওয়ার এবং পারফরম্যান্স === */}
         <TextWithImage
-          imageUrl="https://gobikes.au/wp-content/uploads/2025/10/gobike-20-front-suspension-fork.webp"
+          imageUrl="https://gobikes.au/wp-content/uploads/2025/10/gobike-20-hydraulic-disc-brakes-closeup.webp"
           imageAlt="A young rider leans into a turn on a pump track with the GoBike 20 e-bike."
           title="Unleash Pro-Level Power"
           description="The GoBike 20 isn't just a bike; it's a statement. Featuring a massive 1200W brushless motor, it delivers breathtaking acceleration and the torque to conquer steep inclines. It's the ultimate machine for young riders who are serious about off-road performance."
