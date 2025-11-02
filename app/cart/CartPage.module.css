@@ -205,3 +205,57 @@
   
 }
 }
+
+
+/* Add this to CartPage.module.css */
+
+.couponContainer {
+  margin: 20px 0;
+  width: 100%;
+}
+
+.couponForm {
+  display: flex;
+  gap: 10px;
+}
+
+.couponInput {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.couponButton {
+  padding: 10px 20px;
+  background-color: #2c3e50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.couponButton:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+}
+
+.couponButton:hover:not(:disabled) {
+  background-color: #34495e;
+}
+
+.couponValue {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.removeButtonSmall {
+    background: none;
+    border: none;
+    color: #e74c3c;
+    cursor: pointer;
+    font-size: 0.9em;
+    padding: 0;
+}

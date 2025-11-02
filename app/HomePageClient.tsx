@@ -38,7 +38,7 @@ const HeroSlider = () => {
             <div className={styles.finalSplitContent}>
               <p className={styles.finalSlideSubtitle}>The Ultimate Weapon</p>
               <h2 className={styles.finalSlideTitle}>GOBIKE 20</h2>
-              <p className={styles.finalSlideDescription}>The best 20-inch ebike of its kind. POWERFUL AND FUN. With a tough build, 10AH battery, and reliable performance, it is the ultimate weapon for young adventurers and teens.</p>
+              <p className={styles.finalSlideDescription}>The best 20-inch kids electric bike on the market. Built tough for young adventurers and teens, it delivers powerful performance, long battery life with a 10Ah battery, and reliable fun every ride. The ultimate e-bike for confidence, freedom, and excitement.</p>
               <Link href="product/20-inch-electric-bikes-for-sale-ebike-for-kids" className={styles.finalSlideButton}>Shop Now</Link>
             </div>
           </div>
@@ -47,7 +47,7 @@ const HeroSlider = () => {
               <div className={styles.finalSplitContent}>
                   <p className={styles.finalSlideSubtitle}>The All-Rounder</p>
                   <h2 className={styles.finalSlideTitle}>GOBIKE 16</h2>
-                  <p className={styles.finalSlideDescription}>The fastest 16-inch Electric bike on the market! With 3 speed modes, hydraulic brakes, and front suspension, It is the perfect all-around childrens electric bikes for confident young riders.</p>
+                  <p className={styles.finalSlideDescription}>The fastest 16-inch kids electric bike on the market! Designed for confident young riders. Three speed modes, hydraulic disc brakes, and front suspension for the perfect balance of performance, safety, and fun.</p>
                   <Link href="product/ebike-for-sale-16-inch-gobike-ages-5-9" className={styles.finalSlideButton}>Shop Now</Link>
               </div>
           </div>
@@ -56,7 +56,7 @@ const HeroSlider = () => {
               <div className={styles.finalSplitContent}>
                   <p className={styles.finalSlideSubtitle}>The Everyday GoBike Range</p>
                   <h2 className={styles.finalSlideTitle}>GOBIKE 12</h2>
-                  <p className={styles.finalSlideDescription}>The perfect bike for toddlers aged 2 years and above, transitioning from a Balance Bike! Extra slow learning mode. Easy to ride. Long ride time. Adjustable seat height. Lightweight and reliable!</p>
+                  <p className={styles.finalSlideDescription}>The perfect first electric bike for toddlers aged 2 years and above transitioning from a balance bike. Features an extra-slow learning mode for beginners, easy handling, long ride time, adjustable seat height, and a lightweight, reliable design that grows with your child.</p>
                   <Link href="product/ebike-for-kids-12-inch-electric-bike-ages-2-5" className={styles.finalSlideButton}>Shop Now</Link>
               </div>
           </div>

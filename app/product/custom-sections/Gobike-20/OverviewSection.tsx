@@ -6,7 +6,7 @@ const overviewImages = [
   { src: 'https://gobikes.au/wp-content/uploads/2025/10/gobike-12-lightweight-aluminum-frame.webp', alt: 'A young rider catching air on a jump with the GoBike 20 at a bike park.' },
   { src: 'https://gobikes.au/wp-content/uploads/2025/10/kids-ebike-durable-tires-gobike.webp', alt: 'Action shot of a kid jumping the GoBike 20, showcasing its performance suspension.' },
   { src: 'https://gobikes.au/wp-content/uploads/2025/08/Gobike-kids-electric-bike-ebike-for-kids-5-scaled-1.webp', alt: 'An excited boy celebrating with his brand new GoBike 20 box.' },
-  { src: 'https://gobikes.au/wp-content/uploads/2025/08/Gobike-kids-electric-bike-ebike-for-kids-2-scaled-1.webp', alt: 'Two children with their GoBike e-bikes enjoying a day out on a sandy beach.' },
+  //{ src: 'https://gobikes.au/wp-content/uploads/2025/08/Gobike-kids-electric-bike-ebike-for-kids-2-scaled-1.webp', alt: 'Two children with their GoBike e-bikes enjoying a day out on a sandy beach.' },
 ];
 
 
