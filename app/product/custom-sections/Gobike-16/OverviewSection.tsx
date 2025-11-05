@@ -14,7 +14,7 @@ export default function OverviewSection() {
     <section className={styles.sectionContainer}>
       <div className={styles.overviewGrid}>
         <div className={styles.overviewText}>
-          <h1 className={styles.mainTitle}>Gobike 16: The Ultimate Kids Adventure E-Bike</h1>
+          <h2 className={styles.mainTitle}>Gobike 16: The Ultimate Kids Adventure E-Bike</h2>
           <p className={styles.mainDescription}>
             Ready to level up your little grom is riding adventures? The Gobike 16 is the ultimate electric balance bike, perfectly blending serious fun with skill development. It’s built to boost confidence, helping kids master balance and throttle control on any terrain. From the backyard to the local pump track, give your child the freedom to explore and watch them ride with a massive grin.
           </p>

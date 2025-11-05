@@ -15,7 +15,7 @@ export default function OverviewSection() {
     <section className={styles.sectionContainer}>
       <div className={styles.overviewGrid}>
         <div className={styles.overviewText}>
-          <h1 className={styles.mainTitle}>GoBike 20: The Adventure Gets Real</h1>
+          <h2 className={styles.mainTitle}>GoBike 20: The Adventure Gets Real</h2>
           <p className={styles.mainDescription}>
             For the young gun who is outgrown the basics and is ready to really rip. The GoBike 20 is a tough, trail-ready e-bike for kids aged 8-12, built with a more powerful motor, responsive suspension, and a rugged frame. It’s the ultimate step-up for tackling proper trails, hitting jumps, and unlocking a new level of off-road freedom.
           </p>

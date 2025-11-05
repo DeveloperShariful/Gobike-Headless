@@ -16,7 +16,7 @@ export default function OverviewSection() {
     <section className={styles.sectionContainer}>
       <div className={styles.overviewGrid}>
         <div className={styles.overviewText}>
-          <h1 className={styles.mainTitle}>GoBike 12: The Easiest Way to Teach Your Kid to Ride</h1>
+          <h2 className={styles.mainTitle}>GoBike 12: The Easiest Way to Teach Your Kid to Ride</h2>
           <p className={styles.mainDescription}>
             Say goodbye to tears and tricky training wheels. The GoBike 12 (ages 2-5) is engineered to be the safest, easiest way for your child to learn. This is not just a bike; it is a confidence-builder. By focusing on balance first, your little rider will master the basics in no time. It is light, durable, and ready for every Aussie backyard. Give the gift of confidence and start their riding journey today.</p>
         </div>
