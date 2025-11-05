@@ -96,7 +96,7 @@ const TrustBadges = () => {
     <section className={styles.gobikeSection}>
       <div className={styles.container1500}>
         <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>The GoBike Promise: Australias Best Kids Electric Bike</h2>
+          <h1 className={styles.sectionTitle}>The GoBike Promise: Australias Best Kids Electric Bike</h1>
           <p className={styles.sectionSubtitle}>We are committed to providing an unmatched riding experience, backed by guarantees you can count on. Here’s why GoBike is the choice for Aussie families. Electric balance bike</p>
         </div>
         <div className={styles.finalTrustGrid}>

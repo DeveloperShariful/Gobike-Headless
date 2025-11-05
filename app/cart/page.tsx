@@ -1,3 +1,5 @@
+//app/cart/page.tsx
+
 "use client";
 import Breadcrumbs from '../../components/Breadcrumbs';
 import { useCart } from '../../context/CartContext';
