@@ -3,6 +3,7 @@ import Script from 'next/script';
 import styles from './Returns.module.css';
 import Breadcrumbs from '../../components/Breadcrumbs';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Return and Refund Policy | GoBike Australia',
@@ -45,7 +46,7 @@ const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "GoBike.au",
-  "url": "https://sharifulbuilds.com",
+  "url": "https:gobike.au",
   "logo": "URL_TO_YOUR_LOGO.png", // অনুগ্রহ করে আপনার লোগোর সঠিক URL দিন
   "contactPoint": {
     "@type": "ContactPoint",
@@ -136,7 +137,7 @@ export default function RefundAndReturnsPolicyPage() {
                     <p><strong>Business Name:</strong> GoBike.au<br />
                     <strong>Email:</strong> <a href="mailto:support@gobike.au">support@gobike.au</a><br />
                     <strong>Phone:</strong> +61 426 067 277<br />
-                    <strong>Website:</strong> <a href="https://sharifulbuilds.com">https://sharifulbuilds.com</a></p>
+                    <strong>Website:</strong> <Link href="https://gobike.au">Gobike Australia </Link></p>
                 </div>
             </div>
 

@@ -5,6 +5,7 @@ import styles from './ContactPage.module.css';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
 import Breadcrumbs from '../../components/Breadcrumbs';
+import Link from 'next/link';
 
 export default function ContactPageClient() {
   const [formData, setFormData] = useState({
@@ -118,7 +119,7 @@ export default function ContactPageClient() {
               <div className={styles.consumerRightsContent}>
                   <div><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#007bff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg></div>
                   <h2>Your Rights When Buying an Ebike in Australia</h2>
-                  <p>At <a href="https://sharifulbuilds.com/">GoBike.au</a>, we are committed to fair and transparent practices. We adhere strictly to all guidelines set by the <strong>Australian Consumer Law</strong> to ensure your rights are protected when purchasing a kids electric bike.</p>
+                  <p>At <Link href="https://gobike.au/">GoBike Australia</Link>, we are committed to fair and transparent practices. We adhere strictly to all guidelines set by the <strong>Australian Consumer Law</strong> to ensure your rights are protected when purchasing a kids electric bike.</p>
                   <p>You have the right to a repair, replacement, or refund for a major failure and compensation for any other reasonably foreseeable loss or damage.</p>
                   <a href="https://www.accc.gov.au/" target="_blank" rel="noopener noreferrer" className={styles.consumerRightsButton}>Learn More at ACCC Website</a>
               </div>

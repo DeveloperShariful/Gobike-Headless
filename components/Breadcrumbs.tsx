@@ -4,10 +4,8 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import styles from './Breadcrumbs.module.css';
 
-// --- নতুন: Interface যোগ করা হয়েছে ---
 interface BreadcrumbsProps {
-  // pageTitle হলো একটি ঐচ্ছিক prop
-  pageTitle?: string; 
+  pageTitle?: string;
 }
 
 const formatBreadcrumb = (str: string) => {
@@ -29,14 +27,20 @@ export default function Breadcrumbs({ pageTitle }: BreadcrumbsProps) {
         
         {pathSegments.map((segment, index) => {
           const isLast = index === pathSegments.length - 1;
-          const href = '/' + pathSegments.slice(0, index + 1).join('/');
+          let href = '/' + pathSegments.slice(0, index + 1).join('/');
 
-          // --- কার্যকরী সমাধান: pageTitle ব্যবহার করা হচ্ছে ---
+          // ★★★ সমাধান: 'product' সেগমেন্টের জন্য লিঙ্ক পরিবর্তন করা হয়েছে ★★★
+          // যদি URL-এর অংশ 'product' হয়, তাহলে লিঙ্কটি '/products' করে দাও।
+          // আপনার প্রোডাক্ট পেজের লিঙ্ক যদি অন্য কিছু হয় (যেমন /shop), তাহলে সেটি এখানে দিন।
+          if (segment === 'product') {
+            href = '/products'; 
+          }
+          // ---------------------------------------------------------------
+
           let title = formatBreadcrumb(segment);
           if (isLast && pageTitle) {
-            title = pageTitle; // যদি pageTitle prop দেওয়া থাকে, তাহলে সেটি ব্যবহার করো
+            title = pageTitle;
           }
-          // ----------------------------------------------------
 
           return (
             <li key={segment} className={styles.breadcrumbItem}>

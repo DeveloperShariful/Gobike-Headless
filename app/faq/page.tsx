@@ -152,7 +152,7 @@ export default function FaqPage() {
 
         <details className={styles.premiumFaqItem}>
             <summary className={styles.premiumFaqQuestion}><span>Where can I get spare parts?</span><span className={styles.faqIcon}>&gt;</span></summary>
-            <div className={styles.premiumFaqAnswer}><p>We use standard parts for items like brakes, grips, and tyres, which are available at your <strong>local bike shop</strong>. For specific GoBike parts, <a href="https://gobike.au/contact-us-ebike-expertin-australia-kids-electric-bike/">contact us</a> directly.</p></div>
+            <div className={styles.premiumFaqAnswer}><p>We use standard parts for items like brakes, grips, and tyres, which are available at your <strong>local bike shop</strong>. For specific GoBike parts, <Link href="/contact"> Contect us </Link> directly.</p></div>
         </details>
         
         <details className={styles.premiumFaqItem}>
@@ -180,18 +180,13 @@ export default function FaqPage() {
 
         <details className={styles.premiumFaqItem}>
             <summary className={styles.premiumFaqQuestion}><span>What is your return policy?</span><span className={styles.faqIcon}>&gt;</span></summary>
-            <div className={styles.premiumFaqAnswer}><p>We offer a return policy on unused bikes in their original packaging. For full details, please visit our official <a href="https://gobike.au/privacy-policy-kids-ebike-electric-bike-kids-ages-2-16/" target="_blank" rel="noopener noreferrer">Return Policy page</a>.</p></div>
+            <div className={styles.premiumFaqAnswer}><p>We offer a return policy on unused bikes in their original packaging. For full details, please visit our official <Link href="/privacy-policy"> Return Policy page </Link>.</p></div>
         </details>
 
         {/* Final Call to Action */}
         <div className={styles.faqCtaContainer}>
             <h3 className={styles.faqCtaTitle}>Still Have Questions?</h3>
-            <Link 
-          href="/contact" // <-- পরিবর্তন: এখন এটি একটি ইন্টারনাল পাথ
-          className={styles.seeMoreButton}
-        >
-          See More FAQs
-        </Link>
+        <Link href="/contact" className={styles.seeMoreButton}> Contect Us </Link>
         </div>
 
       </div>

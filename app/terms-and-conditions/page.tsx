@@ -4,6 +4,7 @@ import styles from './Terms.module.css';
 import Breadcrumbs from '../../components/Breadcrumbs'; 
 import type { Metadata } from 'next';
 
+
 export const metadata: Metadata = {
   title: 'Terms and Conditions | GoBike Australia',
   description: 'Please read the official terms and conditions for using the GoBike Australia website, purchasing products, and our warranty policies.',
@@ -28,7 +29,7 @@ export default function TermsAndConditionsPage() {
 
       <div className={styles.termsSection}>
         <h2>1. Definitions</h2>
-        <p><strong>“GoBike”</strong>, “we”, “us” refers to our company and website, <a href="https://sharifulbuilds.com/">GoBike.au</a>. <strong>“User”</strong>, “you” refers to any visitor or customer. <strong>“Products”</strong> include our entire range of <strong><Link href="/bikes">electric balance bikes</Link></strong> and <Link href="/products">accessories</Link>.</p>
+        <p><strong>“GoBike”</strong>, “we”, “us” refers to our company and website, <Link href="https://gobike.au/">GoBike.au</Link>. <strong>“User”</strong>, “you” refers to any visitor or customer. <strong>“Products”</strong> include our entire range of <strong><Link href="/bikes">electric balance bikes</Link></strong> and <Link href="/products">accessories</Link>.</p>
       </div>
 
       <div className={styles.termsSection}>
