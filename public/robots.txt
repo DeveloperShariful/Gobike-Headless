@@ -1,5 +1,5 @@
 # ===============================================================
-# robots.txt for GoBike Australia (gobike.au / sharifulbuilds.com)
+# robots.txt for GoBike Australia (gobike.au)
 # ===============================================================
 
 # Allow all friendly search engine crawlers to access the entire site
@@ -11,4 +11,4 @@ Disallow: /account
 
 
 # Provide the location of the sitemap to all crawlers
-Sitemap: https://sharifulbuilds.com/sitemap.xml
+Sitemap: https://gobike.au/sitemap.xml

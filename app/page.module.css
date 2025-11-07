@@ -414,11 +414,11 @@
     font-weight: 600;
     margin-bottom: 30px;
 }
-.videoGrid {
+/*.videoGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 40px;
-}
+} */
 .videoMainWrapper {
     max-width: 1500px;
     margin: 0 auto 60px auto;
@@ -816,4 +816,99 @@
     border: none; /* ডিফল্ট বর্ডার তুলে দেওয়া হচ্ছে */
     border-top: 1px solid #e0e0e0; /* একটি ১ পিক্সেল চওড়া, হালকা ধূসর রঙের লাইন */
     margin: 1rem 0 0 0; /* উপরে এবং নিচে ফাঁকা জায়গা তৈরি করে */
+}
+
+/* app/page.module.css */
+
+/* --- আপনার পুরনো .videoGrid স্টাইলটি মুছে ফেলুন বা কমেন্ট করে দিন --- */
+/*
+.videoGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 40px;
+}
+*/
+
+/* --- ভিডিও স্লাইডারের জন্য নতুন স্টাইল যোগ করুন --- */
+
+.videoGridWrapper { /* এই ক্লাসটি এখন আর ব্যবহৃত হচ্ছে না, কিন্তু রেখে দিতে পারেন */
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.videoSliderContainer {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+}
+
+.videoSlider {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    gap: 30px;
+    padding-bottom: 15px; /* for shadow or other effects */
+}
+.videoSlider::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+.videoSlide {
+    flex: 0 0 48%; /* ডেস্কটপে দুটি আইটেম */
+    scroll-snap-align: start;
+    box-sizing: border-box;
+}
+
+/* স্লাইডার নেভিগেশন বাটন */
+.sliderNav {
+    position: absolute;
+    top: 40%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 10;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.sliderNav:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+.prev {
+    left: -5px;
+}
+.next {
+    right: -5px;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 992px) {
+    .videoSlide {
+        flex-basis: 47%;
+    }
+}
+
+@media (max-width: 767px) {
+    .videoSlide {
+        flex-basis: 95%; /* মোবাইলে একটি আইটেম */
+    }
+    .sliderNav {
+        top: 35%;
+        width: 40px;
+        height: 40px;
+    }
+    .prev { left: 5px; }
+    .next { right: 5px; }
 }

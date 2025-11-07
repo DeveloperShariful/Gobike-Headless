@@ -385,37 +385,75 @@ function YouTubePlayer({ youtubeId, thumbnailUrl }: YouTubePlayerProps) {
         </div>
     );
 } 
+// ====================================================================
+// VideoReviews Component (Updated with Slider Functionality)
+// ====================================================================
 const VideoReviews = () => {
+    const sliderRef = useRef<HTMLDivElement>(null);
+
+    const videoData = [
+        {
+            youtubeId: "BARebHNa3lY",
+            thumbnailUrl: "https://i.ytimg.com/vi/BARebHNa3lY/maxresdefault.jpg",
+            title: "GoBike 16: From Parks to Trails",
+            description: "A deep-dive review showing the GoBike 16 versatility and power on different terrains."
+        },
+        {
+            youtubeId: "CIevuTbyTlY",
+            thumbnailUrl: "https://i.ytimg.com/vi/CIevuTbyTlY/maxresdefault.jpg",
+            title: "Parents Guide: Choosing The Right GoBike",
+            description: "Confused between models? This helpful guide breaks down the features of each GoBike."
+        },
+        // --- প্রয়োজনে আরও ভিডিও যোগ করতে পারেন ---
+        {
+            youtubeId: "Fl8jEUxS_LU", // Example of another video
+            thumbnailUrl: "https://i.ytimg.com/vi/Fl8jEUxS_LU/maxresdefault.jpg",
+            title: "Unboxing & First Ride: The GoBike 12 Experience",
+            description: "From first rides to pro-level tricks, our video reviews showcase the real-world performance and unbeatable fun of our kids electric bikes. See them in action!"
+        }
+    ];
+
+    const scroll = (direction: 'left' | 'right') => {
+        if (sliderRef.current) {
+            const { current } = sliderRef;
+            // প্রতিটি স্লাইডের প্রস্থ গণনা করা হচ্ছে (গ্যাপ সহ)
+            const slideWidth = current.children[0].clientWidth + 30; // 30px is the gap
+            const scrollAmount = direction === 'left' ? -slideWidth : slideWidth;
+            current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        }
+    };
+
     return (
         <section className={`${styles.gobikeSection} ${styles.videoSection}`} style={{ backgroundColor: '#f8f9fa' }}>
             <div className={styles.sectionHeader}>
                 <h2 className={styles.sectionTitle}>See Why Parents & Kids Love The GoBike</h2>
                 <p className={styles.sectionSubtitle} style={{ color: '#1a1a1a' }}>From first rides to pro-level tricks, our video reviews showcase the real-world performance and unbeatable fun of our kids electric bikes. See them in action!</p>
             </div>
+            {/* --- প্রধান ভিডিওটি আগের মতোই থাকবে --- 
             <div className={styles.videoMainWrapper}>
                 <YouTubePlayer youtubeId="Fl8jEUxS_LU" thumbnailUrl="https://i.ytimg.com/vi/Fl8jEUxS_LU/maxresdefault.jpg" />
                 <div className={styles.videoCaption}>
                     <h3 className={styles.videoCaptionTitle}>Unboxing & First Ride: The GoBike 12 Experience</h3>
                     <p className={styles.videoCaptionDescription}>Watch how easy it is to assemble the GoBike 12 and see a 3- year -olds real-time reaction on his first-ever electric bike ride.</p>
                 </div>
-            </div>
-            <div className={styles.videoGridWrapper}>
-                <div className={styles.videoGrid}>
-                    <div>
-                        <YouTubePlayer youtubeId="BARebHNa3lY" thumbnailUrl="https://i.ytimg.com/vi/BARebHNa3lY/maxresdefault.jpg" />
-                        <div className={styles.videoCaption}>
-                            <h3 className={styles.videoCaptionTitle}>GoBike 16: From Parks to Trails</h3>
-                            <p className={styles.videoCaptionDescription}>A deep-dive review showing the GoBike 16 versatility and power on different terrains.</p>
+            </div>*/}
+
+            {/* --- ভিডিও গ্রিডের পরিবর্তে নতুন স্লাইডার সেকশন --- */}
+            <div className={styles.videoSliderContainer}>
+                <div className={styles.videoSlider} ref={sliderRef}>
+                    {videoData.map((video, index) => (
+                        <div className={styles.videoSlide} key={index}>
+                            <YouTubePlayer youtubeId={video.youtubeId} thumbnailUrl={video.thumbnailUrl} />
+                            <div className={styles.videoCaption}>
+                                <h3 className={styles.videoCaptionTitle}>{video.title}</h3>
+                                <p className={styles.videoCaptionDescription}>{video.description}</p>
+                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <YouTubePlayer youtubeId="CIevuTbyTlY" thumbnailUrl="https://i.ytimg.com/vi/CIevuTbyTlY/maxresdefault.jpg" />
-                        <div className={styles.videoCaption}>
-                            <h3 className={styles.videoCaptionTitle}>Parents Guide: Choosing The Right GoBike</h3>
-                            <p className={styles.videoCaptionDescription}>Confused between models? This helpful guide breaks down the features of each GoBike.</p>
-                        </div>
-                    </div>
+                    ))}
                 </div>
+                {/* স্লাইডার নেভিগেশন বাটন */}
+                <button onClick={() => scroll('left')} className={`${styles.sliderNav} ${styles.prev}`} aria-label="Previous video">&#10094;</button>
+                <button onClick={() => scroll('right')} className={`${styles.sliderNav} ${styles.next}`} aria-label="Next video">&#10095;</button>
             </div>
         </section>
     );
