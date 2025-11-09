@@ -2,7 +2,7 @@
 title: "Extend the Adventure: 5 Essential Care Tips for Your GoBike's Battery"
 date: "2025-09-28"
 author: "The GoBike Team"
-cover_image: "https://gobikes.au/wp-content/uploads/2025/02/1-1.webp"
+cover_image: "https://gobikes.au/wp-content/uploads/2025/10/gobike-au-1-year-warranty-kids-ebikes.webp"
 excerpt: "Your GoBike's battery is its heart. Learn how to maximize its lifespan and performance with these simple, effective maintenance tips for Aussie conditions."
 ---
 

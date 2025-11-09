@@ -3,7 +3,7 @@ title: "Unplug and Play: The Real-World Benefits of Outdoor Adventures for Kids"
 date: "2025-09-20"
 author: "GoBike Team"
 excerpt: "In a world full of screens, outdoor play is more important than ever. Discover how riding a GoBike can boost your child's physical health, mental wellbeing, and social skills."
-cover_image: "https://gobikes.au/wp-content/uploads/2025/02/8-1.webp"
+cover_image: "https://gobikes.au/wp-content/uploads/2025/10/j1.webp"
 tags: ["Outdoor Play", "Child Development", "Screen Time", "Healthy Kids"]
 ---
 

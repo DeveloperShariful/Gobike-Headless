@@ -3,7 +3,7 @@ title: "Keep the Good Times Rolling: A Simple GoBike Maintenance Checklist"
 date: "2025-10-01"
 author: "GoBike Tech Team"
 excerpt: "A little bit of care goes a long way. Follow our simple pre-ride checklist to keep your child's GoBike running smoothly and safely for years to come."
-cover_image: "https://gobikes.au/wp-content/uploads/2025/02/3-2.webp"
+cover_image: "https://gobikes.au/wp-content/uploads/2025/10/gobike-12-safety-features-for-toddlers.webp"
 tags: ["Bike Maintenance", "E-Bike Care", "Safety Check", "GoBike Tips"]
 ---
 

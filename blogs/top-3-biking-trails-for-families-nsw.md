@@ -2,7 +2,7 @@
 title: "Family Adventure Awaits: Our Top 3 Kid-Friendly Biking Trails in NSW"
 date: "2025-09-28"
 author: "The GoBike Team"
-cover_image: "https://gobikes.au/wp-content/uploads/2025/02/1-Static-1x1-1-1.webp"
+cover_image: "https://gobikes.au/wp-content/uploads/2025/10/gobike-20-front-suspension-fork.webp"
 excerpt: "Looking for the perfect spot to take your GoBike for a spin? We've rounded up three of the best family-friendly biking trails in New South Wales that are perfect for young riders."
 ---
 
