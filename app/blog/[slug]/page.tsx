@@ -24,6 +24,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: {
       canonical: `/blog/${slug}`,
     },
+     openGraph: {
+      title: frontmatter.title,
+      description: frontmatter.excerpt,
+      url: `https://gobike.au/blog/${slug}`,
+      siteName: 'GoBike Australia',
+      images: [
+        {
+          url: frontmatter.cover_image || 'https://gobikes.au/wp-content/uploads/2025/09/Gobike-kids-electric-bike-ebike-for-kids-scaled.webp', // পোস্টের কভার ইমেজ বা একটি ডিফল্ট ইমেজ
+          width: 1200,
+          height: 630,
+          alt: frontmatter.title,
+        },
+      ],
+      locale: 'en_AU',
+      type: 'article', // <-- এই পেজের টাইপ 'article' হবে
+      publishedTime: frontmatter.date,
+      authors: [frontmatter.author],
+    },
   };
 }
 

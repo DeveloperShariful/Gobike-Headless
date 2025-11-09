@@ -5,9 +5,15 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'About GoBike Australia | Our Story & Mission',
-  description: 'Learn about GoBike Australia, our mission to provide safe, fun, and high-performance electric bikes for kids, and our commitment to quality and Aussie customer service.',
+  description: 'Discover GoBike Australia and our mission to build safe, fun, and high-performance kids e-bikes, backed by our commitment to quality and local Aussie service.',
   alternates: {
     canonical: '/about',
+  },
+  // --- এই অংশটি যোগ করুন ---
+  openGraph: {
+    title: 'About GoBike Australia | Our Story & Mission',
+    description: 'Discover GoBike Australia and our mission to build safe, fun, and high-performance kids e-bikes, backed by our commitment to quality and local Aussie service.',
+    url: 'https://gobike.au/about', // <-- সঠিক এবং সম্পূর্ণ URL
   },
 };
 
@@ -20,7 +26,7 @@ export default function AboutPage() {
       <div className={styles['section-container']}>
         <h1>Our Story: More Than Just a kids eBike</h1>
         <p className={styles['intro-text']}>
-          Welcome to GoBike! We&apos;re not just another brand; we are a community born from a passion for adventure, family, and the pure joy of riding. Our journey began with a simple mission: to create the <strong><a href="https://gobike.au/" target="_blank" rel="noopener noreferrer">best kids electric bike</a></strong> in Australia.
+          Welcome to GoBike! We&apos;re not just another brand; we are a community born from a passion for adventure, family, and the pure joy of riding. Our journey began with a simple mission: to create the <strong><Link href="/">best kids electric bike</Link></strong> in Australia.
         </p>
       </div>
 

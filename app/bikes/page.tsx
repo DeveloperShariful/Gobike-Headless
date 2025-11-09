@@ -52,10 +52,21 @@ export async function generateMetadata(): Promise<Metadata> {
       canonical: '/bikes',
     },
     openGraph: {
-      title,
-      description,
-      url: '/bikes',
-    }
+      title: title,
+      description: description,
+      url: 'https://gobike.au/bikes',
+      siteName: 'GoBike Australia',
+      images: [
+        {
+          url: 'https://gobikes.au/wp-content/uploads/2025/09/Gobike-kids-electric-bike-ebike-for-kids-scaled.webp', // এই পেজের প্রধান ছবি
+          width: 1200,
+          height: 630,
+          alt: 'A happy child riding a GoBike electric bike in a park',
+        },
+      ],
+      locale: 'en_AU',
+      type: 'website',
+    },
   };
 }
 
@@ -122,6 +133,8 @@ export default async function BikesPage({ searchParams }: {
   const resolvedSearchParams = await searchParams;
   const after = typeof resolvedSearchParams.after === 'string' ? resolvedSearchParams.after : null;
   const before = typeof resolvedSearchParams.before === 'string' ? resolvedSearchParams.before : null;
+  //const after = typeof searchParams.after === 'string' ? searchParams.after : null;
+  //const before = typeof searchParams.before === 'string' ? searchParams.before : null;
 
   const { products, pageInfo } = await getBikeProducts(
     before ? null : PRODUCTS_PER_PAGE,
@@ -130,14 +143,59 @@ export default async function BikesPage({ searchParams }: {
     before
   );
 
+ // --- নতুন সংযোজন: Schema Markup / Structured Data ---
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    'name': 'Kids Electric Bikes',
+    'description': 'Browse our collection of top-rated electric bikes for kids.',
+    'itemListElement': products.map((product, index) => ({
+      '@type': 'ListItem',
+      'position': index + 1,
+      'item': {
+        '@type': 'Product',
+        'name': product.name,
+        'url': `https://gobike.au/product/${product.slug}`,
+        'image': product.image?.sourceUrl,
+        'description': `Discover the ${product.name}, a top-rated electric bike for kids. Safe, durable, and built for adventure.`,
+        'sku': product.databaseId.toString(),
+        'brand': {
+          '@type': 'Brand',
+          'name': 'GoBike'
+        },
+        ...(product.reviewCount && product.reviewCount > 0 && {
+          'aggregateRating': {
+            '@type': 'AggregateRating',
+            'ratingValue': product.averageRating || 5,
+            'reviewCount': product.reviewCount
+          }
+        }),
+        'offers': {
+          '@type': 'Offer',
+          'priceCurrency': 'AUD',
+          'price': product.salePrice 
+            ? product.salePrice.replace(/[^0-9.]+/g, "") 
+            : product.regularPrice?.replace(/[^0-9.]+/g, ""),
+          'availability': 'https://schema.org/InStock',
+          'url': `https://gobike.au/product/${product.slug}`
+        }
+      }
+    }))
+  };
+
   return (
     <div>
+      {/* --- নতুন সংযোজন: JSON-LD স্ক্রিপ্টটি পেজে যোগ করা হয়েছে --- */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Breadcrumbs pageTitle="All Bikes" />
       <div className={styles.pageContainer}>
         
         <header className={styles.header}>
           <div className={styles.heroContent}>
-            <h1 className={styles.heroTitle}>Australias Top-Rated Electric Bikes for Kids</h1>
+            <h1 className={styles.heroTitle}>Australia&apos;s Top-Rated Electric Bikes for Kids</h1>
             <p className={styles.heroSubtitle}>
               Give your child the gift of adventure! Our electric balance bikes are engineered for safety, built for fun, and designed to create lifelong memories.
             </p>
@@ -179,7 +237,7 @@ export default async function BikesPage({ searchParams }: {
           </div>
           <div className={styles.whyChooseUsContent}>
               <h2>Engineered for Safety, Built for Fun.</h2>
-              <p>Every GoBike is more than just a toy. It is a premium-quality ride designed with your childs safety as our number one priority.</p>
+              <p>Every GoBike is more than just a toy. It is a premium-quality ride designed with your child&apos;s safety as our number one priority.</p>
               <ul>
                   <li><strong>Lightweight & Durable Frame:</strong> Easy for kids to handle, tough enough for any adventure.</li>
                   <li><strong>Safe Speed Modes:</strong> Start with a slow learning mode and unlock faster speeds as they grow in confidence.</li>

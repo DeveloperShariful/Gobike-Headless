@@ -11,8 +11,23 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/refund-and-returns-policy',
   },
+  openGraph: {
+    title: 'Return and Refund Policy | GoBike Australia',
+    description: 'Learn about our 30-day return policy and process for refunds and exchanges at GoBike Australia.',
+    url: 'https://gobike.au/refund-and-returns-policy', // <-- সঠিক URL
+    siteName: 'GoBike Australia',
+    images: [
+      {
+        url: 'https://gobikes.au/wp-content/uploads/2025/09/Gobike-kids-electric-bike-ebike-for-kids-scaled.webp', // একটি ডিফল্ট শেয়ারিং ইমেজ
+        width: 1200,
+        height: 630,
+        alt: 'GoBike Australia Return and Refund Policy',
+      },
+    ],
+    locale: 'en_AU',
+    type: 'website',
+  },
 };
-
 
 // SEO Schema ডেটা
 const faqSchema = {

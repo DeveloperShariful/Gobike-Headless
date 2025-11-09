@@ -11,7 +11,24 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/terms-and-conditions',
   },
+  openGraph: {
+    title: 'Terms and Conditions | GoBike Australia',
+    description: 'Please read the official terms and conditions for using the GoBike Australia website, purchasing products, and our warranty policies.',
+    url: 'https://gobike.au/terms-and-conditions', // <-- সঠিক URL
+    siteName: 'GoBike Australia',
+    images: [
+      {
+        url: 'https://gobikes.au/wp-content/uploads/2025/09/Gobike-kids-electric-bike-ebike-for-kids-scaled.webp', // একটি ডিফল্ট শেয়ারিং ইমেজ
+        width: 1200,
+        height: 630,
+        alt: 'GoBike Australia Terms and Conditions',
+      },
+    ],
+    locale: 'en_AU',
+    type: 'website',
+  },
 };
+
 
 export default function TermsAndConditionsPage() {
   return (

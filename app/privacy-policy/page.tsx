@@ -9,6 +9,22 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/privacy-policy',
   },
+  openGraph: {
+    title: 'Privacy Policy | GoBike Australia',
+    description: 'Read how GoBike Australia collects, uses, and protects your personal data. Your privacy is important to us.',
+    url: 'https://gobike.au/privacy-policy',
+    siteName: 'GoBike Australia',
+    images: [
+      {
+        url: 'https://gobikes.au/wp-content/uploads/2025/09/Gobike-kids-electric-bike-ebike-for-kids-scaled.webp', // একটি ডিফল্ট শেয়ারিং ইমেজ
+        width: 1200,
+        height: 630,
+        alt: 'GoBike Australia Privacy Policy',
+      },
+    ],
+    locale: 'en_AU',
+    type: 'website',
+  },
 };
 
 export default function PrivacyPolicyPage() {
@@ -20,7 +36,7 @@ export default function PrivacyPolicyPage() {
         <h1>Privacy Policy for GoBike.au</h1>
         <p className={styles.lastUpdated}>Last Updated: 12 August 2025</p>
         
-        <p>At <strong><Link href="https://gobike.au"> Gobike </Link></strong>, your privacy is our priority. This Privacy Policy outlines how we collect, use, and protect your personal information when you browse or shop for your next <strong>Kids Ebike</strong> on our website. We are fully compliant with the Australian Privacy Principles (APPs) as set out in the <em><a href="https://www.oaic.gov.au/privacy/privacy-legislation/the-privacy-act">Privacy Act 1988 (Cth)</a></em>.</p>
+        <p>At <strong><Link href="/"> Gobike </Link></strong>, your privacy is our priority. This Privacy Policy outlines how we collect, use, and protect your personal information when you browse or shop for your next <strong>Kids Ebike</strong> on our website. We are fully compliant with the Australian Privacy Principles (APPs) as set out in the <em><a href="https://www.oaic.gov.au/privacy/privacy-legislation/the-privacy-act">Privacy Act 1988 (Cth)</a></em>.</p>
 
         <h2>1. What Information We Collect</h2>
         <p>When you interact with GoBike.au, we may collect the following information to provide you with the best service:</p>

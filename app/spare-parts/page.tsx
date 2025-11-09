@@ -49,11 +49,22 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: {
       canonical: '/spare-parts',
     },
-    openGraph: {
-      title,
-      description,
-      url: '/spare-parts',
-    }
+     openGraph: {
+      title: title,
+      description: description,
+      url: 'https://gobike.au/spare-parts',
+      siteName: 'GoBike Australia',
+      images: [
+        {
+          url: 'https://gobikes.au/wp-content/uploads/2025/02/Electric-Balance-Bike-Electric-bike-Balance-Bike-scaled-1.webp', // এই পেজের প্রধান ছবি
+          width: 1200,
+          height: 630,
+          alt: 'A collection of genuine GoBike spare parts and accessories.',
+        },
+      ],
+      locale: 'en_AU',
+      type: 'website',
+    },
   };
 }
 
@@ -116,7 +127,7 @@ async function getSpareParts(
 export default async function SparePartsPage({ searchParams }: {
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
-   const resolvedSearchParams = await searchParams;
+  const resolvedSearchParams = await searchParams;
   const after = typeof resolvedSearchParams.after === 'string' ? resolvedSearchParams.after : null;
   const before = typeof resolvedSearchParams.before === 'string' ? resolvedSearchParams.before : null;
 
@@ -127,8 +138,46 @@ export default async function SparePartsPage({ searchParams }: {
     before
   );
 
+ // Schema Markup / Structured Data তৈরি করা হয়েছে
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    'name': 'GoBike Spare Parts & Accessories',
+    'description': 'Find genuine spare parts and accessories for GoBike kids electric bikes.',
+    'itemListElement': products.map((product, index) => ({
+      '@type': 'ListItem',
+      'position': index + 1,
+      'item': {
+        '@type': 'Product',
+        'name': product.name,
+        'url': `https://gobike.au/product/${product.slug}`,
+        'image': product.image?.sourceUrl,
+        'description': `Genuine GoBike spare part: ${product.name}. Ensure perfect fit and performance.`,
+        'sku': product.databaseId.toString(),
+        'brand': {
+          '@type': 'Brand',
+          'name': 'GoBike'
+        },
+        'offers': {
+          '@type': 'Offer',
+          'priceCurrency': 'AUD',
+          'price': product.salePrice 
+            ? product.salePrice.replace(/[^0-9.]+/g, "") 
+            : product.regularPrice?.replace(/[^0-9.]+/g, ""),
+          'availability': 'https://schema.org/InStock',
+          'url': `https://gobike.au/product/${product.slug}`
+        }
+      }
+    }))
+  };
+
   return (
     <div>
+      {/* JSON-LD স্ক্রিপ্টটি পেজে যোগ করা হয়েছে */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Breadcrumbs pageTitle="Spare Parts" />
       <div className={styles.pageContainer}>
         
@@ -194,6 +243,7 @@ export default async function SparePartsPage({ searchParams }: {
           </p>
           <div className={styles.internalLinks}>
             <Link href="/contact" className={styles.internalLink}>Contact Our Team</Link>
+            <Link href="/products" className={styles.internalLink}>Shop All Products</Link>
             <Link href="/faq" className={styles.internalLink}>Find Answers (FAQ)</Link>
           </div>
         </section>

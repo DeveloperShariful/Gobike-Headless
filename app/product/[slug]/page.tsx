@@ -128,6 +128,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       title: product.name,
       description: plainDescription.substring(0, 155),
       images: [{ url: imageUrl, width: 800, height: 800, alt: product.name }],
+      siteName: 'GoBike Australia',
+      locale: 'en_AU',
     },
     twitter: {
       card: 'summary_large_image',

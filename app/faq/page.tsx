@@ -9,6 +9,23 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/faq',
   },
+  // আপনার metadata অবজেক্টের ভেতরে এটি যোগ করুন:
+    openGraph: {
+        title: 'Frequently Asked Questions (FAQ) | GoBike Australia',
+        description: 'Find answers to common questions about our kids electric bikes, shipping, warranty, safety, and more.',
+        url: 'https://gobike.au/faq',
+        siteName: 'GoBike Australia',
+        images: [
+           {
+              url: 'https://gobikes.au/wp-content/uploads/2025/08/Gobike-kids-electric-bike-ebike-for-kids-4-scaled.webp', // পেজের প্রধান ছবি
+              width: 1200,
+              height: 630,
+              alt: 'A smiling Australian child with a helmet enjoying a GoBike electric bike',
+            },
+        ],
+        locale: 'en_AU',
+        type: 'website',
+    },
 };
 
 // SEO এর জন্য সম্পূর্ণ JSON-LD ডেটা

@@ -14,6 +14,22 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/blog',
   },
+  openGraph: {
+    title: 'GoBike Kids E-Bike Blog | Tips, Guides & Stories',
+    description: "Expert tips, safety guides, and inspiring stories for your little rider's next big adventure.",
+    url: 'https://gobike.au/blog',
+    siteName: 'GoBike Australia',
+    images: [
+      {
+        url: 'https://gobikes.au/wp-content/uploads/2025/09/Gobike-kids-electric-bike-ebike-for-kids-scaled.webp', // একটি ডিফল্ট শেয়ারিং ইমেজ
+        width: 1200,
+        height: 630,
+        alt: 'The GoBike Australia Blog for kids e-bikes',
+      },
+    ],
+    locale: 'en_AU',
+    type: 'website',
+  },
 };
 
 export default function BlogPage() {

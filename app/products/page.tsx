@@ -2,7 +2,7 @@
 
 import { gql } from '@apollo/client';
 import type { Metadata } from 'next';
-
+import Link from 'next/link';
 // --- সমাধান: সঠিক ফাইল থেকে getClient import করা হচ্ছে ---
 import { getClient } from '../../lib/apollo-rsc-client';
 
@@ -73,11 +73,24 @@ export async function generateMetadata({ searchParams }: {
     alternates: {
       canonical: canonicalUrl,
     },
+    // --- সমাধান: সম্পূর্ণ Open Graph ট্যাগ যোগ করা হয়েছে ---
     openGraph: {
-      title,
-      description,
+      title: title,
+      description: description,
       url: canonicalUrl,
-    }
+      // --- নতুন সংযোজন ---
+      siteName: 'GoBike Australia', // আপনার সাইটের নাম
+      images: [
+        {
+          url: 'https://gobikes.au/wp-content/uploads/2025/09/Gobike-kids-electric-bike-ebike-for-kids-scaled.webp', // একটি ডিফল্ট শেয়ারিং ইমেজ
+          width: 1200,
+          height: 630,
+          alt: 'GoBike Australia Products',
+        },
+      ],
+      locale: 'en_AU', // আপনার লোকেশন
+      type: 'website', // এই পেজের ধরন
+    },
   };
 }
 
@@ -157,8 +170,42 @@ export default async function ProductsPage({ searchParams }: {
 
   const currentCategoryName = categories.find((c: Category) => c.slug === category)?.name || "All Products";
 
+    // --- নতুন সংযোজন: Schema Markup / Structured Data ---
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    'name': `GoBike ${currentCategoryName}`,
+    'description': `Browse our collection of ${currentCategoryName}.`,
+    'itemListElement': products.map((product, index) => ({
+      '@type': 'ListItem',
+      'position': index + 1,
+      'item': {
+        '@type': 'Product',
+        'name': product.name,
+        'url': `https://gobike.au/product/${product.slug}`,
+        'image': product.image?.sourceUrl,
+        'description': `Genuine GoBike product: ${product.name}.`,
+        'sku': product.databaseId.toString(),
+        'brand': { '@type': 'Brand', 'name': 'GoBike' },
+        'offers': {
+          '@type': 'Offer',
+          'priceCurrency': 'AUD',
+          'price': product.salePrice ? product.salePrice.replace(/[^0-9.]+/g, "") : product.regularPrice?.replace(/[^0-9.]+/g, ""),
+          'availability': 'https://schema.org/InStock',
+          'url': `https://gobike.au/product/${product.slug}`
+        }
+      }
+    }))
+  };
+
   return (
     <div>
+      {/* --- নতুন সংযোজন: JSON-LD স্ক্রিপ্টটি পেজে যোগ করা হয়েছে --- */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       <Breadcrumbs pageTitle={currentCategoryName} />
       <div className={styles.pageWrapper}>
         <header className={styles.header}>
@@ -179,6 +226,11 @@ export default async function ProductsPage({ searchParams }: {
         <div className={styles.paginationWrapper}>
             <PaginationControls pageInfo={pageInfo} basePath="/products" />
         </div>
+        <div className={styles.internalLinks}>
+            <Link href="/contact" className={styles.internalLink}>Contact Our Team</Link>
+            <Link href="/bikes" className={styles.internalLink}>Shop All Bikes</Link>
+            <Link href="/about" className={styles.internalLink}>About Us</Link>
+          </div>
       </div>
     </div>
   );
