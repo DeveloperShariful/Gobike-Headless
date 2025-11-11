@@ -14,6 +14,17 @@ export const metadata: Metadata = {
     title: 'About GoBike Australia | Our Story & Mission',
     description: 'Discover GoBike Australia and our mission to build safe, fun, and high-performance kids e-bikes, backed by our commitment to quality and local Aussie service.',
     url: 'https://gobike.au/about', // <-- সঠিক এবং সম্পূর্ণ URL
+    siteName: 'GoBike Australia',
+    images: [
+      {
+        url: 'https://gobikes.au/wp-content/uploads/2025/08/gobike-scaled.webp', // একটি ডিফল্ট শেয়ারিং ইমেজ
+        width: 2049,
+        height: 2560,
+        alt: 'GoBike Australia About us',
+      },
+    ],
+    locale: 'en_AU',
+    type: 'website',
   },
 };
 

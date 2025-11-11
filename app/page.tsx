@@ -5,16 +5,15 @@ const siteConfig = {
   url: 'https://gobike.au',
   title: 'GoBike - Australia’s Top Rated Kids Electric Balance Bikes',
   description: "Discover Australia's top-rated electric bikes for kids. Safe, fun, and built for adventure. Shop GoBike for the best kids e-bikes with a 1-year local warranty.",
-  ogImage: '/og-image.png',
-  logo: '/logo.png',
+  ogImage: 'https://gobikes.au/wp-content/uploads/2025/10/gobike-12-safety-features-for-toddlers.webp',
+  logo: 'https://gobikes.au/wp-content/uploads/2025/06/cropped-GOBIKE-Electric-Bike-for-kids-1.webp',
   siteName: 'GoBike Australia',
   facebook: 'https://www.facebook.com/Go-Bike-104997195659873',
   instagram: 'https://www.instagram.com/gobikeoz/',
   youtube: 'https://www.youtube.com/@Gobike-r7b',
-  phone: '+61-4-XXXX-XXXX', // <-- আপনার সঠিক ফোন নম্বর দিন
+  phone: '+61-4-XXXX-XXXX',
 };
 
-// +++ SEO Metadata (এখন এটি সার্ভার কম্পোনেন্টে থাকায় সঠিকভাবে কাজ করবে) +++
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: siteConfig.title,
@@ -33,7 +32,7 @@ export const metadata: Metadata = {
       {
         url: siteConfig.ogImage,
         width: 1200,
-        height: 630,
+        height: 857, // --- সমাধান ২: ছবির আসল উচ্চতা দেওয়া হয়েছে ---
         alt: 'A child happily riding a GoBike electric bike in an Australian park.',
       },
     ],
@@ -53,7 +52,7 @@ export default function Home() {
         '@type': 'Organization',
         'name': siteConfig.siteName,
         'url': siteConfig.url,
-        'logo': `${siteConfig.url}${siteConfig.logo}`,
+        'logo': siteConfig.logo, // --- সমাধান ১: এখানে শুধু siteConfig.logo হবে ---
         'contactPoint': { '@type': 'ContactPoint', 'telephone': siteConfig.phone, 'contactType': 'Customer Service' },
         'sameAs': [ siteConfig.facebook, siteConfig.instagram, siteConfig.youtube, ]
       },

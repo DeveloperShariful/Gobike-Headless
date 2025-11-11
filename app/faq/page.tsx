@@ -17,9 +17,9 @@ export const metadata: Metadata = {
         siteName: 'GoBike Australia',
         images: [
            {
-              url: 'https://gobikes.au/wp-content/uploads/2025/08/Gobike-kids-electric-bike-ebike-for-kids-4-scaled.webp', // পেজের প্রধান ছবি
+              url: 'https://gobikes.au/wp-content/uploads/2025/10/gobike-au-1-year-warranty-kids-ebikes.webp', // পেজের প্রধান ছবি
               width: 1200,
-              height: 630,
+              height: 857,
               alt: 'A smiling Australian child with a helmet enjoying a GoBike electric bike',
             },
         ],

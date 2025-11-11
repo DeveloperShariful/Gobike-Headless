@@ -78,8 +78,8 @@ export default function ContactPageClient() {
               </div>
               <div className={styles.contactIntroImage}>
                   <Image 
-                      src="https://gobikes.au/wp-content/uploads/2025/02/1-Static-1x1-1.webp" 
-                      alt="A child confidently riding a GoBike electric balance bike"
+                      src="https://gobikes.au/wp-content/uploads/2025/10/j1.webp" 
+                      alt="A child GoBike electric balance bikes battery"
                       width={500}
                       height={500}
                       sizes="(max-width: 768px) 100vw, 50vw"

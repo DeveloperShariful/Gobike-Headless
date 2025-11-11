@@ -16,9 +16,9 @@ export const metadata: Metadata = {
     siteName: 'GoBike Australia',
     images: [
       {
-        url: 'https://gobikes.au/wp-content/uploads/2025/09/Gobike-kids-electric-bike-ebike-for-kids-scaled.webp', // একটি ডিফল্ট শেয়ারিং ইমেজ
+        url: 'https://gobikes.au/wp-content/uploads/2025/10/gobike-au-australian-owned-brand.webp', // একটি ডিফল্ট শেয়ারিং ইমেজ
         width: 1200,
-        height: 630,
+        height: 857,
         alt: 'GoBike Australia Privacy Policy',
       },
     ],

@@ -127,6 +127,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     openGraph: {
       title: product.name,
       description: plainDescription.substring(0, 155),
+      url: `https://gobike.au/product/${slug}`,
       images: [{ url: imageUrl, width: 800, height: 800, alt: product.name }],
       siteName: 'GoBike Australia',
       locale: 'en_AU',
