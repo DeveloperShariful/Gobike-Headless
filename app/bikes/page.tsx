@@ -58,7 +58,7 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: 'GoBike Australia',
       images: [
         {
-          url: 'https://gobikes.au/wp-content/uploads/2025/10/gobike-ebike-safe-speed-modes.webp', // এই পেজের প্রধান ছবি
+          url: 'https://gobikes.au/wp-content/uploads/2025/11/gobike-ebike-safe-speed-modes.jpg', 
           width: 1200,
           height: 857 ,
           alt: 'A happy child riding a GoBike electric bike in a park',

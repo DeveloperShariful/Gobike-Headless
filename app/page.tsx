@@ -5,7 +5,7 @@ const siteConfig = {
   url: 'https://gobike.au',
   title: 'GoBike - Australia’s Top Rated Kids Electric Balance Bikes',
   description: "Discover Australia's top-rated electric bikes for kids. Safe, fun, and built for adventure. Shop GoBike for the best kids e-bikes with a 1-year local warranty.",
-  ogImage: 'https://gobikes.au/wp-content/uploads/2025/10/gobike-12-safety-features-for-toddlers.webp',
+  ogImage: 'https://gobikes.au/wp-content/uploads/2025/11/gobike-ebike-safe-speed-modes.jpg',
   logo: 'https://gobikes.au/wp-content/uploads/2025/06/cropped-GOBIKE-Electric-Bike-for-kids-1.webp',
   siteName: 'GoBike Australia',
   facebook: 'https://www.facebook.com/Go-Bike-104997195659873',

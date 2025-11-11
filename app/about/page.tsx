@@ -17,9 +17,9 @@ export const metadata: Metadata = {
     siteName: 'GoBike Australia',
     images: [
       {
-        url: 'https://gobikes.au/wp-content/uploads/2025/08/gobike-scaled.webp', // একটি ডিফল্ট শেয়ারিং ইমেজ
-        width: 2049,
-        height: 2560,
+        url: 'https://gobikes.au/wp-content/uploads/2025/11/shop-now-gobike-12-ebike-sale.jpg', // একটি ডিফল্ট শেয়ারিং ইমেজ
+        width: 1200,
+        height: 857,
         alt: 'GoBike Australia About us',
       },
     ],

@@ -35,9 +35,9 @@ export const metadata: Metadata = {
     siteName: 'GoBike Australia',
     images: [
       {
-        url: '/', 
+        url: 'https://gobikes.au/wp-content/uploads/2025/11/gobike-ebike-safe-speed-modes.jpg', 
         width: 1200,
-        height: 630,
+        height: 857,
         alt: 'A child riding a GoBike electric bike.',
       },
     ],
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'GoBike - Kids Electric Bikes Australia',
     description: "Australia's top-rated electric balance bikes for kids.",
-    images: ['/'], 
+    images: ['https://gobikes.au/wp-content/uploads/2025/11/gobike-ebike-safe-speed-modes.jpg'], 
   },
 
   keywords: ['kids electric bike','kids ebike', 'electric bike','electric bike for kids','electric balance bike', 'ebike for kids', 'GoBike','childrens electric motorbike','toddler electric bike','buy kids ebike online','GoBike Australia'],
