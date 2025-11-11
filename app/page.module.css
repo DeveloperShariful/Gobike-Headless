@@ -1,4 +1,13 @@
 /* app/page.module.css */
+/* 
+  এই ফাইলটি আপনার Next.js অ্যাপ্লিকেশনের হোমপেজের জন্য ব্যবহৃত CSS মডিউল। 
+  এখানে সমস্ত স্টাইল অপরিবর্তিত রেখে শুধুমাত্র পঠনযোগ্যতার জন্য সেকশন অনুযায়ী মন্তব্যসহ সাজানো হয়েছে।
+*/
+
+/* =================================================================== */
+/* General / Shared Styles (সাধারণ এবং শেয়ার করা স্টাইল) */
+/* =================================================================== */
+/* এই স্টাইলগুলো বিভিন্ন সেকশনে বারবার ব্যবহার করা হয়েছে */
 
 .gobikeSection {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -48,6 +57,26 @@
     color: #000;
     border-color: #000;
 }
+.sectionFullWidthBreakout {
+    width: 100%;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+}
+.sectionDividerWrapper {
+    max-width: 1500px; 
+    margin: 0 auto; 
+    padding: 0 1rem; 
+}
+.sectionDivider {
+    border: none;
+    border-top: 1px solid #e0e0e0; 
+    margin: 1rem 0 0 0; 
+}
+
+/* =================================================================== */
+/* HeroSlider Section (হিরো স্লাইডার সেকশন) */
+/* =================================================================== */
+
 .finalSplitSliderContainer {
     position: relative;
     width: 100%;
@@ -147,6 +176,11 @@
     cursor: pointer;
     transition: background-color .3s ease, border-color .3s ease;
 }
+
+/* =================================================================== */
+/* TrustBadges Section (ট্রাস্ট ব্যাজ সেকশন) */
+/* =================================================================== */
+
 .finalTrustGrid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -174,6 +208,11 @@
     margin: 0;
     line-height: 1.6;
 }
+
+/* =================================================================== */
+/* ProductCollection Section (প্রোডাক্ট কালেকশন সেকশন) */
+/* =================================================================== */
+
 .productCollectionSection {
     padding: 20px 0;
 }
@@ -263,6 +302,11 @@
     text-align: center;
     margin-top: 40px;
 }
+
+/* =================================================================== */
+/* OurStory Section (আমাদের গল্প সেকশন) */
+/* =================================================================== */
+
 .originStoryGrid {
     display: grid;
     grid-template-columns: 1fr;
@@ -327,6 +371,137 @@
 .storyButton:hover {
     transform: scale(1.05);
 }
+
+/* =================================================================== */
+/* SmarterChoice Section (স্মার্টার চয়েস সেকশন) - আপডেটেড */
+/* =================================================================== */
+
+/* স্লাইডারের মূল কন্টেইনার (নেভিগেশন বাটন রাখার জন্য) */
+.smarterChoiceSliderContainer {
+    position: relative;
+    padding: 0 10px; /* কন্টেইনারের ভেতরে সামান্য প্যাডিং */
+}
+
+/* ডেস্কটপ এবং ট্যাবলেটের জন্য গ্রিড লেআউট */
+.smarterChoiceGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+/* প্রতিটি কার্ডের সাধারণ স্টাইল */
+.choiceCard {
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #f8f9fa;
+    border: 1px solid #e9e9e9;
+    transition: transform .3s ease, box-shadow .3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.choiceCard:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, .1);
+}
+
+.choiceCardImageWrapper {
+    position: relative;
+    width: 100%;
+    background-color: #e0e0e0;
+}
+
+.choiceCardContent {
+    padding: 1.5rem;
+    flex-grow: 1;
+}
+
+.choiceCardTitle {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem 0;
+}
+
+.choiceCardDescription {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #444;
+}
+
+/* স্লাইডার নেভিগেশন বাটন (ভিডিও সেকশনের মতো) */
+/* ডিফল্টভাবে ডেস্কটপে লুকানো থাকবে */
+.smarterChoiceNav {
+    display: none;
+    position: absolute;
+    top: 35%; /* অবস্থান একটু উপরে অ্যাডজাস্ট করা হলো */
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 10;
+    transition: background-color 0.3s ease;
+    align-items: center;
+    justify-content: center;
+}
+
+.smarterChoiceNav:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+.smarterChoiceNav.prev {
+    left: -5px;
+}
+
+.smarterChoiceNav.next {
+    right: -5px;
+}
+
+
+/* --- Responsive Media Queries --- */
+
+/* ট্যাবলেট ভিউ (৯৯২ পিক্সেলের নিচে) */
+@media (max-width: 992px) {
+    .smarterChoiceGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* মোবাইল ভিউ (৭৬৭ পিক্সেলের নিচে) - এখানে গ্রিডকে ফ্লেক্স স্লাইডারে পরিণত করা হবে */
+@media (max-width: 767px) {
+    .smarterChoiceGrid {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Firefox */
+        gap: 1rem; /* স্লাইডের মধ্যে গ্যাপ */
+        padding-bottom: 10px;
+    }
+
+    .smarterChoiceGrid::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
+    }
+
+    .choiceCard {
+        flex: 0 0 90%; /* প্রতিটি কার্ড স্ক্রিনের ৯০% জায়গা নেবে */
+        scroll-snap-align: start;
+    }
+
+    /* মোবাইলে নেভিগেশন বাটনগুলো দেখানো হবে */
+    .smarterChoiceNav {
+        display: flex; 
+    }
+}
+
+/* =================================================================== */
+/* DifferenceSection Section (পার্থক্য সেকশন) */
+/* =================================================================== */
+
 .perfectComparisonSection {
     display: grid;
     grid-template-columns: 1fr;
@@ -376,6 +551,10 @@
     border-radius: 10px;
 }
 
+/* =================================================================== */
+/* CommunitySection Section (কমিউনিটি সেকশন) */
+/* =================================================================== */
+
 .finalCommunityGrid {
     display: grid;
     grid-template-columns: 1fr;
@@ -414,20 +593,60 @@
     font-weight: 600;
     margin-bottom: 30px;
 }
-/*.videoGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 40px;
-} */
-.videoMainWrapper {
-    max-width: 1500px;
-    margin: 0 auto 60px auto;
-    padding: 0 10px;
-}
-.videoGridWrapper {
+
+/* =================================================================== */
+/* VideoReviews Section (ভিডিও রিভিউ সেকশন) */
+/* =================================================================== */
+
+.videoSliderContainer {
     max-width: 1500px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 2px;
+    position: relative;
+}
+.videoSlider {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    gap: 30px;
+    padding-bottom: 0; /* for shadow or other effects */
+}
+.videoSlider::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+.videoSlide {
+    flex: 0 0 48%; /* ডেস্কটপে দুটি আইটেম */
+    scroll-snap-align: start;
+    box-sizing: border-box;
+}
+.sliderNav {
+    position: absolute;
+    top: 40%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 10;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.sliderNav:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+}
+.prev {
+    left: -5px;
+}
+.next {
+    right: -5px;
 }
 .videoCaption {
     margin-top: 25px;
@@ -499,6 +718,11 @@
     height: 100%;
     border: 0;
 }
+
+/* =================================================================== */
+/* FaqSection Section (সাধারণ জিজ্ঞাসা সেকশন) */
+/* =================================================================== */
+
 .premiumFaqContainer {
     max-width: 1500px;
     margin: 0 auto;
@@ -595,6 +819,12 @@
     color: #fff;
     transform: translateY(-3px);
 }
+
+/* =================================================================== */
+/* BlogSection Section (ব্লগ সেকশন) */
+/* =================================================================== */
+/* Note: এই সেকশনের কম্পোনেন্টটি আপনার page.tsx ফাইলে কমেন্ট করা আছে */
+
 .seoBlogSection {
     padding: 10px 15px;
 }
@@ -668,11 +898,10 @@
     align-self: flex-start;
     margin-top: auto;
 }
-.sectionFullWidthBreakout {
-    width: 100%;
-    margin-left: calc(50% - 50vw);
-    margin-right: calc(50% - 50vw);
-}
+
+/* =================================================================== */
+/* Responsive Media Queries (রেসপন্সিভ মিডিয়া কোয়েরি) */
+/* =================================================================== */
 
 @media (min-width:992px) {
     .finalSplitSlide {
@@ -718,11 +947,16 @@
         text-align: left!important;
         margin-left: 0!important;
     }
+    .smarterChoiceGrid { grid-template-columns: repeat(4, 1fr); } /* from the second CSS block */
+    .videoSlide {
+        flex-basis: 47%;
+    }
 }
 @media (max-width:992px) {
     .productGrid {
         grid-template-columns: repeat(2, 1fr);
     }
+    .smarterChoiceGrid { grid-template-columns: repeat(2, 1fr); } /* from the second CSS block */
 }
 @media (max-width:767px) {
     .finalTrustGrid {
@@ -738,169 +972,6 @@
     .collectionTitle {
         font-size: 24px;
     }
-}
-@media (max-width:480px) {
-    .finalTrustGrid {
-        grid-template-columns: 1fr;
-    }
-}
-/* smart choice*/
-/* app/page.module.css */
-
-/* ... (আপনার পুরোনো সব CSS অপরিবর্তিত রাখুন) ... */
-
-
-/* --- SmarterChoice সেকশনের জন্য আপডেট করা স্টাইল --- */
-
-.choiceCard {
-    border-radius: 12px;
-    overflow: hidden;
-    background-color: #f8f9fa;
-    border: 1px solid #e9e9e9;
-    transition: transform .3s ease, box-shadow .3s ease;
-}
-.choiceCard:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, .1);
-}
-.smarterChoiceGrid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
-}
-@media (max-width: 992px) {
-    .smarterChoiceGrid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 600px) {
-    .smarterChoiceGrid { grid-template-columns: 1fr; }
-}
-
-.choiceCard {
-    background-color: #f8f9fa;
-    border-radius: 12px;
-    overflow: hidden; /* Image-কে border-radius-এর ভেতরে রাখে */
-    display: flex;
-    flex-direction: column;
-}
-
-/* --- কার্যকরী সমাধান: ছবির জন্য নতুন wrapper ক্লাস --- */
-.choiceCardImageWrapper {
-    position: relative;
-    width: 100%;
-    background-color: #e0e0e0;
-}
-
-.choiceCardContent {
-    padding: 1.5rem;
-    flex-grow: 1;
-}
-
-.choiceCardTitle {
-    font-size: 1.3rem;
-    font-weight: 700;
-    margin: 0 0 0.75rem 0;
-}
-
-.choiceCardDescription {
-    font-size: 1rem;
-    line-height: 1.6;
-    color: #444;
-}
-.sectionDividerWrapper {
-    max-width: 1500px; /* আপনার container1500-এর সাথে মিলিয়ে প্রস্থ দিন */
-    margin: 0 auto; /* মাঝখানে আনার জন্য */
-    padding: 0 1rem; /* দুই পাশে প্যাডিং */
-}
-
-.sectionDivider {
-    border: none; /* ডিফল্ট বর্ডার তুলে দেওয়া হচ্ছে */
-    border-top: 1px solid #e0e0e0; /* একটি ১ পিক্সেল চওড়া, হালকা ধূসর রঙের লাইন */
-    margin: 1rem 0 0 0; /* উপরে এবং নিচে ফাঁকা জায়গা তৈরি করে */
-}
-
-/* app/page.module.css */
-
-/* --- আপনার পুরনো .videoGrid স্টাইলটি মুছে ফেলুন বা কমেন্ট করে দিন --- */
-/*
-.videoGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 40px;
-}
-*/
-
-/* --- ভিডিও স্লাইডারের জন্য নতুন স্টাইল যোগ করুন --- */
-
-.videoGridWrapper { /* এই ক্লাসটি এখন আর ব্যবহৃত হচ্ছে না, কিন্তু রেখে দিতে পারেন */
-    max-width: 1500px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-.videoSliderContainer {
-    max-width: 1500px;
-    margin: 0 auto;
-    padding: 0 20px;
-    position: relative;
-}
-
-.videoSlider {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Firefox */
-    gap: 30px;
-    padding-bottom: 15px; /* for shadow or other effects */
-}
-.videoSlider::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
-}
-
-.videoSlide {
-    flex: 0 0 48%; /* ডেস্কটপে দুটি আইটেম */
-    scroll-snap-align: start;
-    box-sizing: border-box;
-}
-
-/* স্লাইডার নেভিগেশন বাটন */
-.sliderNav {
-    position: absolute;
-    top: 40%;
-    transform: translateY(-50%);
-    background-color: rgba(0, 0, 0, 0.6);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    font-size: 20px;
-    cursor: pointer;
-    z-index: 10;
-    transition: background-color 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.sliderNav:hover {
-    background-color: rgba(0, 0, 0, 0.9);
-}
-
-.prev {
-    left: -5px;
-}
-.next {
-    right: -5px;
-}
-
-/* --- Responsive Design --- */
-@media (max-width: 992px) {
-    .videoSlide {
-        flex-basis: 47%;
-    }
-}
-
-@media (max-width: 767px) {
     .videoSlide {
         flex-basis: 95%; /* মোবাইলে একটি আইটেম */
     }
@@ -911,4 +982,12 @@
     }
     .prev { left: 5px; }
     .next { right: 5px; }
+}
+@media (max-width:600px) {
+    .smarterChoiceGrid { grid-template-columns: 1fr; } /* from the second CSS block */
+}
+@media (max-width:480px) {
+    .finalTrustGrid {
+        grid-template-columns: 1fr;
+    }
 }

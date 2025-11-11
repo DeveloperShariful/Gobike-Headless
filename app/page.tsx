@@ -1,6 +1,8 @@
 //app/page.tsx
 import type { Metadata } from 'next';
 import HomePageClient from './HomePageClient';
+import DynamicBlogSection from '../components/DynamicBlogSection';
+
 const siteConfig = {
   url: 'https://gobike.au',
   title: 'GoBike - Australia’s Top Rated Kids Electric Balance Bikes',
@@ -71,6 +73,7 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
       <HomePageClient />
+      <DynamicBlogSection />
     </main>
   );
 }

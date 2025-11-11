@@ -180,12 +180,12 @@ const OurStory = () => {
 }
 
 // ====================================================================
-// SmarterChoice Component
+// SmarterChoice Component ( *** পরিবর্তিত সেকশন *** )
 // ====================================================================
 const choices = [
     { 
       imageSrc: "https://gobikes.au/wp-content/uploads/2025/08/Gobike-kids-electric-bikes-electric-bike-for-kids-ebike-kids-electric-bike-Final-1.webp", 
-      width: 1500, height: 1200, // <-- ছবির আসল মাপ (উদাহরণ)
+      width: 1500, height: 1200,
       label: "A child wearing a helmet, representing GoBike's commitment to safety", 
       title: "Safety is Our Foundation", 
       description: "From a gentle, slow-start mode for beginners to responsive, powerful brakes for confident riders, every detail is engineered to keep your child safe on their adventures." 
@@ -214,6 +214,22 @@ const choices = [
 ];
 
 const SmarterChoice = () => {
+    // পরিবর্তন ১: স্লাইডার কন্টেইনারের জন্য একটি ref তৈরি করা হয়েছে
+    const sliderRef = useRef<HTMLDivElement>(null);
+
+    // পরিবর্তন ২: স্ক্রল করার জন্য ফাংশন যোগ করা হয়েছে
+    const scroll = (direction: 'left' | 'right') => {
+        if (sliderRef.current) {
+            const { current } = sliderRef;
+            // প্রতিটি কার্ডের প্রস্থ এবং গ্যাপ অনুযায়ী স্ক্রল করা হবে
+            const scrollAmount = direction === 'left' 
+                ? -(current.offsetWidth * 0.9) // একবারে একটি কার্ডের সমান বামে যাবে
+                : (current.offsetWidth * 0.9); // একবারে একটি কার্ডের সমান ডানে যাবে
+            
+            current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        }
+    };
+
   return (
     <section className={`${styles.gobikeSection} ${styles.smarterChoiceSection} ${styles.sectionFullWidthBreakout}`}>
       <div className={styles.container1500}>
@@ -221,26 +237,35 @@ const SmarterChoice = () => {
           <h2 className={styles.sectionTitle}>Why GoBike is The Smarter Choice</h2>
           <p className={styles.sectionSubtitle} style={{ color: '#000' }}>When we could not find the best kids electric bike for our own kids, we decided to build it. Every GoBike is a promise of, durability, performance and pure FUN.</p>
         </div>
-        <div className={styles.smarterChoiceGrid}>
-          {choices.map((choice, index) => (
-            <div className={styles.choiceCard} key={index}>
-              <div className={styles.choiceCardImageWrapper}>
-                <Image
-                  src={choice.imageSrc}
-                  alt={choice.label}
-                  width={choice.width}   // <-- ছবির আসল প্রস্থ
-                  height={choice.height} // <-- ছবির আসল উচ্চতা
-                  sizes="(max-width: 768px) 100vw, 25vw"
-                  style={{ objectFit: 'cover', width: '100%', height: '100%' }} // <-- height: 100% যোগ করা হয়েছে
-                />
-              </div>
-              <div className={styles.choiceCardContent}>
-                <h3 className={styles.choiceCardTitle}>{choice.title}</h3>
-                <p className={styles.choiceCardDescription}>{choice.description}</p>
-              </div>
+
+        {/* পরিবর্তন ৩: স্লাইডারের মূল কন্টেইনার এবং নেভিগেশন বাটন যোগ করা হয়েছে */}
+        <div className={styles.smarterChoiceSliderContainer}>
+            <div className={styles.smarterChoiceGrid} ref={sliderRef}>
+                {choices.map((choice, index) => (
+                    <div className={styles.choiceCard} key={index}>
+                    <div className={styles.choiceCardImageWrapper}>
+                        <Image
+                        src={choice.imageSrc}
+                        alt={choice.label}
+                        width={choice.width}
+                        height={choice.height}
+                        sizes="(max-width: 767px) 90vw, (max-width: 992px) 50vw, 25vw"
+                        style={{ objectFit: 'cover', width: '100%', height: 'auto' }}
+                        />
+                    </div>
+                    <div className={styles.choiceCardContent}>
+                        <h3 className={styles.choiceCardTitle}>{choice.title}</h3>
+                        <p className={styles.choiceCardDescription}>{choice.description}</p>
+                    </div>
+                    </div>
+                ))}
             </div>
-          ))}
+
+            {/* স্লাইডার নেভিগেশন বাটন */}
+            <button onClick={() => scroll('left')} className={`${styles.smarterChoiceNav} ${styles.prev}`} aria-label="Previous choice">&#10094;</button>
+            <button onClick={() => scroll('right')} className={`${styles.smarterChoiceNav} ${styles.next}`} aria-label="Next choice">&#10095;</button>
         </div>
+
       </div>
     </section>
   );
@@ -497,12 +522,12 @@ const FaqSection = () => {
   );
 }
 
-// ====================================================================
+/*// ====================================================================
 // BlogSection Component
 // ====================================================================
 const blogPosts = [
     { link: "/blog/gobike-maintenance-tips", imageSrc: "https://gobikes.au/wp-content/uploads/2025/08/Gobike-kids-electric-bike-ebike-for-kids-2-scaled-1.webp", altText: "A child standing with a GoBike 14, representing the future of fun for kids electric balance bikes", badge: "Buyer's Guide", title: "Electric Bikes: The Future of Fun for Aussie Kids?", excerpt: "Is an electric balance bike the right choice for your child? We break down the benefits, from safety features to building confidence." },
-    { link: "/blog", imageSrc: "https://gobikes.au/wp-content/uploads/2025/02/Electric-Balance-Bike-Electric-bike-Balance-Bike-Bike-baby-bikes-1-scaled.webp", altText: "A young child having outdoor fun on a GoBike electric balance bike, revolutionizing their playtime", badge: "Tips & Tricks", title: "Revolutionizing Kid's Outdoor Fun: The GoBike Guide", excerpt: "Discover how a GoBike can transform your child's outdoor playtime, encouraging adventure and developing crucial motor skills." },
+    { link: "/blog/ebike-battery-care-tips", imageSrc: "https://gobikes.au/wp-content/uploads/2025/02/Electric-Balance-Bike-Electric-bike-Balance-Bike-Bike-baby-bikes-1-scaled.webp", altText: "A young child having outdoor fun on a GoBike electric balance bike, revolutionizing their playtime", badge: "Tips & Tricks", title: "Revolutionizing Kid's Outdoor Fun: The GoBike Guide", excerpt: "Discover how a GoBike can transform your child's outdoor playtime, encouraging adventure and developing crucial motor skills." },
     { link: "/blog", imageSrc: "https://gobikes.au/wp-content/uploads/2025/08/Gobike-kids-electric-bike-ebike-for-kids-5-scaled-1.webp", altText: "A child giving a thumbs up on a GoBike, an eco-friendly ride for all ages", badge: "Lifestyle", title: "A Fun and Eco-Friendly Ride for the Whole Family", excerpt: "Learn why electric bikes are a fantastic, eco-friendly way for kids and teens to stay active and explore their world." }
 ];
 
@@ -536,7 +561,7 @@ const BlogSection = () => {
     </section>
   );
 }
-
+*/
 // ====================================================================
 // Main Home Page Component
 // ====================================================================
@@ -593,7 +618,7 @@ export default function HomePageClient() {
       <div className={styles.sectionDividerWrapper}>
         <hr className={styles.sectionDivider} />
       </div>
-      <BlogSection />
+      {/*<BlogSection />*/}
     </>
   );
 }
