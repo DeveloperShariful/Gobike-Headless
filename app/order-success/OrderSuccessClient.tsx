@@ -1,4 +1,3 @@
-// app/order-success/OrderSuccessClient.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -6,12 +5,11 @@ import { useCart } from '../../context/CartContext';
 import styles from './OrderSuccessClient.module.css';
 import Image from 'next/image';
 import Link from 'next/link';
-// --- ★★★ পরিবর্তন: GTM এবং Klaviyo ফাংশন ইম্পোর্ট করা হচ্ছে ★★★ ---
 import { gtmPurchase } from '../../lib/gtm';
 import { klaviyoIdentify, klaviyoTrackPlacedOrder } from '../../lib/klaviyo';
 
 // ====================================================================
-// TypeScript ইন্টারফেস (ট্র্যাকিংয়ের জন্য প্রয়োজনীয় ডেটা সহ আপডেট করা হয়েছে)
+// TypeScript ইন্টারফেস (অপরিবর্তিত)
 // ====================================================================
 interface OrderItemNode {
   databaseId: number;
@@ -47,8 +45,8 @@ interface OrderData {
   databaseId: number;
   date: string;
   total: string;
-  shippingTotal: string | null; // <-- শিপিং খরচ
-  discountTotal: string | null; // <-- ডিসকাউন্ট
+  shippingTotal: string | null;
+  discountTotal: string | null;
   status: string;
   paymentMethodTitle: string;
   lineItems: {
@@ -57,7 +55,6 @@ interface OrderData {
   billing: Address;
   shipping: Address;
   customerNote: string | null;
-  // WooCommerce থেকে এই ডেটা API রেসপন্সে যোগ করতে হতে পারে
   appliedCoupons?: {
     nodes: { code: string }[];
   } | null;
@@ -69,8 +66,6 @@ export default function OrderSuccessClient({ orderId, orderKey }: { orderId: str
   const [order, setOrder] = useState<OrderData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // --- ★★★ পরিবর্তন: ডুপ্লিকেট ট্র্যাকিং প্রতিরোধের জন্য স্টেট ★★★ ---
   const [trackingFired, setTrackingFired] = useState(false);
 
   useEffect(() => {
@@ -112,17 +107,13 @@ export default function OrderSuccessClient({ orderId, orderKey }: { orderId: str
     return () => { isMounted = false; };
   }, [orderId, orderKey, clearCart]);
 
-  // --- ★★★ পরিবর্তন: GTM এবং Klaviyo ট্র্যাকিংয়ের জন্য নতুন useEffect ★★★ ---
   useEffect(() => {
-    // শর্ত: অর্ডার ডেটা থাকতে হবে এবং ট্র্যাকিং আগে হয়নি
     if (order && !trackingFired) {
-      // Helper ফাংশন: প্রাইস স্ট্রিং থেকে নম্বর বের করার জন্য
       const parsePrice = (priceStr: string | null | undefined): number => {
         if (!priceStr) return 0;
         return parseFloat(priceStr.replace(/[^0-9.]/g, ''));
       };
 
-      // Klaviyo-তে ব্যবহারকারীকে শনাক্ত করা হচ্ছে
       if (order.billing.email) {
         klaviyoIdentify({
           email: order.billing.email,
@@ -131,26 +122,23 @@ export default function OrderSuccessClient({ orderId, orderKey }: { orderId: str
         });
       }
 
-      // GTM 'purchase' ইভেন্টের জন্য আইটেম তালিকা প্রস্তুত করা হচ্ছে
       const gtmItems = order.lineItems.nodes.map(item => ({
         item_name: item.product.node.name,
         item_id: item.product.node.databaseId,
-        price: parsePrice(item.total) / item.quantity, // প্রতি আইটেমের মূল্য
+        price: parsePrice(item.total) / item.quantity,
         quantity: item.quantity,
       }));
 
-      // GTM 'purchase' ইভেন্ট পাঠানো হচ্ছে
       gtmPurchase({
         transaction_id: order.databaseId.toString(),
         value: parsePrice(order.total),
-        tax: 0, // আপনার ট্যাক্স ডেটা থাকলে এখানে যোগ করুন
+        tax: 0,
         shipping: parsePrice(order.shippingTotal),
         currency: 'AUD',
         coupon: order.appliedCoupons?.nodes[0]?.code || '',
         items: gtmItems,
       });
 
-      // Klaviyo 'Placed Order' ইভেন্ট পাঠানো হচ্ছে
       klaviyoTrackPlacedOrder({
         order_id: order.databaseId.toString(),
         value: parsePrice(order.total),
@@ -167,10 +155,25 @@ export default function OrderSuccessClient({ orderId, orderKey }: { orderId: str
         })),
       });
 
-      // স্টেট আপডেট করে দেওয়া হচ্ছে যাতে এই ইভেন্ট আর না পাঠানো হয়
+      // --- ★★★ নতুন কোড শুরু ★★★ ---
+      // WooCommerce-এ অর্ডারের সোর্স আপডেট করার জন্য API কল
+      fetch('/api/update-order-source', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId: order.databaseId.toString() }),
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log('WooCommerce source update response:', data.message);
+      })
+      .catch(err => {
+        console.error('Failed to send order source to WooCommerce:', err);
+      });
+      // --- ★★★ নতুন কোড শেষ ★★★ ---
+
       setTrackingFired(true);
     }
-  }, [order, trackingFired]); // এই useEffect-টি order বা trackingFired পরিবর্তন হলে রান হবে
+  }, [order, trackingFired]);
 
   if (loading) { return <div className={styles.loader}>Loading your order details...</div>; }
   if (error) { return <div className={styles.error}>{error}</div>; }
@@ -186,6 +189,7 @@ export default function OrderSuccessClient({ orderId, orderKey }: { orderId: str
   );
 
   return (
+    // ... আপনার বাকি JSX কোড সম্পূর্ণ অপরিবর্তিত থাকবে
     <div className={styles.wrapper}>
       <div className={styles.header}>
         <span className={styles.successIcon}>✓</span>
@@ -201,7 +205,6 @@ export default function OrderSuccessClient({ orderId, orderKey }: { orderId: str
           <p><strong>Payment Method:</strong> {order.paymentMethodTitle}</p>
         </div>
         
-        {/* --- সমাধান: অর্ডার নোট দেখানো হচ্ছে --- */}
         {order.customerNote && (
           <div className={styles.notesSection}>
             <h3>Your Note:</h3>
@@ -220,7 +223,7 @@ export default function OrderSuccessClient({ orderId, orderKey }: { orderId: str
                   <td className={styles.itemImageCell}>
                     {isShipping ? (
                       <div className={styles.shippingIcon}><Image
-                        src="/Transdirect.jpg" // public ফোল্ডার থেকে ইমেজ লোড হচ্ছে
+                        src="/Transdirect.jpg"
                         alt="Transdirect Shipping"
                         width={80}
                         height={80}

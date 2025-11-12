@@ -6,6 +6,8 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import DelayedScripts from '../components/DelayedScripts';
 import { ClientProviders } from "./providers";
+import { Suspense } from 'react';
+import SourceTracker from '@/components/SourceTracker';
 
 // --- ফন্ট কনফিগারেশন ---
 const geistSans = Geist({
@@ -91,6 +93,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning={true}
       >
+        <Suspense>
+          <SourceTracker />
+        </Suspense>
         <ClientProviders>
           <Header />
           <main>

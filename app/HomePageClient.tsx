@@ -418,6 +418,12 @@ const VideoReviews = () => {
 
     const videoData = [
         {
+            youtubeId: "Fl8jEUxS_LU", 
+            thumbnailUrl: "https://i.ytimg.com/vi/Fl8jEUxS_LU/maxresdefault.jpg",
+            title: "Unboxing & First Ride: The GoBike 12 Experience",
+            description: "From first rides to pro-level tricks, our video reviews showcase the real-world performance and unbeatable fun of our kids electric bikes. See them in action!"
+        },
+        {
             youtubeId: "BARebHNa3lY",
             thumbnailUrl: "https://i.ytimg.com/vi/BARebHNa3lY/maxresdefault.jpg",
             title: "GoBike 16: From Parks to Trails",
@@ -430,12 +436,7 @@ const VideoReviews = () => {
             description: "Confused between models? This helpful guide breaks down the features of each GoBike."
         },
         // --- প্রয়োজনে আরও ভিডিও যোগ করতে পারেন ---
-        {
-            youtubeId: "Fl8jEUxS_LU", // Example of another video
-            thumbnailUrl: "https://i.ytimg.com/vi/Fl8jEUxS_LU/maxresdefault.jpg",
-            title: "Unboxing & First Ride: The GoBike 12 Experience",
-            description: "From first rides to pro-level tricks, our video reviews showcase the real-world performance and unbeatable fun of our kids electric bikes. See them in action!"
-        }
+      
     ];
 
     const scroll = (direction: 'left' | 'right') => {
