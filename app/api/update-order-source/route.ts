@@ -1,5 +1,4 @@
-// app/api/update-order-source/route.ts
-
+import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import { cookies } from 'next/headers';
@@ -18,34 +17,53 @@ export async function POST(request: Request) {
     if (!orderId) {
       return NextResponse.json({ message: 'Order ID is required' }, { status: 400 });
     }
+    
+    const headerList = await headers();
+    const userAgent = headerList.get('user-agent') || '';
+    const isMobile = /Mobi|Android|iPhone/i.test(userAgent);
+    const deviceType = isMobile ? 'Mobile' : 'Desktop';
 
     const cookieStore = await cookies(); 
     const visitorSourceCookie = cookieStore.get('visitor_source');
+    const pageViewsCookie = cookieStore.get('visitor_page_views');
 
     if (!visitorSourceCookie) {
       return NextResponse.json({ message: 'Source cookie not found. Nothing to update.' });
     }
     
     const source = visitorSourceCookie.value;
+    const pageViews = pageViewsCookie ? parseInt(pageViewsCookie.value, 10) : 1;
     
-    // সোর্সের ধরনের জন্য একটি সহজ লজিক
     let sourceType = 'direct';
     if (source.includes('organic')) {
       sourceType = 'organic';
-    } else if (source.includes('referral') || source === 'facebook' || source === 'instagram') {
-      sourceType = 'social'; // আপনি 'referral' ও ব্যবহার করতে পারেন
+    } else if (source.includes('referral') || source.includes('facebook') || source.includes('instagram')) {
+      sourceType = 'social';
+    } else if (source.includes('utm_')) {
+      sourceType = 'utm';
     }
 
-    // ★★★ সমাধান: সঠিক WooCommerce মেটা কী ব্যবহার করা হচ্ছে ★★★
     const updateData = {
       meta_data: [
         {
-          key: '_wc_order_attribution_origin', // <-- সঠিক কী
+          key: '_wc_order_attribution_origin',
           value: source,
         },
         {
-          key: '_wc_order_attribution_source_type', // <-- টাইপের জন্য সঠিক কী
+          key: '_wc_order_attribution_source_type',
           value: sourceType,
+        },
+        {
+          key: '_wc_order_attribution_source',
+          value: source,
+        },
+        {
+          key: '_wc_order_attribution_device_type',
+          value: deviceType,
+        },
+        {
+          key: '_wc_order_attribution_session_page_views',
+          value: pageViews,
         }
       ]
     };
