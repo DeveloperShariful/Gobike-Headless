@@ -57,7 +57,7 @@ const SourceTracker = () => {
             source = `${referrerHost}_referral`;
           }
         } catch {
-          // یہاں کچھ کرنے کی ضرورت نہیں
+
         }
       }
     }

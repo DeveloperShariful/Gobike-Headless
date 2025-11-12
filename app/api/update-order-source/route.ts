@@ -1,3 +1,5 @@
+// app/api/update-order-source/route.ts
+
 import { NextResponse } from 'next/server';
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import { cookies } from 'next/headers';
@@ -17,10 +19,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Order ID is required' }, { status: 400 });
     }
 
-    // --- ★★★ চূড়ান্ত সমাধান এখানে ★★★ ---
-    // নিচের কমেন্টটি ESLint-কে এই লাইনের জন্য 'any' টাইপ ব্যবহার করার অনুমতি দেয়।
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const cookieStore = cookies() as any;
+    const cookieStore = await cookies(); 
     const visitorSourceCookie = cookieStore.get('visitor_source');
 
     if (!visitorSourceCookie) {
@@ -28,12 +27,25 @@ export async function POST(request: Request) {
     }
     
     const source = visitorSourceCookie.value;
+    
+    // সোর্সের ধরনের জন্য একটি সহজ লজিক
+    let sourceType = 'direct';
+    if (source.includes('organic')) {
+      sourceType = 'organic';
+    } else if (source.includes('referral') || source === 'facebook' || source === 'instagram') {
+      sourceType = 'social'; // আপনি 'referral' ও ব্যবহার করতে পারেন
+    }
 
+    // ★★★ সমাধান: সঠিক WooCommerce মেটা কী ব্যবহার করা হচ্ছে ★★★
     const updateData = {
       meta_data: [
         {
-          key: '_visitor_source',
+          key: '_wc_order_attribution_origin', // <-- সঠিক কী
           value: source,
+        },
+        {
+          key: '_wc_order_attribution_source_type', // <-- টাইপের জন্য সঠিক কী
+          value: sourceType,
         }
       ]
     };

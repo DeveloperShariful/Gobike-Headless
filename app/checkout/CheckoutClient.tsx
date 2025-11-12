@@ -356,7 +356,9 @@ const handlePlaceOrder = async (paymentData?: {
                 }).catch(err => console.error("Failed to update payment intent description:", err));
               }
             }
-            router.push(`/order-success?order_id=${result.order.id}&key=${result.order.orderKey}`);
+            
+            await router.push(`/order-success?order_id=${result.order.id}&key=${result.order.orderKey}`);
+
             if (typeof clearCart === 'function') await clearCart();
         } else {
             toast.dismiss();
