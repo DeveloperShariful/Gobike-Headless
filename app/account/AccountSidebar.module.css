@@ -1,0 +1,81 @@
+/* app/account/AccountSidebar.module.css */
+
+/* --- ডেস্কটপ এবং বড় স্ক্রিনের জন্য স্টাইল --- */
+.sidebar {
+  width: 280px; /* ডেস্কটপে নির্দিষ্ট প্রস্থ */
+  flex-shrink: 0;
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  margin-bottom: 0.5rem;
+}
+
+.navLink {
+  display: block;
+  padding: 0.8rem 1.2rem;
+  text-decoration: none;
+  color: #333;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.navLink:hover {
+  background-color: #f0f0f0;
+}
+
+.active {
+  background-color: #e6f2ff;
+  color: #007bff;
+  font-weight: 600;
+}
+
+.logoutButton {
+  width: 100%;
+  padding: 0.8rem 1.2rem;
+  margin-top: 1rem;
+  border: none;
+  background-color: transparent;
+  color: #d9534f;
+  text-align: left;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.logoutButton:hover {
+  background-color: #f8d7da;
+}
+
+
+/* ★★★ মোবাইল এবং ট্যাবলেটের জন্য রেসপন্সিভ স্টাইল ★★★ */
+@media (max-width: 992px) {
+  .sidebar {
+    width: 100%; /* ছোট স্ক্রিনে সম্পূর্ণ প্রস্থ জুড়ে থাকবে */
+    padding: 1.5rem; /* প্যাডিং কমানো হলো */
+  }
+
+  .sidebar h3 {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+  }
+}

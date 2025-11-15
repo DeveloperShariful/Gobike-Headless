@@ -1,9 +1,9 @@
 // app/account/AccountSidebar.tsx
-'use client'; // এটি ক্লায়েন্ট কম্পোনেন্ট থাকবে
+'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation'; 
-import styles from './layout.module.css';
+import { usePathname } from 'next/navigation';
+import styles from './AccountSidebar.module.css';
 
 const navLinks = [
   { href: '/account', name: 'Dashboard' },
@@ -12,15 +12,12 @@ const navLinks = [
   { href: '/account/details', name: 'Account Details' },
 ];
 
-// ★★★ সমাধান: logoutAction ফাংশনটি prop হিসেবে গ্রহণ করা ★★★
-export default function AccountSidebar({ 
-  logoutAction 
-}: { 
-  logoutAction: () => Promise<void>; // সার্ভার অ্যাকশনের টাইপ
+export default function AccountSidebar({
+  logoutAction,
+}: {
+  logoutAction: () => Promise<void>;
 }) {
   const pathname = usePathname();
-
-  // ★★★ সমাধান: async function logoutAction() {...} কোডটি এখান থেকে মুছে ফেলা হয়েছে ★★★
 
   return (
     <aside className={styles.sidebar}>
@@ -30,9 +27,10 @@ export default function AccountSidebar({
           const isActive = pathname === link.href;
           return (
             <li key={link.name}>
-              <Link 
+              {/* ★★★ সমাধান: className সঠিকভাবে সেট করা হয়েছে ★★★ */}
+              <Link
                 href={link.href}
-                className={isActive ? styles.active : ''}
+                className={`${styles.navLink} ${isActive ? styles.active : ''}`}
               >
                 {link.name}
               </Link>
@@ -41,7 +39,6 @@ export default function AccountSidebar({
         })}
 
         <li>
-          {/* ★★★ সমাধান: prop-টি action হিসেবে ব্যবহার করা ★★★ */}
           <form action={logoutAction}>
             <button type="submit" className={styles.logoutButton}>
               Logout
