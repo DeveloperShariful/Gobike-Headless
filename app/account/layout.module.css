@@ -1,0 +1,101 @@
+/* app/account/layout.module.css */
+/* globals.css স্পর্শ না করে সম্পূর্ণ লোকাল স্টাইল */
+
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  display: grid;
+  grid-template-columns: 240px 1fr; /* সাইডবার এবং কন্টেন্ট */
+  gap: 2.5rem; /* গ্যাপ */
+}
+
+/* --- সাইডবার --- */
+.sidebar {
+  border-right: 1px solid #eee;
+  padding-right: 1.5rem;
+}
+
+.sidebar h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  margin-bottom: 0.5rem;
+}
+
+.sidebar li a {
+  display: block;
+  padding: 0.8rem 1.2rem;
+  text-decoration: none;
+  color: #333;
+  font-weight: 600;
+  border-radius: 6px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sidebar li a:hover {
+  background-color: #f4f4f4;
+  color: #007bff;
+}
+
+/* লগআউট বাটন */
+.logoutButton {
+  display: block;
+  width: 100%;
+  padding: 0.8rem 1.2rem;
+  background: none;
+  border: none;
+  color: #d9534f; /* লাল রং */
+  font-weight: 600;
+  font-size: 1rem;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.logoutButton:hover {
+  background-color: #fdf2f2;
+  color: #b92c28;
+}
+
+/* --- মূল কন্টেন্ট --- */
+.content {
+  padding-left: 1.5rem;
+}
+
+.content h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+/* ... (আগের সব CSS কোড অপরিবর্তিত থাকবে) ... */
+
+/* ★★★ এই নতুন ক্লাসটি নিচে যোগ করুন ★★★ */
+.sidebar li a.active {
+  background-color: #e6f2ff; /* হালকা নীল ব্যাকগ্রাউন্ড */
+  color: #007bff; /* প্রাইমারি কালার */
+  font-weight: 700; /* বোল্ড */
+}

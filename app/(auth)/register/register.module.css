@@ -1,0 +1,182 @@
+/* app/(auth)/register/register.module.css */
+
+/* --- গ্লোবাল এবং কন্টেইনার স্টাইল --- */
+.registerContainer {
+  max-width: 480px; /* কন্টেইনার কিছুটা বড় করা হলো */
+  margin: 4rem auto;
+  padding: 3rem;
+  background-color: #ffffff;
+  border-radius: 16px; /* বর্ডার আরও স্মুথ করা হলো */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* শ্যাডো আরও সুন্দর করা হলো */
+  border: 1px solid #f0f0f0;
+}
+
+.title {
+  text-align: center;
+  font-size: 2.25rem; /* টাইটেল বড় এবং আকর্ষণীয় */
+  font-weight: 700;
+  color: #1a202c; /* ডার্ক টেক্সট কালার */
+  margin-bottom: 2.5rem;
+}
+
+/* --- নামের ফিল্ডগুলো পাশাপাশি দেখানোর জন্য --- */
+.nameFields {
+  display: flex;
+  gap: 1.5rem; /* দুটি ফিল্ডের মধ্যে স্পেস */
+  width: 100%;
+}
+.nameFields .formGroup {
+  flex: 1; /* দুটি ফিল্ডকে সমান জায়গা দেওয়া */
+}
+
+/* --- ফর্মের প্রতিটি অংশ --- */
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.label {
+  display: block;
+  margin-bottom: 0.6rem;
+  font-weight: 600;
+  color: #4a5568; /* লেবেলের কালার পরিবর্তন */
+  font-size: 0.9rem;
+}
+
+/* --- ইনপুট ফিল্ডের জন্য নতুন স্টাইল --- */
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 15px;
+  color: #a0aec0; /* আইকনের কালার */
+  pointer-events: none; /* আইকনের উপর ক্লিক কাজ করবে না */
+}
+
+.formInput {
+  width: 100%;
+  padding: 0.9rem 1rem 0.9rem 2.75rem; /* আইকনের জন্য বামে প্যাডিং */
+  font-size: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background-color: #f7fafc; /* ইনপুটের হালকা ব্যাকগ্রাউন্ড */
+  color: #2d3748;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.formInput:focus {
+  border-color: #3182ce; /* প্রাইমারি কালার */
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+  outline: none;
+}
+
+/* পাসওয়ার্ড ফিল্ডের জন্য আলাদা স্টাইল */
+.passwordInput {
+  width: 100%;
+  padding: 0.9rem 2.75rem; /* ডানে-বামে আইকনের জন্য প্যাডিং */
+  font-size: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background-color: #f7fafc;
+  color: #2d3748;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.passwordInput:focus {
+  border-color: #3182ce;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+  outline: none;
+}
+
+.passwordToggleBtn {
+  position: absolute;
+  right: 15px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #a0aec0;
+  display: flex;
+}
+.passwordToggleBtn:hover {
+  color: #2d3748;
+}
+
+
+/* --- বাটন --- */
+.btn {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s ease;
+  background-image: linear-gradient(to right, #3182ce, #2b6cb0); /* গ্রেডিয়েন্ট বাটন */
+  color: white;
+  margin-top: 1rem;
+  box-shadow: 0 4px 15px rgba(49, 130, 206, 0.3);
+}
+
+.btn:hover {
+  transform: translateY(-2px); /* হালকা উপরে উঠবে */
+  box-shadow: 0 6px 20px rgba(49, 130, 206, 0.4);
+}
+
+.btn:disabled {
+  background-image: none;
+  background-color: #a0aec0;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* --- এরর/সাকসেস মেসেজ --- */
+.errorMessage {
+  color: #c53030;
+  background-color: #fed7d7;
+  border: 1px solid #fbb6b6;
+  padding: 0.9rem 1.25rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.successMessage {
+  color: #2f855a;
+  background-color: #c6f6d5;
+  border: 1px solid #9ae6b4;
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+}
+.successMessage p {
+  margin: 0.5rem 0;
+}
+.successMessage a {
+  font-weight: 700;
+  color: #2c5282;
+}
+
+/* --- নিচের লিংক --- */
+.links {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #4a5568;
+}
+.links a {
+  color: #3182ce;
+  font-weight: 600;
+  text-decoration: none;
+}
+.links a:hover {
+  text-decoration: underline;
+}

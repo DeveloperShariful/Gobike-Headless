@@ -1,0 +1,57 @@
+/* app/account/dashboard.module.css */
+
+.welcomeMessage {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.welcomeMessage strong {
+  font-weight: 700;
+  color: #007bff;
+}
+
+.introText {
+  font-size: 1.1rem;
+  color: #555;
+  line-height: 1.7;
+  margin-bottom: 2.5rem;
+}
+
+/* --- কুইক লিংক বক্স --- */
+.quickLinksGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.quickLink {
+  display: block;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.quickLink:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+  border-color: #007bff;
+}
+
+.quickLink h4 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #007bff;
+}
+
+.quickLink p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #555;
+}

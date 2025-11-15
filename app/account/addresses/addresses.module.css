@@ -1,0 +1,110 @@
+/* app/account/addresses/addresses.module.css */
+
+.introText {
+  font-size: 1.1rem;
+  color: #555;
+  line-height: 1.7;
+  margin-bottom: 2rem;
+}
+
+/* --- ফর্মের লেআউট --- */
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* পাশাপাশি দুটি কলাম */
+  gap: 2.5rem;
+}
+
+.addressColumn h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+/* --- ফর্মের প্রতিটি অংশ --- */
+.formGroup {
+  margin-bottom: 1.25rem;
+}
+
+.label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.formInput {
+  display: block;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box; 
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.formInput:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+  outline: none;
+}
+
+/* --- সেভ বাটন --- */
+.saveButton {
+  display: inline-block;
+  width: 100%;
+  padding: 0.9rem 1.5rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+  background-color: #007bff;
+  color: white;
+  margin-top: 1rem; /* ফর্মের নিচে একটু স্পেস */
+}
+.saveButton:hover {
+  background-color: #0056b3;
+}
+.saveButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* --- এরর/সাকসেস মেসেজ --- */
+.errorMessage {
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 0.75rem 1.25rem;
+  border-radius: 5px;
+  margin-bottom: 1.25rem;
+  text-align: center;
+  font-size: 0.95rem;
+  grid-column: 1 / -1; /* দুটি কলাম জুড়েই দেখাবে */
+}
+
+.successMessage {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  padding: 0.75rem 1.25rem;
+  border-radius: 5px;
+  margin-bottom: 1.25rem;
+  text-align: center;
+  font-size: 0.95rem;
+  grid-column: 1 / -1; /* দুটি কলাম জুড়েই দেখাবে */
+}
+
+/* ফর্মের নিচের বাটন (যেহেতু এটি গ্রিডের বাইরে) */
+.submitRow {
+  margin-top: 1.5rem;
+  border-top: 1px solid #eee;
+  padding-top: 1.5rem;
+}

@@ -64,9 +64,9 @@ export default function Header() {
               <IoSearch size={25} />
               <span>Search products</span>
             </button>
-            <a href="https://gobikes.au/my-account/" className={`${styles.iconButton} ${styles.desktopOnly}`}aria-label="My account link">
+            <Link href="/account" className={`${styles.iconButton} ${styles.desktopOnly}`}aria-label="My account link">
               <IoPersonOutline size={25} />
-            </a>
+            </Link>
             <button className={styles.cartIcon} onClick={openMiniCart} aria-label="MiniCart" >
               <span>🛒</span>
               {totalItems > 0 && <span className={styles.cartCount}>{totalItems}</span>}
@@ -97,10 +97,10 @@ export default function Header() {
                <Link href="/blog" className={pathname === '/blog' ? styles.activeLink : ''} onClick={closeAllOverlays}>Blog</Link>
             </nav>
           <div className={styles.mobileMenuFooter}>
-            <a href="https://gobikes.au/my-account/" className={styles.mobileMenuLink} aria-label="My account">
+            <Link href="/account" className={styles.mobileMenuLink} aria-label="My account">
                 <IoPersonOutline />
                 <span>My Account</span>
-            </a>
+            </Link>
           </div>
       </div>
       {isMenuOpen && <div className={styles.menuOverlay} onClick={() => setIsMenuOpen(false)} aria-label="Close"></div>}

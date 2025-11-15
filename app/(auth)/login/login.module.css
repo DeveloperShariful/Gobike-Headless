@@ -1,0 +1,140 @@
+/* app/(auth)/login/login.module.css */
+/* globals.css থেকে কোনো স্টাইল নেওয়া হচ্ছে না */
+
+.loginContainer {
+  max-width: 420px;
+  margin: 4rem auto;
+  padding: 2.5rem;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 2rem;
+}
+
+/* --- ফর্মের প্রতিটি অংশ --- */
+.formGroup {
+  margin-bottom: 1.25rem;
+}
+
+.label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.formInput {
+  display: block;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box; 
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.formInput:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+  outline: none;
+}
+
+/* --- পাসওয়ার্ডের জন্য --- */
+.passwordWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.passwordInput {
+  /* .formInput এর সব স্টাইল এখানেও লাগবে */
+  display: block;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  padding-right: 40px !important; /* বাটন দেখানোর জন্য জায়গা */
+}
+.passwordInput:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+  outline: none;
+}
+
+.passwordToggleBtn {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  color: #555;
+  display: flex;
+}
+
+/* --- বাটন --- */
+.btn {
+  display: inline-block;
+  width: 100%;
+  padding: 0.9rem 1.5rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+  background-color: #007bff;
+  color: white;
+}
+.btn:hover {
+  background-color: #0056b3;
+}
+.btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* --- এরর মেসেজ --- */
+.errorMessage {
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 0.75rem 1.25rem;
+  border-radius: 5px;
+  margin-bottom: 1.25rem;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+/* --- নিচের লিংক --- */
+.links {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #555;
+}
+.links p {
+  margin: 0.75rem 0;
+}
+.links a {
+  color: #007bff;
+  font-weight: 600;
+  text-decoration: none;
+}
+.links a:hover {
+  text-decoration: underline;
+}

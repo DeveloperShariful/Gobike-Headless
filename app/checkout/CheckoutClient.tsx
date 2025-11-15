@@ -156,7 +156,7 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
   const { cartItems, loading: isCartContextLoading, clearCart } = useCart();
   const [state, dispatch] = useReducer(checkoutReducer, initialState);
   const { customerInfo, shippingRates, selectedShipping, selectedPaymentMethod, cartData, orderNotes, addressInputStarted, loading, shipToDifferentAddress, shippingInfo } = state;
-
+  const [orderPlacementInProgress, setOrderPlacementInProgress] = useState(false);
   const customerInfoRef = useRef(customerInfo);
   useEffect(() => { customerInfoRef.current = customerInfo; }, [customerInfo]);
 
@@ -164,12 +164,12 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
   useEffect(() => { shippingInfoRef.current = shippingInfo; }, [shippingInfo]);
 
   const refetchCartData = useCallback(async () => { dispatch({ type: 'SET_LOADING', key: 'cart', payload: true }); try { const { data } = await client.query<{ cart: CartData }>({ query: GET_CHECKOUT_DATA, fetchPolicy: 'network-only' }); if (data?.cart) { dispatch({ type: 'SET_CHECKOUT_DATA', payload: { cart: data.cart } }); } } catch (err) {console.error("Error updating customer address:", err); toast.error('Could not refresh cart data.'); } finally { dispatch({ type: 'SET_LOADING', key: 'cart', payload: false }); } }, []);
-  useEffect(() => { if (!isCartContextLoading && cartItems.length === 0) router.push('/cart'); else refetchCartData(); }, [isCartContextLoading, cartItems.length, router, refetchCartData]);
+  useEffect(() => { if (!isCartContextLoading && cartItems.length === 0 && !orderPlacementInProgress) router.push('/cart'); else refetchCartData(); }, [isCartContextLoading, cartItems.length, router, refetchCartData, orderPlacementInProgress]);
   const handleAddressChange = useCallback(async (address: Partial<ShippingFormData>) => { dispatch({ type: 'SET_CUSTOMER_INFO', payload: address }); if (!addressInputStarted) { dispatch({ type: 'SET_ADDRESS_INPUT_STARTED', payload: true });} const updatedCustomerInfo = { ...customerInfoRef.current, ...address }; if (updatedCustomerInfo.city && updatedCustomerInfo.postcode && updatedCustomerInfo.state) { dispatch({ type: 'SET_LOADING', key: 'shipping', payload: true }); try { await client.mutate({ mutation: UPDATE_CUSTOMER_MUTATION, variables: { input: { shipping: updatedCustomerInfo, billing: updatedCustomerInfo } } }); await refetchCartData(); } catch (err) {  console.error("Error refetching cart data:", err); toast.error('Could not calculate shipping.'); } finally { dispatch({ type: 'SET_LOADING', key: 'shipping', payload: false }); } } }, [addressInputStarted, refetchCartData]);
   const handleApplyCoupon = async (couponCode: string) => { if (cartData?.appliedCoupons && cartData.appliedCoupons.length > 0) { toast.error("Only one coupon can be applied per order."); return; } dispatch({ type: 'SET_LOADING', key: 'applyingCoupon', payload: true }); toast.loading('Applying coupon...'); try { await client.mutate({ mutation: APPLY_COUPON_MUTATION, variables: { input: { code: couponCode } } }); await refetchCartData(); toast.dismiss(); toast.success('Coupon applied!'); } catch (error) { toast.dismiss(); toast.error(getErrorMessage(error)); } finally { dispatch({ type: 'SET_LOADING', key: 'applyingCoupon', payload: false }); } };
   const handleRemoveCoupon = async (couponCode: string) => { if (loading.removingCoupon) return; dispatch({ type: 'SET_LOADING', key: 'removingCoupon', payload: true }); toast.loading('Removing coupon...'); try { await client.mutate({ mutation: REMOVE_COUPON_MUTATION, variables: { input: { codes: [couponCode] } } }); await refetchCartData(); toast.dismiss(); toast.success('Coupon removed.'); } catch (error) { toast.dismiss(); toast.error(getErrorMessage(error)); } finally { dispatch({ type: 'SET_LOADING', key: 'removingCoupon', payload: false }); } };
   const handleShippingSelect = (rateId: string) => {  dispatch({ type: 'SET_SELECTED_SHIPPING', payload: rateId }); const selectedRate = shippingRates.find(rate => rate.id === rateId); if (cartData && selectedRate) { const subtotal = parseFloat(cartData.subtotal.replace(/[^0-9.]/g, '')) || 0; const discount = parseFloat(cartData.discountTotal.replace(/[^0-9.]/g, '')) || 0; const shippingCost = parseFloat(selectedRate.cost) || 0; const newTotal = (subtotal - discount) + shippingCost; dispatch({ type: 'UPDATE_TOTALS', payload: { shippingTotal: `$${shippingCost.toFixed(2)}`, total: `$${newTotal.toFixed(2)}` } }); } client.mutate({ mutation: UPDATE_SHIPPING_METHOD_MUTATION, variables: { input: { shippingMethods: [rateId] } }, }).catch(err => { console.error("Failed to sync shipping method with server:", err); toast.error("Could not save shipping preference."); }); };
-  
+ 
   const handleShippingAddressChange = useCallback((address: Partial<ShippingFormData>) => {
     dispatch({ type: 'SET_SHIPPING_INFO', payload: address });
   }, []);
@@ -198,6 +198,7 @@ const handlePlaceOrder = async (paymentData?: {
     }
   
     dispatch({ type: 'SET_LOADING', key: 'order', payload: true });
+    setOrderPlacementInProgress(true);
 
     const isStandaloneRedirect = selectedPaymentMethod === 'stripe_klarna' || selectedPaymentMethod === 'stripe_afterpay_clearpay';
     const isEmbeddedRedirect = paymentData?.is_embedded_redirect === true;
@@ -356,7 +357,7 @@ const handlePlaceOrder = async (paymentData?: {
                 }).catch(err => console.error("Failed to update payment intent description:", err));
               }
             }
-            
+
             await router.push(`/order-success?order_id=${result.order.id}&key=${result.order.orderKey}`);
 
             if (typeof clearCart === 'function') await clearCart();
