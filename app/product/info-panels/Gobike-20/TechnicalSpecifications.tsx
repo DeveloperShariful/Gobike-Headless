@@ -18,7 +18,7 @@ const specs = [
     { label: 'Speed Modes', value: 'Low (15 km/h), Medium (30 km/h), High (55km/h)' },
     { label: 'Battery', value: 'Industrial-grade waterproof 36V-42V 10.0Ah lithium-ion battery' },
     { label: 'Ride Time', value: 'Run time is up to 2 hours' },
-    { label: 'Charge Time', value: 'Quick 70–90 minutes' },
+    { label: 'Charge Time', value: 'around 2-4 hours' },
     { label: 'Brakes', value: 'Confident stopping power with hydraulic brakes (front & rear)' },
     { label: 'Protection', value: 'Thermal safety guards the motor and controller' },
 ];

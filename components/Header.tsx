@@ -97,7 +97,7 @@ export default function Header() {
                <Link href="/blog" className={pathname === '/blog' ? styles.activeLink : ''} onClick={closeAllOverlays}>Blog</Link>
             </nav>
           <div className={styles.mobileMenuFooter}>
-            <Link href="/account" className={styles.mobileMenuLink} aria-label="My account">
+            <Link href="/account" className={pathname === '/account' ? styles.mobileMenuLink : ''} onClick={closeAllOverlays} aria-label="My account">
                 <IoPersonOutline />
                 <span>My Account</span>
             </Link>

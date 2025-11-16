@@ -17,7 +17,7 @@ const specs = [
     { label: 'Speed Modes', value: 'Low (10 km/h), Medium (25 km/h), High (45km/h)' },
     { label: 'Battery', value: 'Industrial-grade waterproof 36V-42V 5.0Ah lithium-ion' },
     { label: 'Ride Time', value: 'Run time is up to 2 hours' },
-    { label: 'Charge Time', value: '70–90 minutes' },
+    { label: 'Charge Time', value: 'around 1-2 hours ' },
     { label: 'Braking System', value: 'Hydraulic brakes on front and rear' },
 ];
 

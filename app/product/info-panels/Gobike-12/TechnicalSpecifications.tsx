@@ -18,7 +18,7 @@ const specs = [
   { label: 'Braking', value: 'Rear cable disc brake – smooth & safe' },
   { label: 'Battery', value: 'Industrial-grade waterproof 36V 5.0Ah lithium-ion' },
   { label: 'Ride Time', value: 'Run time is up to 2 hours' },
-  { label: 'Charge Time', value: 'Only 30–60 minutes' },
+  { label: 'Charge Time', value: 'around 1-2 hours' },
 ];
 
 export default function TechnicalSpecifications() {
