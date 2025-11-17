@@ -24,8 +24,8 @@ const keyFeatures = [
   {
     imageSrc: 'https://gobikes.au/wp-content/uploads/2025/10/16-Y-L-Motor.webp',
     imageAlt: 'The GoBike 16\'s rear wheel showcasing the all-weather disc brake system.',
-    title: 'All-Weather Disc Brakes',
-    description: 'With great power comes the need for great brakes. The mechanical disc brakes provide strong, reliable stopping power in wet or dry conditions.'
+    title: 'All-Weather Hydraulic Disc Brakes',
+    description: 'With great power comes the need for great brakes. The Hydraulic disc brakes provide strong, reliable stopping power in wet or dry conditions.'
   }
 ];
 

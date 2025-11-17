@@ -12,8 +12,8 @@ const keyFeatures = [
   {
     imageSrc: 'https://gobikes.au/wp-content/uploads/2025/10/20-Y-R-Wheel-Front.webp',
     imageAlt: 'Close-up of the GoBike 20\'s front wheel showing the all-weather disc brake.',
-    title: 'All-Weather Disc Brakes',
-    description: 'Dependable stopping power is a must. These mechanical disc brakes deliver consistent performance in both wet and dry conditions, keeping your rider safe.'
+    title: 'All-Weather Hydraulic Disc Brakes',
+    description: 'Dependable stopping power is a must. These Hydraulic disc brakes deliver consistent performance in both wet and dry conditions, keeping your rider safe.'
   },
   {
     imageSrc: 'https://gobikes.au/wp-content/uploads/2025/10/20-W-R-Seat.webp',

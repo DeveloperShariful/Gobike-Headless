@@ -60,7 +60,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const regularPriceNum = parsePrice(product.regularPrice);
   const salePriceNum = parsePrice(product.salePrice);
   const discountPercent = regularPriceNum > 0 && salePriceNum < regularPriceNum 
-      ? Math.round(((regularPriceNum - salePriceNum) / salePriceNum) * 100) 
+      ? Math.round(((regularPriceNum - salePriceNum) / regularPriceNum) * 100) 
       : 0;
 
   const handleAddToCart = async (e: React.MouseEvent<HTMLButtonElement>) => {
