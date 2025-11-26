@@ -38,6 +38,10 @@ import InTheBox12 from './info-panels/Gobike-12/WhatsInTheBox';
 import TechSpec20 from './info-panels/Gobike-20/TechnicalSpecifications';
 import InTheBox20 from './info-panels/Gobike-20/WhatsInTheBox';
 
+// === GoBike 24 Panels ===
+import TechSpec24 from './info-panels/Gobike-24/TechnicalSpecifications';
+import InTheBox24 from './info-panels/Gobike-24/WhatsInTheBox';
+
 // === Common Panels ===
 import PaymentMethods from './info-panels/Common/PaymentMethods';
 
@@ -71,4 +75,11 @@ export const productInfoPanelsMap: { [key: string]: PanelConfig[] } = {
     { id: 'payment20', label: 'PAYMENT METHODS', component: PaymentMethods },
   ],
   
+  // --- GoBike 24 (New) ---
+  // Slug-টি আপনার ওয়েবসাইটের URL এর সাথে মিলিয়ে নিন
+  'gobike-24-inch-electric-bike-teens-high-speed-performance-for-ages-13': [
+    { id: 'specs24', label: 'TECHNICAL SPECIFICATIONS', component: TechSpec24 },
+    { id: 'box24', label: "WHAT'S IN THE BOX", component: InTheBox24 },
+    { id: 'payment24', label: 'PAYMENT METHODS', component: PaymentMethods },
+  ],
 };

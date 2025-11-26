@@ -19,6 +19,12 @@ import PowerSection20 from './custom-sections/Gobike-20/PowerSection';
 import KeyFeaturesSection20 from './custom-sections/Gobike-20/KeyFeaturesSection';
 import FaqSection20 from './custom-sections/Gobike-20/FaqSection';
 
+// === GoBike 24 Sections ===
+import OverviewSection24 from './custom-sections/Gobike-24/OverviewSection';
+import PowerSection24 from './custom-sections/Gobike-24/PowerSection';
+import KeyFeaturesSection24 from './custom-sections/Gobike-24/KeyFeaturesSection';
+import FaqSection24 from './custom-sections/Gobike-24/FaqSection';
+
 type SectionComponent = ComponentType;
 export const productLayoutMap: { [key: string]: SectionComponent[] } = {
   
@@ -46,4 +52,11 @@ export const productLayoutMap: { [key: string]: SectionComponent[] } = {
     FaqSection20,
   ],
   
+  // GoBike 24 Design (New)
+  'gobike-24-inch-electric-bike-teens-high-speed-performance-for-ages-13': [
+    OverviewSection24,
+    PowerSection24,
+    KeyFeaturesSection24,
+    FaqSection24,
+  ],
 };
