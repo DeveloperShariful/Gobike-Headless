@@ -1,11 +1,20 @@
 /* components/Header.module.css */
+/* components/Header.module.css */
+
 .header {
   background-color: #ffffff;
   border-bottom: 1px solid #eaeaea;
   padding: .3rem 0;
   position: sticky;
-  top: 0;
+  top: 52px; 
   z-index: 50;
+  transition: top 0.3s ease; 
+}
+
+@media (max-width: 768px) {
+  .header {
+    top: 48px; 
+  }
 }
 .container {
   max-width: 1400px;
