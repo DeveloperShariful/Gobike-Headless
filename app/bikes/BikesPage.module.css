@@ -72,11 +72,15 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
   margin-bottom: 3rem;
 }
-
+@media (max-width: 992px) {
+    .grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}  
 /* === Why Choose Us Section === */
 .whyChooseUs {
   display: grid;

@@ -23,8 +23,15 @@ export async function POST(request: Request) {
       updateData.amount = Math.round(amount * 100);
     }
     
+    // ★★★ Zip-এর জন্য Order ID আপডেট (সবচেয়ে গুরুত্বপূর্ণ অংশ) ★★★
     if (orderId) {
+      // 1. Description আপডেট করুন (স্ট্রাইপ ড্যাশবোর্ডে দেখার জন্য)
       updateData.description = `Order #${orderId} for GOBIKE`;
+      
+      // 2. Metadata আপডেট করুন (Verify API-তে চেক করার জন্য) - এটা মিস করা যাবে না!
+      updateData.metadata = {
+          order_id: orderId.toString()
+      };
     }
 
     // যদি কোনো আপডেট করার ডেটা না থাকে

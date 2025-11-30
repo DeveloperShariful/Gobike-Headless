@@ -217,6 +217,7 @@ const handlePlaceOrder = async (paymentData?: {
             const getPaymentMethodTitle = (methodId: string): string => {
               if (methodId.includes('klarna')) return 'Klarna';
               if (methodId.includes('afterpay_clearpay')) return 'Afterpay';
+              if (methodId.includes('zip')) return 'Zip Pay';
               return 'Redirect Payment';
             };
 

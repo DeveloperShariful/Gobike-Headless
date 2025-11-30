@@ -150,23 +150,76 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
           return;
         }
 
-        const { error, paymentIntent } = await stripe.confirmPayment({
-          elements,
-          clientSecret,
-          confirmParams: {
-            return_url: `${window.location.origin}/order-success`,
-          },
-          redirect: 'if_required',
-        });
-        
-        toast.dismiss();
-        if (error) {
-          toast.error(error.message || "An unexpected error occurred.");
-        } else if (paymentIntent?.status === 'succeeded') {
-          toast.success('Payment confirmed!');
-          await onPlaceOrder({ transaction_id: paymentIntent.id, paymentMethodId: 'stripe' });
+        // ★★★ ZIP Payment Specific Logic ★★★
+        if (internalStripeMethod === 'zip') {
+            try {
+                // ১. আগে অর্ডার ক্রিয়েট করা (REST API দিয়ে)
+                const orderDetails = await onPlaceOrder({ 
+                    redirect_needed: true,
+                    is_embedded_redirect: true,
+                    paymentMethodId: 'zip' 
+                });
+
+                if (!orderDetails || !orderDetails.orderId || !orderDetails.orderKey) {
+                    throw new Error("Could not create order before redirection.");
+                }
+
+                // ২. বিদ্যমান PaymentIntent আপডেট করা (Order ID লিংক করা)
+                // clientSecret থেকে ID বের করা হচ্ছে (format: pi_xxxx_secret_yyyy)
+                const paymentIntentId = clientSecret.split('_secret_')[0];
+                
+                await fetch('/api/update-payment-intent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        paymentIntentId: paymentIntentId,
+                        orderId: orderDetails.orderId
+                    })
+                });
+
+                // ৩. পেমেন্ট কনফার্ম এবং রিডাইরেক্ট করা
+                const { error } = await stripe.confirmPayment({
+                    elements,
+                    clientSecret,
+                    confirmParams: {
+                        return_url: `${window.location.origin}/order-confirmation?order_id=${orderDetails.orderId}&key=${orderDetails.orderKey}`,
+                    },
+                });
+
+                if (error) {
+                    toast.dismiss();
+                    toast.error(error.message || "Payment failed");
+                    setIsProcessing(false);
+                }
+                // সফল হলে অটোমেটিক রিডাইরেক্ট হয়ে যাবে।
+
+            } catch (err) {
+                toast.dismiss();
+                toast.error(err instanceof Error ? err.message : "Failed to process Zip payment.");
+                setIsProcessing(false);
+            }
         }
-        setIsProcessing(false);
+        
+        // ★★★ Card Payment Logic (Default) ★★★
+        else {
+            const { error, paymentIntent } = await stripe.confirmPayment({
+              elements,
+              clientSecret,
+              confirmParams: {
+                return_url: `${window.location.origin}/order-success`,
+              },
+              redirect: 'if_required',
+            });
+            
+            toast.dismiss();
+            if (error) {
+              toast.error(error.message || "An unexpected error occurred.");
+            } else if (paymentIntent?.status === 'succeeded') {
+              toast.success('Payment confirmed!');
+              await onPlaceOrder({ transaction_id: paymentIntent.id, paymentMethodId: 'stripe' });
+            }
+            setIsProcessing(false);
+        }
       }
       
       else {

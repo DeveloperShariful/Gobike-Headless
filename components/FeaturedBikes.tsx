@@ -32,7 +32,7 @@ interface QueryData {
 // --- GraphQL কোয়েরি (অপরিবর্তিত) ---
 const GET_FEATURED_BIKES_QUERY = gql`
   query GetFeaturedBikes {
-    products(where: { category: "bikes" }, first: 3) {
+    products(where: { category: "bikes" }, first: 5) {
       nodes {
         id
         databaseId
