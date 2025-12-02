@@ -9,7 +9,7 @@ import StickyAddToCart from './StickyAddToCart';
 import { useState, useEffect, useRef, ComponentType } from 'react';
 import styles from './ProductPage.module.css';
 import Image from 'next/image';
-import QuantityAddToCart from '../../../components/QuantityAddToCart';
+import QuantityAddToCart from './QuantityAddToCart';
 import ReviewForm from './ReviewForm';
 import ProductCard from '../../products/ProductCard';
 import { gtmViewItem } from '../../../lib/gtm';

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCart } from '../context/CartContext';
+import { useCart } from '../../../context/CartContext';
 import styles from './QuantityAddToCart.module.css';
 import toast from 'react-hot-toast';
 

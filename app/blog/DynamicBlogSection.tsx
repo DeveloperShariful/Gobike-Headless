@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getSortedPostsData } from '../lib/posts';
+import { getSortedPostsData } from '../../lib/posts';
 import styles from './BlogSection.module.css';
 import BlogSlider from './BlogSlider';
 

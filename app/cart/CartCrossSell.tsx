@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { gql } from '@apollo/client';
-import client from '../lib/apolloClient';
-import ProductCard from '../app/products/ProductCard';
+import client from '../../lib/apolloClient';
+import ProductCard from '../products/ProductCard';
 import styles from './CartCrossSell.module.css';
 
 // --- টাইপ ইন্টারফেস (অপরিবর্তিত) ---

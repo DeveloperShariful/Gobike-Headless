@@ -5,7 +5,7 @@ import Breadcrumbs from '../../components/Breadcrumbs';
 import { useCart } from '../../context/CartContext';
 import Link from 'next/link';
 import styles from './CartPage.module.css';
-import CartCrossSell from '../../components/CartCrossSell';
+import CartCrossSell from './CartCrossSell';
 import { gtmViewCart, gtmBeginCheckout } from '../../lib/gtm';
 import { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';

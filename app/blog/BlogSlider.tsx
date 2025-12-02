@@ -3,7 +3,7 @@
 import React, { useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { PostData } from '../lib/posts';
+import { PostData } from '../../lib/posts';
 import styles from './BlogSection.module.css';
 
 type BlogSliderProps = {
