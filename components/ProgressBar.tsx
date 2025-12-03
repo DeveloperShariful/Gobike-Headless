@@ -28,7 +28,7 @@ export default function ProgressBar() {
         const newUrl = new URL(targetUrl);
 
         if (newUrl.origin === currentUrl.origin && newUrl.pathname !== currentUrl.pathname) {
-          const dynamicRoutes = ['/bikes', '/products', '/product/', '/spare-parts', '/checkout', '/cart'];
+          const dynamicRoutes = ['/bikes', '/products', '/product/', '/spare-parts', '/checkout', '/cart', '/apparel'];
           if (dynamicRoutes.some(route => newUrl.pathname.startsWith(route))) {
             NProgress.start();
           }

@@ -6,12 +6,18 @@ import Image from 'next/image';
 import styles from './OrderSummary.module.css'; // একটি সম্মিলিত CSS ফাইল ব্যবহার করা হবে
 
 // --- TypeScript Interfaces ---
+interface CartItemAttribute {
+  name: string;
+  value: string;
+}
+
 interface CartItem {
   key: string;
   name: string;
   quantity: number;
   price: string;
   image?: string;
+  attributes?: CartItemAttribute[];
 }
 
 interface AppliedCoupon {
@@ -78,13 +84,17 @@ export default function OrderSummary({
   // --- OrderSummary-এর Logic ---
   const subtotalDisplay = cartData?.subtotal || '$0.00';
   const totalDisplay = cartData?.total || '$0.00';
+  const formatLabel = (name: string) => {
+    const clean = name.replace(/^pa_/, '').replace(/_/g, ' ');
+    return clean.charAt(0).toUpperCase() + clean.slice(1);
+  };
 
   return (
-    // ★★★ এই ক্লাস নামটি পরিবর্তন করা যেতে পারে আপনার CSS অনুযায়ী ★★★
+
     <div className={styles.yourOrderContainer}> 
       <h2 className={styles.title}>Your Order</h2>
 
-      {/* --- Product List (from OrderSummary.tsx) --- */}
+      {/* --- Product List --- */}
       <div className={styles.itemsList}>
         {cartItems.map(item => (
           <div key={item.key} className={styles.summaryItem}>
@@ -96,14 +106,28 @@ export default function OrderSummary({
               )}
               <span className={styles.itemQuantity}>{item.quantity}</span>
             </div>
+            
             <div className={styles.itemInfo}>
               <p className={styles.itemName}>{item.name}</p>
+              
+              {/* ২. Color এবং Size দেখানোর লজিক --- */}
+              {item.attributes && item.attributes.length > 0 && (
+                <div style={{ fontSize: '13px', color: '#666', marginTop: '4px' }}>
+                  {item.attributes.map((attr, index) => (
+                    <div key={index}>
+                      <strong>{formatLabel(attr.name)}:</strong> {attr.value}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {/* ------------------------------------- */}
+              
             </div>
             <p className={styles.itemPrice} dangerouslySetInnerHTML={{ __html: item.price }} />
           </div>
-          
         ))}
       </div>
+
       <div className={styles.totalsSection}>
         <div className={`${styles.totalRow} ${styles.Subtotal}`}>
           <p>Subtotal</p>

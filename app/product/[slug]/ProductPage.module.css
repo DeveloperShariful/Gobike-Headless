@@ -412,3 +412,75 @@
     color: #333; transition: color 0.2s ease;
 }
 .tabItem:hover { color: #007bff; }
+
+/* অ্যাট্রিবিউট কন্টেইনার */
+.attributeRow {
+    padding-top: 10px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #f0f0f0; /* হালকা ডিভাইডার */
+    padding-bottom: 20px;
+}
+
+.attributeRow:last-child {
+    border-bottom: none;
+}
+
+/* লেবেল স্টাইল (যেমন: Size: Medium) */
+.attributeLabel {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #222;
+    margin-bottom: 10px;
+    margin-top: 5px;
+}
+
+.selectedValue {
+    font-weight: 400;
+    color: #666;
+    margin-left: 5px;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+/* বাটনগুলোর র‍্যাপার */
+.attributeOptions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* বাটন স্টাইল (স্বাভাবিক অবস্থা) */
+.attributeBtn {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-family: inherit;
+    font-weight: 500;
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #e1e1e1;
+    border-radius: 4px; /* সামান্য গোল */
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    min-width: 50px;
+    text-align: center;
+    text-transform: uppercase; 
+}
+
+/* মাউস হোভার করলে */
+.attributeBtn:hover {
+    border-color: #333;
+}
+
+/* সিলেক্ট করা বাটন (Active State) */
+.attributeBtnActive {
+    background-color: #000;
+    color: #fff;
+    border-color: #000;
+    font-weight: 600;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* হালকা শ্যাডো */
+    transform: translateY(-1px); /* একটু উপরে উঠবে */
+}

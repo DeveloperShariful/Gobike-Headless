@@ -1,18 +1,21 @@
-//app/products/ProductCard.tsx
+// app/products/ProductCard.tsx
 
 'use client';
 import Image from 'next/image';
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation'; 
 import styles from './products.module.css';
 import { useCart } from '../../context/CartContext';
 
-// --- Interface ---
+// --- Interface Update ---
 interface Product {
   id: string;
   databaseId: number;
   name: string;
   slug: string;
+  type?: string; 
+  __typename?: string; 
   image?: { sourceUrl: string };
   price?: string;
   averageRating?: number;
@@ -21,9 +24,11 @@ interface Product {
   regularPrice?: string;
   salePrice?: string;
 }
+
 interface ProductCardProps {
   product: Product;
 }
+
 const StarRating = ({ rating, count }: { rating: number, count: number }) => {
   const totalStars = 5;
   const fullStars = Math.floor(rating);
@@ -36,7 +41,6 @@ const StarRating = ({ rating, count }: { rating: number, count: number }) => {
       {halfStar && <span key="half">⭐</span>}
       {[...Array(emptyStars)].map((_, i) => <span key={`empty-${i}`}>☆</span>)}
       
-      {/* --- কার্যকরী সমাধান: এখানে "customer review(s)" যোগ করা হয়েছে --- */}
       {count > 0 && (
         <span className={styles.ratingValue}>
           ({rating.toFixed(1)}) ({count} customer review{count > 1 ? 's' : ''})
@@ -45,13 +49,11 @@ const StarRating = ({ rating, count }: { rating: number, count: number }) => {
     </div>
   );
 };
-// --------------------------------------------------------------------------
 
 export default function ProductCard({ product }: ProductCardProps) {
   const [isAdding, setIsAdding] = useState(false);
   const { addToCart } = useCart();
-  
-  // --- কার্যকরী সমাধান: ডিসকাউন্ট শতাংশ গণনা ---
+  const router = useRouter();
   const parsePrice = (priceStr?: string): number => {
     if (!priceStr) return 0;
     return parseFloat(priceStr.replace(/[^0-9.]/g, ''));
@@ -63,11 +65,17 @@ export default function ProductCard({ product }: ProductCardProps) {
       ? Math.round(((regularPriceNum - salePriceNum) / regularPriceNum) * 100) 
       : 0;
 
-  const handleAddToCart = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const isVariableProduct = product.type === 'VARIABLE' || product.__typename === 'VariableProduct';
+
+  const handleButtonClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     'use client';
     e.preventDefault();
     e.stopPropagation();
 
+    if (isVariableProduct) {
+        router.push(`/product/${product.slug}`);
+        return;
+    }
     if (!product || !product.databaseId) {
       console.error("Incomplete product data in ProductCard:", product);
       return;
@@ -92,7 +100,6 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    // --- কার্যকরী সমাধান: মূল কন্টেইনার এখন একটি div, Link নয় ---
     <div className={styles.productCard}>
         <Link href={`/product/${product.slug}`} className={styles.productLinkWrapper}>
             <div className={styles.productImageContainer}>
@@ -126,16 +133,14 @@ export default function ProductCard({ product }: ProductCardProps) {
                 </div>
             </div>
         </Link>
-        
-        {/* --- কার্যকরী সমাধান: বাটনটিকে Link-এর বাইরে আনা হয়েছে --- */}
         <button 
           className={styles.addToCartBtn} 
-          onClick={handleAddToCart}
+          onClick={handleButtonClick}
           disabled={isAdding} 
         >
-          {isAdding ? 'Adding...' : 'Add to Cart'}
+          {isAdding ? 'Adding...' : (isVariableProduct ? 'Select Options' : 'Add to Cart')}
         </button>
-        {/* ----------------------------------------------------------- */}
+        {/* ------------------------- */}
     </div>
   );
 }

@@ -1,17 +1,47 @@
+// app/product/[slug]/page.tsx
+
 import { gql } from '@apollo/client';
 import { notFound } from 'next/navigation';
-import type { Metadata} from 'next';
+import type { Metadata } from 'next';
 
-// --- সমাধান: সঠিক ফাইল থেকে getClient import করা হচ্ছে ---
+// --- Client Import ---
 import { getClient } from '../../../lib/apollo-rsc-client';
 
 import ProductClient from './ProductClient'; 
 import Breadcrumbs from '../../../components/Breadcrumbs';
 
-// --- Interfaces (আপডেট করা হয়েছে) ---
 interface ReviewEdge {
   rating: number;
   node: { id: string; author: { node: { name: string; }; }; content: string; date: string; };
+}
+
+interface ImageNode {
+  sourceUrl: string;
+}
+
+interface Attribute {
+  name: string;
+  options: string[];
+}
+
+// ভেরিয়েশনের ভিতরের এট্রিবিউট (যেমন: Size: S)
+interface VariationAttribute {
+  name: string;
+  value: string;
+}
+
+// প্রতিটি ভেরিয়েশনের ডেটা স্ট্রাকচার
+interface Variation {
+  databaseId: number;
+  price?: string;
+  regularPrice?: string;
+  salePrice?: string;
+  stockStatus?: string;
+  stockQuantity?: number;
+  name: string;
+  attributes: {
+    nodes: VariationAttribute[];
+  };
 }
 
 interface Product {
@@ -21,15 +51,16 @@ interface Product {
   name: string; 
   description: string; 
   shortDescription?: string;
-  image?: { sourceUrl: string }; 
-  galleryImages: { nodes: { sourceUrl: string }[] };
+  image?: ImageNode; 
+  galleryImages: { nodes: ImageNode[] };
   price?: string; 
   salePrice?: string; 
   regularPrice?: string; 
   sku?: string; 
   stockStatus?: string;
-  onSale: boolean; // <-- সমাধান: এই লাইনটি যোগ করা হয়েছে
-  attributes: { nodes: { name: string, options: string[] }[] };
+  onSale: boolean;
+  attributes: { nodes: Attribute[] }; 
+  variations?: { nodes: Variation[] }; 
   averageRating: number; 
   reviewCount: number; 
   reviews: { edges: ReviewEdge[]; };
@@ -39,7 +70,7 @@ interface Product {
       databaseId: number; 
       name: string; 
       slug: string; 
-      image?: { sourceUrl: string };
+      image?: ImageNode;
       price?: string; 
       salePrice?: string; 
       regularPrice?: string; 
@@ -51,9 +82,10 @@ interface Product {
   width?: number;
   height?: number;
 }
+
 interface QueryData { product: Product | null; }
 
-// --- GraphQL Query (অপরিবর্তিত) ---
+// --- GraphQL Query (Variations যোগ করা হয়েছে) ---
 const GET_PRODUCT_QUERY = gql`
   query GetProductBySlug($slug: ID!) {
     product(id: $slug, idType: SLUG) {
@@ -65,8 +97,49 @@ const GET_PRODUCT_QUERY = gql`
       shortDescription
       image { sourceUrl }
       galleryImages { nodes { sourceUrl } }
-      ... on SimpleProduct { price(format: FORMATTED) regularPrice(format: FORMATTED) salePrice(format: FORMATTED) onSale sku stockStatus stockQuantity attributes { nodes { name options } } weight length width height }
-      ... on VariableProduct { price(format: FORMATTED) regularPrice(format: FORMATTED) salePrice(format: FORMATTED) onSale sku stockStatus stockQuantity attributes { nodes { name options } } weight length width height }
+  
+      ... on SimpleProduct { 
+        price(format: FORMATTED) 
+        regularPrice(format: FORMATTED) 
+        salePrice(format: FORMATTED) 
+        onSale 
+        sku 
+        stockStatus 
+        stockQuantity 
+        attributes { nodes { name options } } 
+        weight length width height 
+      }
+
+      ... on VariableProduct { 
+        price(format: FORMATTED) 
+        regularPrice(format: FORMATTED) 
+        salePrice(format: FORMATTED) 
+        onSale 
+        sku 
+        stockStatus 
+        stockQuantity 
+        attributes { nodes { name options } } 
+        weight length width height 
+        
+        variations(first: 100) {
+          nodes {
+            databaseId
+            price(format: FORMATTED)
+            regularPrice(format: FORMATTED)
+            salePrice(format: FORMATTED)
+            stockStatus
+            stockQuantity
+            name
+            attributes {
+              nodes {
+                name
+                value
+              }
+            }
+          }
+        }
+      }
+
       averageRating
       reviewCount
       reviews(first: 100) { edges { rating node { id author { node { name } } content date } } }
@@ -94,7 +167,7 @@ async function getProductData(slug: string): Promise<Product | null> {
         const { data } = await getClient().query<QueryData>({ 
             query: GET_PRODUCT_QUERY, 
             variables: { slug }, 
-            context: { fetchOptions: { next: { revalidate: 50000 } } } // 12 hour cache
+            context: { fetchOptions: { next: { revalidate: 0 } } } // Cache setting
         });
         
         if (!data || !data.product) {

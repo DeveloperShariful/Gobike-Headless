@@ -1,3 +1,5 @@
+// app/product/[slug]/QuantityAddToCart.tsx
+
 'use client';
 
 import { useState } from 'react';

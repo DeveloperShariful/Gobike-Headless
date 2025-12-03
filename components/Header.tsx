@@ -51,7 +51,7 @@ export default function Header() {
             <Link href="/" className={pathname === '/' ? styles.activeLink : ''}>Home</Link>
             <Link href="/bikes" className={pathname === '/bikes' ? styles.activeLink : ''}>Bikes</Link>
             <Link href="/spare-parts" className={pathname === '/spare-parts' ? styles.activeLink : ''}>Spare Parts</Link>
-            <Link href="/products" className={pathname === '/products' ? styles.activeLink : ''}>Shop</Link>
+            <Link href="/apparel" className={pathname === '/apparel' ? styles.activeLink : ''}>Apparel</Link>
             <Link href="/about" className={pathname === '/about' ? styles.activeLink : ''}>About Us</Link>
             <Link href="/contact" className={pathname === '/contact' ? styles.activeLink : ''}>Contact</Link>
             <Link href="/faq" className={pathname === '/faq' ? styles.activeLink : ''}>FAQs</Link>
@@ -90,7 +90,7 @@ export default function Header() {
                <Link href="/" className={pathname === '/' ? styles.activeLink : ''} onClick={closeAllOverlays}>Home</Link>
                <Link href="/bikes" className={pathname === '/bikes' ? styles.activeLink : ''} onClick={closeAllOverlays}>Bikes</Link>
                <Link href="/spare-parts" className={pathname === '/spare-parts' ? styles.activeLink : ''} onClick={closeAllOverlays}>Spare Parts</Link>
-               <Link href="/products" className={pathname === '/products' ? styles.activeLink : ''} onClick={closeAllOverlays}>Shop</Link>
+               <Link href="/apparel" className={pathname === '/apparel' ? styles.activeLink : ''} onClick={closeAllOverlays}>Apparel</Link>
                <Link href="/about" className={pathname === '/about' ? styles.activeLink : ''} onClick={closeAllOverlays}>About</Link>
                <Link href="/faq" className={pathname === '/faq' ? styles.activeLink : ''} onClick={closeAllOverlays}>FAQs</Link>
                <Link href="/contact" className={pathname === '/contact' ? styles.activeLink : ''} onClick={closeAllOverlays}>Contact us</Link>

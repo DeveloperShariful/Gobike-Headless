@@ -1,11 +1,7 @@
-'use client';
 // app/product/[slug]/ProductClient.tsx
 
-// ... আপনার অন্যান্য import ...
-import { productVideoMap } from '../productVideos';
-import LazyLoadYouTube from '../components/YouTubVideo/LazyLoadYouTube';
-import StickyAddToCart from './StickyAddToCart';
-// ... বাকি কোড ...
+'use client';
+
 import { useState, useEffect, useRef, ComponentType } from 'react';
 import styles from './ProductPage.module.css';
 import Image from 'next/image';
@@ -14,75 +10,89 @@ import ReviewForm from './ReviewForm';
 import ProductCard from '../../products/ProductCard';
 import { gtmViewItem } from '../../../lib/gtm';
 import { klaviyoTrackViewedProduct } from '../../../lib/klaviyo';
-
+import { productVideoMap } from '../productVideos';
+import LazyLoadYouTube from '../components/YouTubVideo/LazyLoadYouTube';
+import StickyAddToCart from './StickyAddToCart';
 import { productLayoutMap } from '../productLayoutMap';
 import { productInfoPanelsMap } from '../productInfoPanelsMap';
-import SlideOutPanel from '../components/SlideOutPanel/SlideOutPanel'
+import SlideOutPanel from '../components/SlideOutPanel/SlideOutPanel';
 
-
-// --- ইন্টারফেসগুলো নতুন ডেটা স্ট্রাকচার অনুযায়ী আপডেট করা হয়েছে ---
+// --- Interfaces Update (Variable Product Support Added) ---
 interface ImageNode { sourceUrl: string; }
-interface Attribute { name: string; options: string[]; }
+interface Attribute { name: string; options: string[]; label?: string; }
+interface VariationAttribute { name: string; value: string; }
+
+// ভেরিয়েশনের টাইপ ডেফিনিশন
+interface Variation {
+    databaseId: number;
+    price?: string;
+    regularPrice?: string;
+    salePrice?: string;
+    stockStatus?: string;
+    stockQuantity?: number;
+    name?: string;
+    attributes: { nodes: VariationAttribute[] };
+    image?: ImageNode;
+}
+
 interface ReviewEdge {
-  rating: number;
-  node: {
-    id: string;
-    author: { node: { name: string; avatar?: { url: string } }; };
-    content: string;
-    date: string;
-  };
+    rating: number;
+    node: {
+        id: string;
+        author: { node: { name: string; avatar?: { url: string } }; };
+        content: string;
+        date: string;
+    };
 }
-interface RelatedProduct { id: string; databaseId: number; name: string; slug: string; image?: ImageNode; price?: string; }
+
+interface RelatedProduct { id: string; databaseId: number; name: string; slug: string; image?: ImageNode; price?: string; onSale: boolean; }
+
 interface Product {
-  id: string;
-  databaseId: number;
-  slug: string;
-  name: string;
-  description: string;
-  shortDescription?: string;
-  image?: ImageNode;
-  galleryImages: { nodes: ImageNode[]; };
-  price?: string;
-  onSale: boolean;
-  regularPrice?: string;
-  salePrice?: string;
-  stockStatus?: string | null;
-  stockQuantity?: number | null;
-  attributes: { nodes: Attribute[]; };
-  averageRating: number;
-  reviewCount: number;
-  reviews: { 
-    edges: ReviewEdge[];
-  };
-  related: { nodes: RelatedProduct[]; };
-  weight?: number;
-  length?: number;
-  width?: number;
-  height?: number;
+    id: string;
+    databaseId: number;
+    slug: string;
+    name: string;
+    description: string;
+    shortDescription?: string;
+    image?: ImageNode;
+    galleryImages: { nodes: ImageNode[]; };
+    price?: string;
+    onSale: boolean;
+    regularPrice?: string;
+    salePrice?: string;
+    stockStatus?: string | null;
+    stockQuantity?: number | null;
+    attributes: { nodes: Attribute[]; };
+    variations?: { nodes: Variation[]; }; // ভেরিয়েশন লিস্ট
+    averageRating: number;
+    reviewCount: number;
+    reviews: { edges: ReviewEdge[]; };
+    related: { nodes: RelatedProduct[]; };
+    weight?: number;
+    length?: number;
+    width?: number;
+    height?: number;
 }
-// ----------------------------------------------------------------------
-interface RelatedProduct {
-  id: string;
-  databaseId: number;
-  name: string;
-  slug: string;
-  image?: ImageNode;
-  price?: string;
-  onSale: boolean; // <-- এই লাইনটি যোগ করুন
-}
+// --- Helper Functions ---
+const cleanStr = (str: string) => {
+    if (!str) return '';
+    return str.toLowerCase().replace(/pa_/g, '').replace(/[^a-z0-9]/g, ''); 
+};
 
-// StarRating কম্পোনেন্ট (টাইপিং ভুল সংশোধন করা হয়েছে)
+const formatLabel = (name: string) => {
+    const clean = name.replace(/^pa_/, '').replace(/_/g, ' ');
+    return clean.charAt(0).toUpperCase() + clean.slice(1);
+};
+
+// --- Sub-Components ---
 const StarRating = ({ rating }: { rating: number }) => {
-    // --- কার্যকরী সমাধান: `useState` এর 'S' বড় হাতের হবে ---
     const [starRating, setStarRating] = useState({ full: 0, empty: 5 });
-
     useEffect(() => {
         const totalStars = 5;
         const fullStars = Math.round(rating || 0);
         const emptyStars = totalStars - fullStars;
         setStarRating({ full: fullStars, empty: emptyStars });
     }, [rating]);
-
     return (
         <div className={styles.starRating}>
             {[...Array(starRating.full)].map((_, i) => <span key={`full-${i}`}>★</span>)}
@@ -93,81 +103,116 @@ const StarRating = ({ rating }: { rating: number }) => {
 
 const FormattedDate = ({ dateString }: { dateString: string }) => {
     const [formattedDate, setFormattedDate] = useState<string | null>(null);
-
-    useEffect(() => {
-        setFormattedDate(new Date(dateString).toLocaleDateString());
-    }, [dateString]);
-
-    if (!formattedDate) {
-        return <span className={styles.reviewDate}></span>;
-    }
-
+    useEffect(() => { setFormattedDate(new Date(dateString).toLocaleDateString()); }, [dateString]);
+    if (!formattedDate) return <span className={styles.reviewDate}></span>;
     return <span className={styles.reviewDate}>{formattedDate}</span>;
 };
 
 
 export default function ProductClient({ product }: { product: Product }) {
+    // --- State Management ---
     const [mainImage, setMainImage] = useState<string | undefined>(product.image?.sourceUrl);
+    
+    // ভেরিয়েবল প্রোডাক্টের স্টেট
+    const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
+    const [currentVariation, setCurrentVariation] = useState<Variation | null>(null);
+    const isVariableProduct = product.variations && product.variations.nodes && product.variations.nodes.length > 0;
+
+    // --- Helper Logic ---
     const parsePrice = (priceStr?: string): number => {
         if (!priceStr) return 0;
         return parseFloat(priceStr.replace(/[^0-9.]/g, ''));
     };
+
+    // --- Attribute Selection Logic ---
+    const handleAttributeSelect = (attributeName: string, value: string) => {
+        const newAttributes = { ...selectedAttributes, [attributeName]: value };
+        setSelectedAttributes(newAttributes);
+
+        if (!isVariableProduct) return;
+
+        // ভেরিয়েশন ম্যাচিং লজিক
+        const matchingVariation = product.variations?.nodes.find(variation => {
+            const isMatch = variation.attributes.nodes.every(varAttr => {
+                const varName = cleanStr(varAttr.name);
+                const varValue = cleanStr(varAttr.value);
+                if (!varValue) return true; // Any value
+
+                const userKey = Object.keys(newAttributes).find(k => cleanStr(k) === varName);
+                if (!userKey) return false; 
+                return varValue === cleanStr(newAttributes[userKey]);
+            });
+            return isMatch;
+        });
+
+        const requiredAttributeCount = product.attributes.nodes.length;
+        const selectedAttributeCount = Object.keys(newAttributes).length;
+
+        if (matchingVariation && selectedAttributeCount >= requiredAttributeCount) {
+            // ম্যাচ পাওয়া গেলে ভেরিয়েশন সেট করুন এবং ইমেজ আপডেট করুন
+            setCurrentVariation(matchingVariation);
+            if (matchingVariation.image?.sourceUrl) {
+                setMainImage(matchingVariation.image.sourceUrl);
+            }
+        } else {
+            setCurrentVariation(null);
+        }
+    };
+
+    // --- Dynamic Display Logic (Price & Stock) ---
+    const displayPrice = currentVariation?.price || product.price;
+    const displaySalePrice = currentVariation?.salePrice || product.salePrice;
+    const displayRegularPrice = currentVariation?.regularPrice || product.regularPrice;
+    const isOnSale = currentVariation ? (!!currentVariation.salePrice) : product.onSale;
+
+    const currentStockStatus = currentVariation ? currentVariation.stockStatus : product.stockStatus;
+    const currentStockQty = currentVariation ? currentVariation.stockQuantity : product.stockQuantity;
+    
+    // বাটন ভ্যালিডেশন চেক
+    const isSelectionMissing = isVariableProduct && !currentVariation;
+
+    // --- Discount Calculation ---
+    const regularPriceNum = parsePrice(displayRegularPrice);
+    const salePriceNum = parsePrice(displaySalePrice);
+    const discountPercent = regularPriceNum > 0 && salePriceNum < regularPriceNum 
+        ? Math.round(((regularPriceNum - salePriceNum) / regularPriceNum) * 100) 
+        : 0;
+
+    // --- Refs & Other Hooks ---
     const mainAddToCartRef = useRef<HTMLDivElement | null>(null);
     const [isStickyVisible, setStickyVisible] = useState(false);
     const INITIAL_REVIEWS_TO_SHOW = 5;
     const [visibleReviews, setVisibleReviews] = useState(INITIAL_REVIEWS_TO_SHOW);
-        // --- নতুন state এবং ভ্যারিয়েবল যোগ করা হয়েছে ---
+    
+    // Panels
     const [activePanel, setActivePanel] = useState<string | null>(null);
     const CustomSections = productLayoutMap[product.slug] || [];
     const panelConfigs = productInfoPanelsMap[product.slug] || [];
     const activePanelConfig = panelConfigs.find(p => p.id === activePanel);
     const PanelContentComponent = activePanelConfig?.component as ComponentType<{ product: Product }> | undefined;
 
-
-
-    const regularPriceNum = parsePrice(product.regularPrice);
-    const salePriceNum = parsePrice(product.salePrice);
-    const discountPercent = regularPriceNum > 0 && salePriceNum < regularPriceNum 
-        ? Math.round(((regularPriceNum - salePriceNum) / regularPriceNum) * 100) 
-        : 0;
+    // Sticky Observer
     useEffect(() => {
         const observer = new IntersectionObserver(
             ([entry]) => {
-                // --- এখানে নতুন এবং উন্নত লজিক যোগ করা হয়েছে ---
                 const isAboveViewport = entry.boundingClientRect.top < 0;
-                if (!entry.isIntersecting && isAboveViewport) {
-                    setStickyVisible(true);
-                } else {
-                    setStickyVisible(false);
-                }
+                setStickyVisible(!entry.isIntersecting && isAboveViewport);
             },
             { rootMargin: "0px", threshold: [0, 1] } 
         );
-
         const currentRef = mainAddToCartRef.current;
-        if (currentRef) {
-            observer.observe(currentRef);
-        }
-
-        // কম্পোনেন্টটি unmount হওয়ার সময় observer পরিষ্কার করুন
-        return () => {
-            if (currentRef) {
-                observer.unobserve(currentRef);
-            }
-        };
+        if (currentRef) observer.observe(currentRef);
+        return () => { if (currentRef) observer.unobserve(currentRef); };
     }, []);
 
+    // Tracking
     useEffect(() => {
         if (product) {
             const priceString = product.salePrice || product.price || '0';
             const priceNum = parseFloat(priceString.replace(/[^0-9.]/g, ''));
-            
-            gtmViewItem({
-                item_name: product.name,
-                item_id: product.databaseId,
-                price: priceNum,
-                quantity: 1
-            });
+
+            gtmViewItem({ item_name: product.name, item_id: product.databaseId, price: priceNum, quantity: 1 });
+
             klaviyoTrackViewedProduct({
                 ProductID: product.databaseId,
                 ProductName: product.name,
@@ -180,27 +225,26 @@ export default function ProductClient({ product }: { product: Product }) {
         }
     }, [product]);
            
-        
     if (!product) return null;
     const allReviews = product.reviews?.edges || [];
     const hasMoreReviews = allReviews.length > visibleReviews;
 
+    // --- CART OBJECT CONSTRUCTION (Updated for Variation) ---
     const productForCart = {
         id: product.id,
-        databaseId: product.databaseId,
-        name: product.name,
-        price: product.price,
+        databaseId: product.databaseId, 
+        variationId: currentVariation ? currentVariation.databaseId : undefined, 
+        name: product.name + (currentVariation && Object.keys(selectedAttributes).length > 0 ? ` - ${Object.values(selectedAttributes).join(', ')}` : ''),
+        price: displayPrice,
         image: product.image?.sourceUrl,
         slug: product.slug,
     };
+    // --------------------------------------------------------
 
     const allImages = [product.image, ...product.galleryImages.nodes].filter(Boolean) as ImageNode[];
-    
-    const customerImages = product.reviews?.edges
-        ?.map((edge: ReviewEdge) => edge.node.author.node.avatar?.url)
-        .filter(Boolean) || [];
-
+    const customerImages = product.reviews?.edges?.map((edge: ReviewEdge) => edge.node.author.node.avatar?.url).filter(Boolean) || [];
     const videoId = productVideoMap[product.slug];    
+
     return (
     <div className={styles.container}>
     <div className={styles.productLayout}>
@@ -262,10 +306,50 @@ export default function ProductClient({ product }: { product: Product }) {
             dangerouslySetInnerHTML={{ __html: product.shortDescription.replace(/<ul>/g, `<ul class="${styles.featuresGrid}">`).replace(/<li>/g, `<li class="${styles.featureItem}">`) }} 
             />
         )}
-        <div ref={mainAddToCartRef}>
-                    <QuantityAddToCart product={productForCart} />
-                </div>
 
+        {/* === Attributes Selection (Styled) === */}
+        {product.attributes?.nodes.map((attr) => (
+            <div key={attr.name} className={styles.attributeRow}>
+                <div className={styles.attributeLabel}>
+                    {formatLabel(attr.name)}: 
+                    <span className={styles.selectedValue}>{selectedAttributes[attr.name]}</span>
+                </div>
+                
+                <div className={styles.attributeOptions}>
+                    {attr.options.map((option) => {
+                        // বাটনটি সিলেক্ট করা আছে কিনা চেক করা হচ্ছে
+                        const isActive = cleanStr(selectedAttributes[attr.name]) === cleanStr(option);
+                        
+                        return (
+                            <button
+                                key={option}
+                                type="button"
+                                onClick={() => handleAttributeSelect(attr.name, option)}
+                                className={`${styles.attributeBtn} ${isActive ? styles.attributeBtnActive : ''}`}
+                            >
+                                {option}
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+        ))}
+
+        {/* === Add to Cart Section === */}
+        <div ref={mainAddToCartRef}>
+             {/* যদি ভেরিয়েশন সিলেক্ট না করা হয়, তবে বাটন ডিজেবল থাকবে */}
+             {isVariableProduct && !currentVariation ? (
+                 <div style={{marginTop: '20px'}}>
+                     <button disabled style={{ padding:'15px', width:'100%', background:'#e5e5e5', color: '#888', border:'none', borderRadius: '5px', cursor:'not-allowed', fontWeight: 'bold' }}>
+                        {Object.keys(selectedAttributes).length < product.attributes.nodes.length ? "Select Size and Color" : "Unavailable / Out of Stock"}
+                     </button>
+                 </div>
+             ) : (
+                 <QuantityAddToCart product={productForCart} />
+             )}
+        </div>
+
+        {/* === Trust Badges === */}
         <div className={styles.producttrustfeatureswrapper}>
           <div className={styles.trustfeaturesgrid}>
               <div className={styles.trustfeatureitem}>✓ 100% Secure Checkout</div>
@@ -280,8 +364,9 @@ export default function ProductClient({ product }: { product: Product }) {
         </div>
         </div>
     </div>
-    {/* === ইনফো ট্যাব সেকশন (সঠিক জায়গায়) === */}
-        {panelConfigs.length > 0 && (
+
+    {/* === Panels & Custom Sections === */}
+    {panelConfigs.length > 0 && (
             <div className={styles.infoTabsSection}>
                 {panelConfigs.map((panel) => (
                     <div key={panel.id} className={styles.tabItem} onClick={() => setActivePanel(panel.id)}>
@@ -429,16 +514,19 @@ export default function ProductClient({ product }: { product: Product }) {
         </div>
         </div>
     )}
-    <SlideOutPanel
-            isOpen={!!activePanelConfig}
-            onClose={() => setActivePanel(null)}
-            title={activePanelConfig?.label || ''}
-        >
+
+    {/* === Slide Panel & Sticky Cart === */}
+    <SlideOutPanel isOpen={!!activePanelConfig} onClose={() => setActivePanel(null)} title={activePanelConfig?.label || ''} >
             {PanelContentComponent && <PanelContentComponent product={product} />}
-        </SlideOutPanel>
-    <StickyAddToCart product={productForCart} isVisible={isStickyVisible} />
-    </div>
+    </SlideOutPanel>
     
+    <StickyAddToCart 
+        product={productForCart} 
+        isVisible={isStickyVisible} 
+        isValid={!isSelectionMissing} // বাটন এনাবল/ডিজেবল লজিক
+    />
+    
+    </div>
     </div>
    );
 }

@@ -4,7 +4,7 @@
   /* ডেস্কটপ ও মোবাইল দুই জায়গাতেই Sticky */
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 50;
   
   background: linear-gradient(
     90deg, 

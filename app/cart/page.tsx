@@ -9,7 +9,7 @@ import CartCrossSell from './CartCrossSell';
 import { gtmViewCart, gtmBeginCheckout } from '../../lib/gtm';
 import { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
-import { gql } from '@apollo/client'; // <-- ApolloError ইম্পোর্ট সরানো হয়েছে
+import { gql } from '@apollo/client'; 
 import client from '../../lib/apolloClient';
 import toast from 'react-hot-toast';
 
@@ -76,11 +76,13 @@ export default function CartPage() {
   const [cartDetails, setCartDetails] = useState<CartDetails | null>(null);
   const [couponCode, setCouponCode] = useState('');
   const [isCouponLoading, setCouponLoading] = useState(false);
+  
+  // ১. Removing স্টেট যোগ করা হয়েছে
+  const [removingKey, setRemovingKey] = useState<string | null>(null);
 
   // --- সার্ভার থেকে কার্টের তথ্য আনার ফাংশন ---
   const fetchCartDetails = useCallback(async () => {
     try {
-      // ★★★ সমাধান ১: কোয়েরির টাইপ লেখার পদ্ধতি পরিবর্তন করা হয়েছে ★★★
       const { data } = await client.query<{ cart: CartDetails }>({
         query: GET_CART_DETAILS,
         fetchPolicy: 'network-only'
@@ -107,10 +109,8 @@ export default function CartPage() {
     }
   }, [cartItems]);
 
-  // ★★★ সমাধান ২: এরর মেসেজ পাওয়ার জন্য একটি নিরাপদ ফাংশন ★★★
   const getErrorMessage = (error: unknown): string => {
     if (typeof error === 'object' && error !== null && 'message' in error) {
-      // GraphQL error এবং 일반 error উভয়ের জন্যই কাজ করবে
       return String((error as { message: string }).message).replace(/<[^>]*>?/gm, '');
     }
     return 'An unknown error occurred.';
@@ -160,6 +160,19 @@ export default function CartPage() {
     }
   };
 
+  // ২. রিমুভ হ্যান্ডলার যোগ করা হয়েছে
+  const handleRemoveItem = async (key: string) => {
+    setRemovingKey(key);
+    await removeFromCart(key);
+    setRemovingKey(null);
+  };
+
+  // অ্যাট্রিবিউট নাম সুন্দর করার ফাংশন
+  const formatLabel = (name: string) => {
+    const clean = name.replace(/^pa_/, '').replace(/_/g, ' ');
+    return clean.charAt(0).toUpperCase() + clean.slice(1);
+  };
+
   const isLoading = isCartLoading || isCouponLoading;
 
   return (
@@ -184,6 +197,18 @@ export default function CartPage() {
                     {item.image ? ( <Image src={item.image} alt={item.name} className={styles.itemImage} width={100} height={100}/> ) : ( <div className={styles.placeholderImage} /> )}
                     <div className={styles.itemInfo}>
                       <h2 className={styles.itemName}>{item.name}</h2>
+                      
+                      {/* ৩. অ্যাট্রিবিউট (Color/Size) দেখানোর কোড যোগ করা হয়েছে */}
+                      {item.attributes && item.attributes.length > 0 && (
+                        <div style={{ marginTop: '5px', fontSize: '14px', color: '#555' }}>
+                          {item.attributes.map((attr: any, index: number) => (
+                            <span key={index} style={{ marginRight: '10px', display: 'inline-block' }}>
+                                <strong>{formatLabel(attr.name)}:</strong> {attr.value}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
                       <div className={styles.itemMeta}>
                           <p className={styles.itemPrice} dangerouslySetInnerHTML={{ __html: item.price }}></p>
                           <div className={styles.quantityControl}>
@@ -194,7 +219,15 @@ export default function CartPage() {
                       </div>
                     </div>
                     <div className={styles.itemActions}>
-                      <button onClick={() => removeFromCart(item.key)} className={styles.removeButton} disabled={isLoading}>Remove</button>
+                      {/* ৪. রিমুভ বাটনে লোডিং টেক্সট এবং হ্যান্ডলার যোগ করা হয়েছে */}
+                      <button 
+                        onClick={() => handleRemoveItem(item.key)} 
+                        className={styles.removeButton} 
+                        disabled={isLoading || removingKey === item.key}
+                        style={{ opacity: removingKey === item.key ? 0.7 : 1 }}
+                      >
+                        {removingKey === item.key ? 'Removing...' : 'Remove'}
+                      </button>
                     </div>
                   </div>
                 ))}
