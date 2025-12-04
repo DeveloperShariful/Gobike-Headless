@@ -33,7 +33,7 @@ export default function PowerSection() {
 
         {/* Section 3: Handling */}
         <TextWithImage
-          imageUrl="https://gobikes.au/wp-content/uploads/2025/11/24inch-Gobike-Premium-Electric-Balance-Bike-Ebike-for-Kids-Ready-for-Action-2.webp"
+          imageUrl="https://gobikes.au/wp-content/uploads/2025/12/Gobike-24inch-Electric-Dirt-Bike-–-Durable-Kids-Electric-Bike-for-Trail-Riding-kids-ebike.webp"
           imageAlt="Rider carving a turn on the GoBike 24."
           title="Precision Handling & Control"
           description="The 24-inch Kenda fat tires combined with a perfectly balanced aluminum frame offer unmatched grip and handling. Corner with confidence and stay in control at high speeds."
