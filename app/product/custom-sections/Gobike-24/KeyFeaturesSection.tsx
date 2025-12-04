@@ -7,8 +7,8 @@ const keyFeatures = [
   {
     imageSrc: 'https://gobikes.au/wp-content/uploads/2025/11/24-W-R-Motor.webp', // Replace with 24" Motor Image
     imageAlt: 'The massive 1500W brushless hub motor on the GoBike 24 Pro.',
-    title: 'Extreme 1500W Power',
-    description: 'Experience the thrill with our most powerful 1500W motor. Capable of climbing steep hills and hitting 50km/h, it offers unmatched torque for serious riders.'
+    title: 'Extreme 2500W Power',
+    description: 'Experience the thrill with our most powerful 2500W motor. Capable of climbing steep hills and hitting 61km/h, it offers unmatched torque for serious riders.'
   },
   {
     imageSrc: 'https://gobikes.au/wp-content/uploads/2025/11/24-Y-R-back-Suspension-scaled.webp', // Replace with 24" Suspension Image

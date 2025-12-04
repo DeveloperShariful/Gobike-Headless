@@ -15,7 +15,7 @@ const specs = [
     { label: 'Speed Modes', value: 'Low (20km/hr), Medium (38km/hr), High (61km/hr)' },
     { label: 'Top Speed', value: 'Up to 31 mph (61 km/h)' },
     { label: 'Battery', value: '48-55V 15AH-18650 Lithium-ion (Removable)' },
-    { label: 'Ride Time', value: '15-30km range (approx. Up to 3Hours dependent on terrain)' },
+    { label: 'Ride Time', value: 'Range (approx. Up to 3Hours dependent on terrain)' },
     { label: 'Charge Time', value: '2-4 hours (54.6V/2.0A Charger)' },
     { label: 'Brakes', value: 'TIM Brand Hydraulic Disc Brakes (Front & Rear)' },
     { label: 'Display', value: 'WUXING Brand DZ50' },
