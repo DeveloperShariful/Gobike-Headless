@@ -108,6 +108,7 @@ const FormattedDate = ({ dateString }: { dateString: string }) => {
     return <span className={styles.reviewDate}>{formattedDate}</span>;
 };
 
+const SIZE_ORDER = ['110', '120', '130', '140', '150', '160', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL'];
 
 export default function ProductClient({ product }: { product: Product }) {
     // --- State Management ---
@@ -243,7 +244,14 @@ export default function ProductClient({ product }: { product: Product }) {
 
     const allImages = [product.image, ...product.galleryImages.nodes].filter(Boolean) as ImageNode[];
     const customerImages = product.reviews?.edges?.map((edge: ReviewEdge) => edge.node.author.node.avatar?.url).filter(Boolean) || [];
-    const videoId = productVideoMap[product.slug];    
+    const videoId = productVideoMap[product.slug];   
+     const sortedAttributeNodes = product.attributes?.nodes ? [...product.attributes.nodes].sort((a, b) => {
+        const nameA = a.name.toLowerCase();
+        const nameB = b.name.toLowerCase();
+        if (nameA.includes('color')) return -1;
+        if (nameB.includes('color')) return 1;
+        return 0;
+    }) : [];
 
     return (
     <div className={styles.container}>
@@ -308,32 +316,52 @@ export default function ProductClient({ product }: { product: Product }) {
         )}
 
         {/* === Attributes Selection (Styled) === */}
-        {product.attributes?.nodes.map((attr) => (
-            <div key={attr.name} className={styles.attributeRow}>
-                <div className={styles.attributeLabel}>
-                    {formatLabel(attr.name)}: 
-                    <span className={styles.selectedValue}>{selectedAttributes[attr.name]}</span>
+        {sortedAttributeNodes.map((attr) => {
+            
+            // ★★★ ৩. Size Options Sorting Logic ★★★
+            let displayOptions = [...attr.options]; 
+
+            if (attr.name.toLowerCase().includes('size')) {
+                 displayOptions.sort((a, b) => {
+                     const indexA = SIZE_ORDER.indexOf(a.toUpperCase()); // Case insensitive
+                     const indexB = SIZE_ORDER.indexOf(b.toUpperCase());
+                     
+                     // দুটাই যদি লিস্টে থাকে
+                     if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+                     
+                     // যে কোনো একটা থাকলে সেটা আগে যাবে
+                     if (indexA !== -1) return -1;
+                     if (indexB !== -1) return 1;
+                     
+                     return 0; 
+                 });
+            }
+
+            return (
+                <div key={attr.name} className={styles.attributeRow}>
+                    <div className={styles.attributeLabel}>
+                        {formatLabel(attr.name)}: 
+                        <span className={styles.selectedValue}>{selectedAttributes[attr.name]}</span>
+                    </div>
+                    
+                    <div className={styles.attributeOptions}>
+                        {displayOptions.map((option) => {
+                            const isActive = cleanStr(selectedAttributes[attr.name]) === cleanStr(option);
+                            return (
+                                <button
+                                    key={option}
+                                    type="button"
+                                    onClick={() => handleAttributeSelect(attr.name, option)}
+                                    className={`${styles.attributeBtn} ${isActive ? styles.attributeBtnActive : ''}`}
+                                >
+                                    {option}
+                                </button>
+                            );
+                        })}
+                    </div>
                 </div>
-                
-                <div className={styles.attributeOptions}>
-                    {attr.options.map((option) => {
-                        // বাটনটি সিলেক্ট করা আছে কিনা চেক করা হচ্ছে
-                        const isActive = cleanStr(selectedAttributes[attr.name]) === cleanStr(option);
-                        
-                        return (
-                            <button
-                                key={option}
-                                type="button"
-                                onClick={() => handleAttributeSelect(attr.name, option)}
-                                className={`${styles.attributeBtn} ${isActive ? styles.attributeBtnActive : ''}`}
-                            >
-                                {option}
-                            </button>
-                        );
-                    })}
-                </div>
-            </div>
-        ))}
+            );
+        })}
 
         {/* === Add to Cart Section === */}
         <div ref={mainAddToCartRef}>
@@ -523,7 +551,7 @@ export default function ProductClient({ product }: { product: Product }) {
     <StickyAddToCart 
         product={productForCart} 
         isVisible={isStickyVisible} 
-        isValid={!isSelectionMissing} // বাটন এনাবল/ডিজেবল লজিক
+        isValid={!isSelectionMissing} 
     />
     
     </div>
