@@ -17,7 +17,7 @@ export default function OverviewSection() {
         <div className={styles.overviewText}>
           <h2 className={styles.mainTitle}>GoBike 24 Pro: The Ultimate Machine</h2>
           <p className={styles.mainDescription}>
-            Ready to level up? The **GoBike 24 Inch Pro** is built for teens and adults who demand power. With a massive **1500W motor**, top speeds of **50km/h**, and **fully adjustable suspension**, this isn't just a bike—it's a dirt-shredding beast. Whether hitting jumps or exploring trails, the GoBike 24 delivers pro-level performance and adrenaline-pumping fun.
+            Ready to level up? The **GoBike 24 Inch Pro** is built for teens and adults who demand power. With a massive **2500W motor**, top speeds of **61km/h**, and **fully adjustable suspension**, this isn't just a bike—it's a dirt-shredding beast. Whether hitting jumps or exploring trails, the GoBike 24 delivers pro-level performance and adrenaline-pumping fun.
           </p>
         </div>
         <div className={styles.overviewSlider}>

@@ -17,8 +17,8 @@ export default function PowerSection() {
         <TextWithImage
           imageUrl="https://gobikes.au/wp-content/uploads/2025/11/Gobike-24inch-Electric-Dirt-Bike-–-Durable-Kids-Electric-Bike-for-Trail-Riding.webp"
           imageAlt="Close up of the 1500W hub motor on the GoBike 24."
-          title="1500W of Pure Adrenaline"
-          description="At the heart of the GoBike 24 lies a beastly 1500W brushless motor. It delivers explosive acceleration and the torque needed to crush steep inclines. This is serious power for serious riders."
+          title="2500W of Pure Adrenaline"
+          description="At the heart of the GoBike 24 lies a beastly 2500W brushless motor. It delivers explosive acceleration and the torque needed to crush steep inclines. This is serious power for serious riders."
           reverse={false} 
         />
 
@@ -44,8 +44,8 @@ export default function PowerSection() {
         <TextWithImage
           imageUrl="https://gobikes.au/wp-content/uploads/2025/11/Best-Off-Road-Ebike-for-Kids-–-24inch-Gobike-Electric-Mountain-Bike-on-Dirt-Trails.webp"
           imageAlt="48V Lithium battery on the GoBike 24."
-          title="Long-Range 48V Power"
-          description="Ride longer with the 48V 10Ah lithium-ion battery. Secured safely within the frame yet easily removable, it powers your adventures for up to 90 minutes on a single charge."
+          title="Long-Range 48-55V Power"
+          description="Ride longer with the 48V 10Ah lithium-ion battery. Secured safely within the frame yet easily removable, it powers your adventures for up to 3hours on a single charge."
           reverse={true} 
         />
 
