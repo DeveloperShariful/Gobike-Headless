@@ -30,9 +30,16 @@ interface QueryData {
 }
 
 // --- GraphQL কোয়েরি (অপরিবর্তিত) ---
+// --- GraphQL কোয়েরি (আপডেট করা হয়েছে) ---
 const GET_FEATURED_BIKES_QUERY = gql`
   query GetFeaturedBikes {
-    products(where: { category: "bikes" }, first: 5) {
+    products(
+      where: { 
+        category: "bikes", 
+        orderby: { field: NAME, order: ASC } 
+      }, 
+      first: 5
+    ) {
       nodes {
         id
         databaseId

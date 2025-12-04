@@ -72,19 +72,22 @@ export async function generateMetadata(): Promise<Metadata> {
 
 
 // --- Data Fetching Function ---
+// --- Data Fetching Function ---
 async function getBikeProducts(
-    first: number | null,
-    after: string | null,
-    last: number | null,
-    before: string | null
+  first: number | null,
+  after: string | null,
+  last: number | null,
+  before: string | null
 ) {
   try {
-    // --- সমাধান: getClient() এখন সঠিকভাবে কাজ করবে ---
     const { data } = await getClient().query<QueryData>({
       query: gql`
         query GetBikesCursor($first: Int, $after: String, $last: Int, $before: String) {
           products(
-            where: { category: "bikes" },
+            where: { 
+                category: "bikes", 
+                orderby: { field: NAME, order: ASC } 
+            },
             first: $first, after: $after, last: $last, before: $before
           ) {
             nodes {
