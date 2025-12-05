@@ -165,17 +165,115 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
 
   const refetchCartData = useCallback(async () => { dispatch({ type: 'SET_LOADING', key: 'cart', payload: true }); try { const { data } = await client.query<{ cart: CartData }>({ query: GET_CHECKOUT_DATA, fetchPolicy: 'network-only' }); if (data?.cart) { dispatch({ type: 'SET_CHECKOUT_DATA', payload: { cart: data.cart } }); } } catch (err) {console.error("Error updating customer address:", err); toast.error('Could not refresh cart data.'); } finally { dispatch({ type: 'SET_LOADING', key: 'cart', payload: false }); } }, []);
   useEffect(() => { if (!isCartContextLoading && cartItems.length === 0 && !orderPlacementInProgress) router.push('/cart'); else refetchCartData(); }, [isCartContextLoading, cartItems.length, router, refetchCartData, orderPlacementInProgress]);
-  const handleAddressChange = useCallback(async (address: Partial<ShippingFormData>) => { dispatch({ type: 'SET_CUSTOMER_INFO', payload: address }); if (!addressInputStarted) { dispatch({ type: 'SET_ADDRESS_INPUT_STARTED', payload: true });} const updatedCustomerInfo = { ...customerInfoRef.current, ...address }; if (updatedCustomerInfo.city && updatedCustomerInfo.postcode && updatedCustomerInfo.state) { dispatch({ type: 'SET_LOADING', key: 'shipping', payload: true }); try { await client.mutate({ mutation: UPDATE_CUSTOMER_MUTATION, variables: { input: { shipping: updatedCustomerInfo, billing: updatedCustomerInfo } } }); await refetchCartData(); } catch (err) {  console.error("Error refetching cart data:", err); toast.error('Could not calculate shipping.'); } finally { dispatch({ type: 'SET_LOADING', key: 'shipping', payload: false }); } } }, [addressInputStarted, refetchCartData]);
+  const handleAddressChange = useCallback(async (address: Partial<ShippingFormData>) => {
+    // ১. লোকাল স্টেট আপডেট
+    dispatch({ type: 'SET_CUSTOMER_INFO', payload: address });
+    
+    if (!addressInputStarted) { 
+        dispatch({ type: 'SET_ADDRESS_INPUT_STARTED', payload: true });
+    }
+
+    // ২. বর্তমান বিলিং এবং শিপিং ডেটা প্রস্তুত করা
+    const updatedBilling = { ...customerInfoRef.current, ...address };
+    
+    // লজিক: যদি 'shipToDifferentAddress' সত্য হয়, তবে শিপিং ডেটা আগেরটাই থাকবে (Shipping Form থেকে)।
+    // আর যদি মিথ্যা হয়, তবে বিলিং ডেটাই শিপিং ডেটা হিসেবে যাবে।
+    const updatedShipping = shipToDifferentAddress 
+        ? shippingInfoRef.current 
+        : updatedBilling;
+
+    // ৩. সার্ভারে ডেটা পাঠানো (যদি প্রয়োজনীয় তথ্য থাকে)
+    if (updatedBilling.city && updatedBilling.postcode && updatedBilling.state) { 
+        dispatch({ type: 'SET_LOADING', key: 'shipping', payload: true }); 
+        try { 
+            await client.mutate({ 
+                mutation: UPDATE_CUSTOMER_MUTATION, 
+                variables: { 
+                    input: { 
+                        shipping: updatedShipping, 
+                        billing: updatedBilling 
+                    } 
+                } 
+            }); 
+            await refetchCartData(); 
+        } catch (err) { 
+            console.error("Error refetching cart data:", err); 
+            toast.error('Could not calculate shipping.'); 
+        } finally { 
+            dispatch({ type: 'SET_LOADING', key: 'shipping', payload: false }); 
+        } 
+    } 
+  }, [addressInputStarted, refetchCartData, shipToDifferentAddress]);
   const handleApplyCoupon = async (couponCode: string) => { if (cartData?.appliedCoupons && cartData.appliedCoupons.length > 0) { toast.error("Only one coupon can be applied per order."); return; } dispatch({ type: 'SET_LOADING', key: 'applyingCoupon', payload: true }); toast.loading('Applying coupon...'); try { await client.mutate({ mutation: APPLY_COUPON_MUTATION, variables: { input: { code: couponCode } } }); await refetchCartData(); toast.dismiss(); toast.success('Coupon applied!'); } catch (error) { toast.dismiss(); toast.error(getErrorMessage(error)); } finally { dispatch({ type: 'SET_LOADING', key: 'applyingCoupon', payload: false }); } };
   const handleRemoveCoupon = async (couponCode: string) => { if (loading.removingCoupon) return; dispatch({ type: 'SET_LOADING', key: 'removingCoupon', payload: true }); toast.loading('Removing coupon...'); try { await client.mutate({ mutation: REMOVE_COUPON_MUTATION, variables: { input: { codes: [couponCode] } } }); await refetchCartData(); toast.dismiss(); toast.success('Coupon removed.'); } catch (error) { toast.dismiss(); toast.error(getErrorMessage(error)); } finally { dispatch({ type: 'SET_LOADING', key: 'removingCoupon', payload: false }); } };
   const handleShippingSelect = (rateId: string) => {  dispatch({ type: 'SET_SELECTED_SHIPPING', payload: rateId }); const selectedRate = shippingRates.find(rate => rate.id === rateId); if (cartData && selectedRate) { const subtotal = parseFloat(cartData.subtotal.replace(/[^0-9.]/g, '')) || 0; const discount = parseFloat(cartData.discountTotal.replace(/[^0-9.]/g, '')) || 0; const shippingCost = parseFloat(selectedRate.cost) || 0; const newTotal = (subtotal - discount) + shippingCost; dispatch({ type: 'UPDATE_TOTALS', payload: { shippingTotal: `$${shippingCost.toFixed(2)}`, total: `$${newTotal.toFixed(2)}` } }); } client.mutate({ mutation: UPDATE_SHIPPING_METHOD_MUTATION, variables: { input: { shippingMethods: [rateId] } }, }).catch(err => { console.error("Failed to sync shipping method with server:", err); toast.error("Could not save shipping preference."); }); };
  
-  const handleShippingAddressChange = useCallback((address: Partial<ShippingFormData>) => {
+  const handleShippingAddressChange = useCallback(async (address: Partial<ShippingFormData>) => {
+    // ১. লোকাল স্টেট আপডেট
     dispatch({ type: 'SET_SHIPPING_INFO', payload: address });
-  }, []);
 
-// ★★★ পরিবর্তন: paymentData অবজেক্টে paymentMethodId যোগ করা হয়েছে ★★★
-const handlePlaceOrder = async (paymentData?: { 
+    // ২. আপডেটেড শিপিং এবং বর্তমান বিলিং ডেটা নেওয়া
+    const updatedShipping = { ...shippingInfoRef.current, ...address };
+    const currentBilling = customerInfoRef.current;
+
+    // ৩. সার্ভারে আপডেট পাঠানো (শুধুমাত্র যদি প্রয়োজনীয় ফিল্ড থাকে)
+    if (updatedShipping.city && updatedShipping.postcode && updatedShipping.state) {
+        dispatch({ type: 'SET_LOADING', key: 'shipping', payload: true });
+        try {
+            await client.mutate({
+                mutation: UPDATE_CUSTOMER_MUTATION,
+                variables: {
+                    input: {
+                        billing: currentBilling, // বিলিং অপরিবর্তিত থাকবে
+                        shipping: updatedShipping // নতুন শিপিং এড্রেস যাবে
+                    }
+                }
+            });
+            await refetchCartData(); // নতুন শিপিং কস্ট নিয়ে আসবে
+        } catch (err) {
+            console.error("Error updating shipping address:", err);
+            toast.error('Could not update shipping cost.');
+        } finally {
+            dispatch({ type: 'SET_LOADING', key: 'shipping', payload: false });
+        }
+    }
+  }, [refetchCartData]);
+
+  const handleToggleShipToDifferent = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const isChecked = e.target.checked;
+    
+    // ১. স্টেট আপডেট
+    dispatch({ type: 'SET_SHIP_TO_DIFFERENT_ADDRESS', payload: isChecked });
+
+    // ২. যদি ইউজার চেকবক্সটি **তুলে দেয় (Uncheck)**, তবে শিপিং এড্রেস আবার বিলিং এড্রেস হয়ে যাবে।
+    // তাই সার্ভারকে জানাতে হবে।
+    if (!isChecked) {
+        const billing = customerInfoRef.current;
+        
+        if (billing.city && billing.postcode && billing.state) {
+            dispatch({ type: 'SET_LOADING', key: 'shipping', payload: true });
+            try {
+                await client.mutate({
+                    mutation: UPDATE_CUSTOMER_MUTATION,
+                    variables: {
+                        input: {
+                            billing: billing,
+                            shipping: billing // শিপিং = বিলিং
+                        }
+                    }
+                });
+                await refetchCartData();
+            } catch (err) {
+                console.error("Error syncing addresses:", err);
+            } finally {
+                dispatch({ type: 'SET_LOADING', key: 'shipping', payload: false });
+            }
+        }
+    }
+  };
+
+  // ★★★ পরিবর্তন: paymentData অবজেক্টে paymentMethodId যোগ করা হয়েছে ★★★
+  const handlePlaceOrder = async (paymentData?: { 
     transaction_id?: string; 
     shippingAddress?: Partial<ShippingFormData>; 
     redirect_needed?: boolean;
@@ -393,7 +491,7 @@ const handlePlaceOrder = async (paymentData?: {
                     type="checkbox"
                     id="ship-to-different-address"
                     checked={shipToDifferentAddress}
-                    onChange={(e) => dispatch({ type: 'SET_SHIP_TO_DIFFERENT_ADDRESS', payload: e.target.checked })}
+                    onChange={handleToggleShipToDifferent}
                 />
                 <span>Ship to a different address?</span>
             </label>

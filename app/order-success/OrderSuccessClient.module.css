@@ -1,139 +1,395 @@
-/* app/order-success/OrderSuccessClient.module.css */
-
-.wrapper {
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    padding: 2rem;
+/* =========================================
+   1. MAIN LAYOUT & CONTAINER
+   ========================================= */
+.mainContainer {
+  min-height: 100vh;
+  background-color: #f3f4f6; /* Light gray background */
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  font-family: system-ui, -apple-system, sans-serif;
 }
 
-.loader, .error {
-    text-align: center;
-    padding: 4rem;
-    font-size: 1.2rem;
-}
-.error { color: #d9534f; }
-
-.header {
-    text-align: center;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 2rem;
-    margin-bottom: 2rem;
-}
-.successIcon {
-    display: inline-block;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background-color: #28a745;
-    color: white;
-    font-size: 2.5rem;
-    line-height: 60px;
-    margin-bottom: 1rem;
-}
-.header h1 {
-    margin: 0 0 0.5rem 0;
-    font-size: 2rem;
-}
-.header p {
-    color: #666;
-    margin: 0;
+/* Success Card Styling */
+.successCard {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 900px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05); /* Soft Shadow */
+  padding: 40px;
+  overflow: hidden;
 }
 
-.orderDetails {
-    margin-bottom: 2rem;
-}
-.orderDetails h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-}
-
-.orderMeta {
-    background-color: #f9f9f9;
-    border: 1px solid #eee;
-    border-radius: 5px;
-    padding: 1rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-.orderMeta p {
-    margin: 0;
+/* =========================================
+   2. HEADER SECTION
+   ========================================= */
+.cardHeader {
+  text-align: center;
+  margin-bottom: 40px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 30px;
 }
 
-.itemsHeader {
-    font-size: 1.25rem;
-    margin-bottom: 1rem;
+.iconCircle {
+  width: 70px;
+  height: 70px;
+  background-color: #dcfce7; /* Light Green */
+  color: #16a34a; /* Green */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
 }
 
-.itemsTable {
-    width: 100%;
-    border-collapse: collapse;
-}
-.itemRow {
-    border-bottom: 1px solid #eee;
-}
-.itemRow:last-child {
-    border-bottom: none;
+.iconCircle svg {
+  width: 35px;
+  height: 35px;
 }
 
-.itemRow td {
-    padding: 1rem 1rem;
-    vertical-align: middle;
+.title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 10px 0;
 }
-.itemImageCell { width: 80px; }
-.itemNameCell { padding-left: 5rem; }
-.itemTotalCell { text-align: right; font-weight: bold; }
 
-.addressSection {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    border-top: 1px solid #eee;
-    padding-top: 2rem;
+.subtitle {
+  font-size: 16px;
+  color: #4b5563;
+  margin: 0 0 5px 0;
 }
+
+.emailText {
+  font-size: 14px;
+  color: #6b7280;
+}
+.emailText span {
+  font-weight: 600;
+  color: #111;
+}
+
+/* =========================================
+   3. META DATA GRID (Order #, Date, Total)
+   ========================================= */
+.metaGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  background: #f9fafb;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 40px;
+  border: 1px solid #f3f4f6;
+}
+
+.metaItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.metaItem span {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #9ca3af;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.metaItem strong {
+  font-size: 15px;
+  color: #1f2937;
+}
+
+.highlightPrice {
+  color: #16a34a !important; /* Green color for price */
+}
+
+/* =========================================
+   4. PRODUCT TABLE SECTION
+   ========================================= */
+.sectionHeading {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #111;
+}
+
+.tableSection {
+  margin-bottom: 40px;
+}
+
+.tableResponsive {
+  overflow-x: auto;
+}
+
+.productTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.productTable th {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 2px solid #e5e7eb;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.productTable td {
+  padding: 16px 12px;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: middle;
+  color: #374151;
+}
+
+/* --- Table Column Widths (Desktop Fix) --- */
+/* ১. Product Column: বেশি জায়গা নিবে */
+.productTable th:nth-child(1),
+.productTable td:nth-child(1) {
+  width: 80%; 
+  text-align: left;
+}
+
+/* ২. Qty Column: ডানদিকে চাপানো এবং Total এর কাছে রাখা */
+.productTable th:nth-child(2),
+.productTable td:nth-child(2) {
+  width: 7%; 
+  text-align: right; /* Right Align */
+  padding-right: 30px; /* Gap adjustment */
+}
+
+/* ৩. Total Column: ডানদিকে থাকবে */
+.productTable th:nth-child(3),
+.productTable td:nth-child(3) {
+  width: 13%;
+  text-align: right;
+}
+
+/* Product Image & Name Wrapper */
+.productFlex {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.imgWrapper {
+  width: 50px;
+  height: 50px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+}
+
+.productName {
+  font-weight: 500;
+  font-size: 15px;
+}
+
+/* =========================================
+   5. ADDRESS GRID
+   ========================================= */
+.addressGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.addressBox {
+  background: #f9fafb;
+  padding: 25px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
 .addressBox h3 {
-    margin-top: 0;
-    font-size: 1.25rem;
+  font-size: 16px;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #111;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
+
 .addressBox address {
-    font-style: normal;
-    line-height: 1.6;
-    color: #555;
+  font-style: normal;
+  line-height: 1.6;
+  color: #4b5563;
+  font-size: 15px;
 }
 
+.addressName {
+  display: block;
+  color: #111;
+  margin-bottom: 4px;
+}
+
+/* =========================================
+   6. FOOTER & BUTTONS
+   ========================================= */
+.footerAction {
+  text-align: center;
+}
+
+.btnPrimary {
+  display: inline-block;
+  background-color: #111827; /* Black */
+  color: #ffffff;
+  padding: 16px 40px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btnPrimary:hover {
+  background-color: #374151;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Loading & Error States */
+.loadingContainer, .errorContainer {
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #111;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* =========================================
+   7. MEDIA QUERIES (RESPONSIVE)
+   ========================================= */
+
+/* --- Tablet Updates (Max Width 768px) --- */
 @media (max-width: 768px) {
-    .orderMeta, .addressSection {
-        grid-template-columns: 1fr;
-    }
-}
-/* ... আপনার ফাইলের শেষে এই কোড যোগ করুন ... */
+  .mainContainer {
+    padding: 20px;
+  }
 
-.notesSection {
-    background-color: #f0f8ff;
-    border: 1px solid #cce5ff;
-    padding: 1rem;
-    border-radius: 5px;
-    margin-bottom: 2rem;
+  .successCard {
+    padding: 30px 20px;
+  }
+
+  .title {
+    font-size: 26px;
+  }
+
+  /* 2 Column Layout for Meta Data */
+  .metaGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  /* Stack Addresses */
+  .addressGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .productTable th,
+  .productTable td {
+    padding: 12px 8px;
+  }
+
+  /* Image Size Adjustment for Tablet (65px) */
+  .imgWrapper {
+    width: 65px;
+    height: 65px;
+    min-width: 65px;
+    padding: 3px;
+  }
+
+  .productFlex {
+    gap: 10px;
+    text-transform: capitalize;
+  }
 }
-.notesSection h3 {
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-}
-.notesSection p {
-    margin: 0;
-    font-style: italic;
-}
-.shippingIcon {
+
+/* --- Mobile Updates (Max Width 480px) --- */
+@media (max-width: 480px) {
+  .mainContainer {
+    padding: 10px;
+  }
+  
+  .successCard {
+    padding: 20px 10px; /* Reduced padding */
+  }
+
+  .title {
+    font-size: 22px;
+  }
+
+  /* Table Adjustments */
+  .productTable th,
+  .productTable td {
+    padding: 12px 2px;
+    font-size: 13px;
+  }
+
+  /* Image Size Increase for Mobile (80px) */
+  .imgWrapper {
     width: 80px;
     height: 80px;
-    display: flex;
-    align-items: center;
+    min-width: 80px;
+    padding: 4px;
+  }
 
-    background-color: #f8f9fa;
-    border-radius: 5px;
-    font-size: 24px;
-    color: #ffffff;
-    padding: 0;
+  .productFlex {
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .productName {
+    font-size: 13px;
+    line-height: 1.3;
+    font-weight: 700;
+  }
+
+  /* Mobile Qty Column: Tight gap with Total */
+  .productTable th:nth-child(2),
+  .productTable td:nth-child(2) {
+    width: auto; /* Reset fixed width */
+    text-align: right;
+    padding-right: 5px; /* Very small gap */
+    white-space: nowrap;
+    font-weight: 800;
+  }
+
+  /* Mobile Total Column */
+  .productTable th:nth-child(3),
+  .productTable td:nth-child(3) {
+    width: auto; /* Reset fixed width */
+    text-align: right;
+    padding: 10px;
+    white-space: nowrap;
+    font-weight: 800;
+    font-size: 15px;
+  }
+  
+  /* Reset Product Column Width for Mobile */
+  .productTable th:nth-child(1),
+  .productTable td:nth-child(1) {
+    width: 80%; 
+  }
 }
