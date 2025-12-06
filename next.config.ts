@@ -1,18 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   
-  // TypeScript error থাকলে বিল্ড process থামিয়ে দেবে না।
-  // প্রোডাকশনে যাওয়ার আগে এটি false করে দেওয়া বা মুছে ফেলা উচিত।
   typescript: {
     ignoreBuildErrors: true,
   },
-
-  // ESLint error থাকলে বিল্ড process থামিয়ে দেবে না।
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-
-  // Next.js-এর ইমেজ অপ্টিমাইজেশনের জন্য অনুমোদিত ডোমেইনগুলো
+  
   images: {
     remotePatterns: [
       {
