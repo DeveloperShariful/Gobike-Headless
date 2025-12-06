@@ -6,7 +6,7 @@ import { useState, useEffect, useRef, ComponentType } from 'react';
 import styles from './ProductPage.module.css';
 import Image from 'next/image';
 import QuantityAddToCart from './QuantityAddToCart';
-import ReviewForm from './ReviewForm';
+import ReviewForm from './ReviewForm'; // এখন এটি সম্পূর্ণ রিভিউ সেকশন হ্যান্ডেল করবে
 import ProductCard from '../../products/ProductCard';
 import { gtmViewItem } from '../../../lib/gtm';
 import { klaviyoTrackViewedProduct } from '../../../lib/klaviyo';
@@ -17,12 +17,11 @@ import { productLayoutMap } from '../productLayoutMap';
 import { productInfoPanelsMap } from '../productInfoPanelsMap';
 import SlideOutPanel from '../components/SlideOutPanel/SlideOutPanel';
 
-// --- Interfaces Update (Variable Product Support Added) ---
+// --- Interfaces ---
 interface ImageNode { sourceUrl: string; }
 interface Attribute { name: string; options: string[]; label?: string; }
 interface VariationAttribute { name: string; value: string; }
 
-// ভেরিয়েশনের টাইপ ডেফিনিশন
 interface Variation {
     databaseId: number;
     price?: string;
@@ -63,7 +62,7 @@ interface Product {
     stockStatus?: string | null;
     stockQuantity?: number | null;
     attributes: { nodes: Attribute[]; };
-    variations?: { nodes: Variation[]; }; // ভেরিয়েশন লিস্ট
+    variations?: { nodes: Variation[]; };
     averageRating: number;
     reviewCount: number;
     reviews: { edges: ReviewEdge[]; };
@@ -73,6 +72,7 @@ interface Product {
     width?: number;
     height?: number;
 }
+
 // --- Helper Functions ---
 const cleanStr = (str: string) => {
     if (!str) return '';
@@ -84,37 +84,13 @@ const formatLabel = (name: string) => {
     return clean.charAt(0).toUpperCase() + clean.slice(1);
 };
 
-// --- Sub-Components ---
-const StarRating = ({ rating }: { rating: number }) => {
-    const [starRating, setStarRating] = useState({ full: 0, empty: 5 });
-    useEffect(() => {
-        const totalStars = 5;
-        const fullStars = Math.round(rating || 0);
-        const emptyStars = totalStars - fullStars;
-        setStarRating({ full: fullStars, empty: emptyStars });
-    }, [rating]);
-    return (
-        <div className={styles.starRating}>
-            {[...Array(starRating.full)].map((_, i) => <span key={`full-${i}`}>★</span>)}
-            {[...Array(starRating.empty)].map((_, i) => <span key={`empty-${i}`}>☆</span>)}
-        </div>
-    );
-};
-
-const FormattedDate = ({ dateString }: { dateString: string }) => {
-    const [formattedDate, setFormattedDate] = useState<string | null>(null);
-    useEffect(() => { setFormattedDate(new Date(dateString).toLocaleDateString()); }, [dateString]);
-    if (!formattedDate) return <span className={styles.reviewDate}></span>;
-    return <span className={styles.reviewDate}>{formattedDate}</span>;
-};
-
 const SIZE_ORDER = ['110', '120', '130', '140', '150', '160', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL'];
 
 export default function ProductClient({ product }: { product: Product }) {
     // --- State Management ---
     const [mainImage, setMainImage] = useState<string | undefined>(product.image?.sourceUrl);
     
-    // ভেরিয়েবল প্রোডাক্টের স্টেট
+    // ভেরিয়েবল প্রোডাক্টের স্টেট
     const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
     const [currentVariation, setCurrentVariation] = useState<Variation | null>(null);
     const isVariableProduct = product.variations && product.variations.nodes && product.variations.nodes.length > 0;
@@ -132,12 +108,12 @@ export default function ProductClient({ product }: { product: Product }) {
 
         if (!isVariableProduct) return;
 
-        // ভেরিয়েশন ম্যাচিং লজিক
+        // ভেরিয়েশন ম্যাচিং লজিক
         const matchingVariation = product.variations?.nodes.find(variation => {
             const isMatch = variation.attributes.nodes.every(varAttr => {
                 const varName = cleanStr(varAttr.name);
                 const varValue = cleanStr(varAttr.value);
-                if (!varValue) return true; // Any value
+                if (!varValue) return true; 
 
                 const userKey = Object.keys(newAttributes).find(k => cleanStr(k) === varName);
                 if (!userKey) return false; 
@@ -150,7 +126,6 @@ export default function ProductClient({ product }: { product: Product }) {
         const selectedAttributeCount = Object.keys(newAttributes).length;
 
         if (matchingVariation && selectedAttributeCount >= requiredAttributeCount) {
-            // ম্যাচ পাওয়া গেলে ভেরিয়েশন সেট করুন এবং ইমেজ আপডেট করুন
             setCurrentVariation(matchingVariation);
             if (matchingVariation.image?.sourceUrl) {
                 setMainImage(matchingVariation.image.sourceUrl);
@@ -160,19 +135,15 @@ export default function ProductClient({ product }: { product: Product }) {
         }
     };
 
-    // --- Dynamic Display Logic (Price & Stock) ---
+    // --- Dynamic Display Logic ---
     const displayPrice = currentVariation?.price || product.price;
     const displaySalePrice = currentVariation?.salePrice || product.salePrice;
     const displayRegularPrice = currentVariation?.regularPrice || product.regularPrice;
     const isOnSale = currentVariation ? (!!currentVariation.salePrice) : product.onSale;
-
     const currentStockStatus = currentVariation ? currentVariation.stockStatus : product.stockStatus;
     const currentStockQty = currentVariation ? currentVariation.stockQuantity : product.stockQuantity;
-    
-    // বাটন ভ্যালিডেশন চেক
     const isSelectionMissing = isVariableProduct && !currentVariation;
 
-    // --- Discount Calculation ---
     const regularPriceNum = parsePrice(displayRegularPrice);
     const salePriceNum = parsePrice(displaySalePrice);
     const discountPercent = regularPriceNum > 0 && salePriceNum < regularPriceNum 
@@ -182,8 +153,6 @@ export default function ProductClient({ product }: { product: Product }) {
     // --- Refs & Other Hooks ---
     const mainAddToCartRef = useRef<HTMLDivElement | null>(null);
     const [isStickyVisible, setStickyVisible] = useState(false);
-    const INITIAL_REVIEWS_TO_SHOW = 5;
-    const [visibleReviews, setVisibleReviews] = useState(INITIAL_REVIEWS_TO_SHOW);
     
     // Panels
     const [activePanel, setActivePanel] = useState<string | null>(null);
@@ -225,12 +194,10 @@ export default function ProductClient({ product }: { product: Product }) {
             });
         }
     }, [product]);
-           
+            
     if (!product) return null;
-    const allReviews = product.reviews?.edges || [];
-    const hasMoreReviews = allReviews.length > visibleReviews;
 
-    // --- CART OBJECT CONSTRUCTION (Updated for Variation) ---
+    // --- CART OBJECT CONSTRUCTION ---
     const productForCart = {
         id: product.id,
         databaseId: product.databaseId, 
@@ -243,9 +210,8 @@ export default function ProductClient({ product }: { product: Product }) {
     // --------------------------------------------------------
 
     const allImages = [product.image, ...product.galleryImages.nodes].filter(Boolean) as ImageNode[];
-    const customerImages = product.reviews?.edges?.map((edge: ReviewEdge) => edge.node.author.node.avatar?.url).filter(Boolean) || [];
     const videoId = productVideoMap[product.slug];   
-     const sortedAttributeNodes = product.attributes?.nodes ? [...product.attributes.nodes].sort((a, b) => {
+    const sortedAttributeNodes = product.attributes?.nodes ? [...product.attributes.nodes].sort((a, b) => {
         const nameA = a.name.toLowerCase();
         const nameB = b.name.toLowerCase();
         if (nameA.includes('color')) return -1;
@@ -294,7 +260,6 @@ export default function ProductClient({ product }: { product: Product }) {
             )}
         </div>
         
-        {/* --- সমাধান: স্টকের তথ্য priceWrapper-এর পরে যোগ করা হয়েছে --- */}
         <div className={styles.stockInfo}>
             {product.stockStatus === 'IN_STOCK' ? (
                 product.stockQuantity && product.stockQuantity > 0 && product.stockQuantity <= 5 ? 
@@ -306,7 +271,6 @@ export default function ProductClient({ product }: { product: Product }) {
                 <span className={styles.onBackorder}>Available on Backorder</span>
             ) : null}
         </div>
-        {/* ----------------------------------------------------------- */}
 
         {product.shortDescription && (
             <div 
@@ -315,26 +279,18 @@ export default function ProductClient({ product }: { product: Product }) {
             />
         )}
 
-        {/* === Attributes Selection (Styled) === */}
+        {/* === Attributes Selection === */}
         {sortedAttributeNodes.map((attr) => {
-            
-            // ★★★ ৩. Size Options Sorting Logic ★★★
             let displayOptions = [...attr.options]; 
-
             if (attr.name.toLowerCase().includes('size')) {
-                 displayOptions.sort((a, b) => {
-                     const indexA = SIZE_ORDER.indexOf(a.toUpperCase()); // Case insensitive
-                     const indexB = SIZE_ORDER.indexOf(b.toUpperCase());
-                     
-                     // দুটাই যদি লিস্টে থাকে
-                     if (indexA !== -1 && indexB !== -1) return indexA - indexB;
-                     
-                     // যে কোনো একটা থাকলে সেটা আগে যাবে
-                     if (indexA !== -1) return -1;
-                     if (indexB !== -1) return 1;
-                     
-                     return 0; 
-                 });
+                    displayOptions.sort((a, b) => {
+                        const indexA = SIZE_ORDER.indexOf(a.toUpperCase());
+                        const indexB = SIZE_ORDER.indexOf(b.toUpperCase());
+                        if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+                        if (indexA !== -1) return -1;
+                        if (indexB !== -1) return 1;
+                        return 0; 
+                    });
             }
 
             return (
@@ -365,7 +321,6 @@ export default function ProductClient({ product }: { product: Product }) {
 
         {/* === Add to Cart Section === */}
         <div ref={mainAddToCartRef}>
-             {/* যদি ভেরিয়েশন সিলেক্ট না করা হয়, তবে বাটন ডিজেবল থাকবে */}
              {isVariableProduct && !currentVariation ? (
                  <div style={{marginTop: '20px'}}>
                      <button disabled style={{ padding:'15px', width:'100%', background:'#e5e5e5', color: '#888', border:'none', borderRadius: '5px', cursor:'not-allowed', fontWeight: 'bold' }}>
@@ -405,7 +360,6 @@ export default function ProductClient({ product }: { product: Product }) {
             </div>
         )}
 
-        {/* === কাস্টম কনটেন্ট সেকশন === */}
         {CustomSections.length > 0 && (
             <div className={styles.customSectionsWrapper}>
                 {CustomSections.map((SectionComponent, index) => (
@@ -428,110 +382,48 @@ export default function ProductClient({ product }: { product: Product }) {
     )}
 
     {(product.weight || (product.length && product.width && product.height) || (product.attributes && product.attributes.nodes.length > 0)) && (
-<section className={styles.productInfoSection}>
-    <h2 className={styles.sectionTitle}>Additional Information</h2>
-    <div className={styles.sectionContent}>
-        <table className={styles.attributesTable}>
-            <tbody>
-                {product.weight && (
-                    <tr>
-                        <th>Weight</th>
-                        <td>{product.weight} kg</td>
-                    </tr>
-                )}
+    <section className={styles.productInfoSection}>
+        <h2 className={styles.sectionTitle}>Additional Information</h2>
+        <div className={styles.sectionContent}>
+            <table className={styles.attributesTable}>
+                <tbody>
+                    {product.weight && (
+                        <tr>
+                            <th>Weight</th>
+                            <td>{product.weight} kg</td>
+                        </tr>
+                    )}
 
-                {product.length && product.width && product.height && (
-                    <tr>
-                        <th>Dimensions</th>
-                        <td>{`${product.length} × ${product.width} × ${product.height} cm`}</td>
-                    </tr>
-                )}
+                    {product.length && product.width && product.height && (
+                        <tr>
+                            <th>Dimensions</th>
+                            <td>{`${product.length} × ${product.width} × ${product.height} cm`}</td>
+                        </tr>
+                    )}
 
-                {product.attributes?.nodes.map((attr: { name: string, options: string[] }, index: number) => (
-                    <tr key={index}>
-                        <th>{attr.name}</th>
-                        <td>{attr.options.join(', ')}</td>
-                    </tr>
-                ))}
-             </tbody>
-         </table>
-      </div>
-   </section>
-   )}
-    
-   <section id="reviews" className={styles.productInfoSection}>
-<h2 className={styles.sectionTitle}>Customer Reviews</h2>
-    <div className={styles.reviewsGrid}>
-
-        <div className={styles.reviewFormWrapper}>
-                <ReviewForm 
-                    productId={product.databaseId}
-                    averageRating={product.averageRating ?? 0}
-                    reviewCount={product.reviewCount ?? 0}
-                />
+                    {product.attributes?.nodes.map((attr: { name: string, options: string[] }, index: number) => (
+                        <tr key={index}>
+                            <th>{attr.name}</th>
+                            <td>{attr.options.join(', ')}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         </div>
-
-        <div className={styles.reviewsList}>
-            {customerImages.length > 0 && (
-            <div className={styles.customerImagesSection}>
-                <h3>Customer Images</h3>
-                    <div className={styles.customerImagesGrid}>
-                       {customerImages.map((imageUrl, index) => (
-                        imageUrl && (
-                         <div key={index} className={styles.customerImageWrapper}>
-                             <Image src={imageUrl} alt={`Customer image ${index + 1}`} fill style={{objectFit: 'cover'}} sizes="100px" />
-                        </div>
-                    )
-                ))}
-            </div>
-        </div>
+    </section>
     )}
-    <div className={styles.reviewsListContainer}>
-        <div className={styles.reviewsListHeader}>
-            <input type="search" placeholder="Search customer reviews" className={styles.reviewSearchInput} />
-            <span>{`1-${Math.min(visibleReviews, allReviews.length)} of ${allReviews.length} reviews`}</span>
-            <select className={styles.reviewSortDropdown}>
-                <option>Most Recent</option>
-                <option>Highest Rating</option>
-                <option>Lowest Rating</option>
-            </select>
-        </div>
+    
+    {/* ★★★ সম্পূর্ণ রিভিউ সেকশন এখন ReviewForm কম্পোনেন্ট হ্যান্ডেল করছে ★★★ */}
+    <section id="reviews" className={styles.productInfoSection}>
+        <h2 className={styles.sectionTitle}>Customer Reviews</h2>
+        <ReviewForm 
+            productId={product.databaseId}
+            averageRating={product.averageRating ?? 0}
+            reviewCount={product.reviewCount ?? 0}
+            reviews={product.reviews?.edges || []}
+        />
+    </section>
 
-            {allReviews.length > 0 ? (
-                allReviews.slice(0, visibleReviews).map((edge: ReviewEdge) => (
-                    <div key={edge.node.id} className={styles.reviewItem}>
-                        <div className={styles.reviewAuthor}>
-                            <div className={styles.authorAvatar}>{edge.node.author.node.name.substring(0, 2).toUpperCase()}</div>
-                        </div>
-                        <div className={styles.reviewDetails}>
-                            <div className={styles.reviewHeader}>
-                                <strong>{edge.node.author.node.name}</strong>
-                            <FormattedDate dateString={edge.node.date} />
-                            </div>
-                        {typeof edge.rating === 'number' && edge.rating > 0 && 
-                        <div className={styles.reviewRating}><StarRating rating={edge.rating} /></div>
-                        }
-                        <a href="#" className={styles.verifiedLink}>✓ Verified review</a>
-                        <div className={styles.reviewContent} dangerouslySetInnerHTML={{ __html: edge.node.content }} />
-                    </div>
-                </div>
-            ))
-            ) : ( <p>There are no reviews yet.</p> )}
-        
-        {hasMoreReviews && (
-            <div className={styles.showMoreContainer}>
-                <button 
-                    className={styles.showMoreButton} 
-                    onClick={() => setVisibleReviews(allReviews.length)}
-                >
-                    Show All {allReviews.length} Reviews
-                </button>
-            </div>
-        )}
-        </div>
-    </div>
-</div>
-</section>
     {product.related && product.related.nodes.length > 0 && (
         <div className={styles.relatedProducts}>
         <h2 className={styles.relatedTitle}>Related Products</h2>

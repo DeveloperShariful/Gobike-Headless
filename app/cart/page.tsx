@@ -216,18 +216,18 @@ export default function CartPage() {
                             <span>{item.quantity}</span>
                             <button onClick={() => updateQuantity(item.key, item.quantity + 1)} disabled={isLoading}>+</button>
                           </div>
+                          <div className={styles.itemActions}>
+                           {/* ৪. রিমুভ বাটনে লোডিং টেক্সট এবং হ্যান্ডলার যোগ করা হয়েছে */}
+                            <button 
+                              onClick={() => handleRemoveItem(item.key)} 
+                              className={styles.removeButton} 
+                              disabled={isLoading || removingKey === item.key}
+                              style={{ opacity: removingKey === item.key ? 0.7 : 1 }}
+                            >
+                             {removingKey === item.key ? 'Removing...' : 'Remove'}
+                            </button>
+                          </div>
                       </div>
-                    </div>
-                    <div className={styles.itemActions}>
-                      {/* ৪. রিমুভ বাটনে লোডিং টেক্সট এবং হ্যান্ডলার যোগ করা হয়েছে */}
-                      <button 
-                        onClick={() => handleRemoveItem(item.key)} 
-                        className={styles.removeButton} 
-                        disabled={isLoading || removingKey === item.key}
-                        style={{ opacity: removingKey === item.key ? 0.7 : 1 }}
-                      >
-                        {removingKey === item.key ? 'Removing...' : 'Remove'}
-                      </button>
                     </div>
                   </div>
                 ))}

@@ -107,7 +107,7 @@
     position: sticky; 
     top: 0;
     padding: 10px 5px;
-    height: 48px; /* ফিক্সড হাইট যাতে হেডার পজিশন ঠিক থাকে */
+    height: 55px; /* ফিক্সড হাইট যাতে হেডার পজিশন ঠিক থাকে */
     display: flex;
     align-items: center;
     justify-content: center;

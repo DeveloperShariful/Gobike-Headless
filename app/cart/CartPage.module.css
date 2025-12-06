@@ -1,261 +1,334 @@
 /* app/cart/CartPage.module.css */
+
+/* =========================================
+   1. MAIN CONTAINER & LAYOUT
+   ========================================= */
 .container {
   max-width: 1300px;
   margin: 0 auto;
-  padding: 1rem 0 2rem 2rem;
+  padding: 1rem 1rem 3rem 1rem; /* মোবাইলের জন্য সাইড প্যাডিং কমানো হয়েছে */
+  font-family: system-ui, -apple-system, sans-serif;
+  box-sizing: border-box;
 }
+
 .title {
   text-align: center;
   margin-bottom: 2rem;
   font-size: 2rem;
-  font-weight: 600;
+  font-weight: 700;
+  color: #1a202c;
 }
+
+/* Empty Cart Styles */
+.emptyCartContainer {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
 .continueShopping {
-  display: block;
-  width: fit-content;
-  margin: 2rem auto;
-  padding: 0.8rem 1.5rem;
-  background-color: #0070f3;
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding: 0.8rem 2rem;
+  background-color: #000; /* ব্ল্যাক বাটন */
   color: white;
   text-decoration: none;
-  border-radius: 5px;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: background-color 0.2s;
 }
+.continueShopping:hover {
+  background-color: #333;
+}
+
+/* Cart Grid Layout */
 .cartLayout {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: .8rem;
+  grid-template-columns: 2fr 1fr; /* বামে আইটেম, ডানে সামারি */
+  gap: 2rem;
   align-items: flex-start;
-  padding-bottom: 3rem; /* summary কে উপরে রাখার জন্য */
 }
+
+/* Loading Overlay */
+.loadingOverlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex; justify-content: center; align-items: center;
+  font-size: 1.5rem;
+  z-index: 1000;
+  font-weight: bold;
+}
+.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* =========================================
+   2. CART ITEMS LIST
+   ========================================= */
 .cartItems {
   display: flex;
   flex-direction: column;
-  gap: .5rem;
+  gap: 1rem;
 }
+
 .cartItem {
-  display: grid;
-  grid-template-columns: 100px 1fr auto;
+  display: flex; /* ফ্লেক্সবক্স লেআউট */
   gap: 1.5rem;
-  align-items: center;
-  border: 1px solid #eaeaea;
-  padding: .5rem;
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
+  background-color: #fff;
+  align-items: flex-start;
 }
+
 .itemImage {
   width: 100px;
   height: 100px;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: 6px;
+  border: 1px solid #f3f4f6;
+  flex-shrink: 0; /* ইমেজ ছোট হবে না */
 }
-.itemDetails {
+
+.placeholderImage {
+  width: 100px; height: 100px;
+  background-color: #f3f4f6;
+  border-radius: 6px;
+}
+
+/* Item Details Wrapper */
+.itemInfo {
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
 }
+
 .itemName {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
   margin: 0;
-  font-weight: 600; /* নামটিকে একটু বোল্ড করা হলো */
+  color: #111;
+  line-height: 1.4;
 }
+
+/* Item Meta (Price, Qty, Remove) */
+.itemMeta {
+  display: flex;
+  flex-direction: column; /* নিচে নিচে সাজানো */
+  align-items: flex-start;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+}
+
 .itemPrice {
-  margin: 0.5rem 0;
+  margin: 0;
   font-weight: 700;
+  font-size: 1.1rem;
+  color: #111;
 }
+
+/* Quantity Control Buttons */
 .quantityControl {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  overflow: hidden;
 }
+
 .quantityControl button {
-  padding: 0.2rem 0.6rem;
-  border: 1px solid #ccc;
-  background-color: #f0f0f0;
+  padding: 0.4rem 0.8rem;
+  border: none;
+  background-color: #f9fafb;
   cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: background 0.2s;
 }
+.quantityControl button:hover:not(:disabled) {
+  background-color: #e5e7eb;
+}
+.quantityControl span {
+  padding: 0 0.8rem;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* Remove Button (Quantity এর নিচে) */
 .removeButton {
   background: none;
-  border: 1px solid #ff4d4d;
-  color: #ff4d4d;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
+  border: none;
+  color: #dc2626; /* Red Color */
+  padding: 0;
+  font-size: 0.9rem;
   cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.2s;
+  margin-top: 2px; /* Qty থেকে সামান্য গ্যাপ */
 }
+.removeButton:hover {
+  color: #b91c1c;
+  text-decoration: none;
+}
+
+/* =========================================
+   3. CART SUMMARY (Right Sidebar)
+   ========================================= */
 .cartSummary {
-  border: 1px solid #eaeaea;
+  border: 1px solid #e5e7eb;
   padding: 1.5rem;
   border-radius: 8px;
-  height: fit-content;
-  position: sticky; /* স্ক্রল করলেও যেন সামারি দেখা যায় */
-  top: 100px; /* আপনার হেডারের উচ্চতার উপর নির্ভর করে */
+  background-color: #f9fafb;
+  position: sticky;
+  top: 100px;
 }
+
 .cartSummary h2 {
   margin-top: 0;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
   font-size: 1.5rem;
   font-weight: 700;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 1rem;
 }
 
 .summaryRow {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 2rem;
-  font-size: 1.3rem;
-  font-weight: 600;
-}
-
-.checkoutButton {
-  display: block; /* Link কে বাটন হিসেবে দেখানোর জন্য */
-  text-align: center;
-  width: 100%;
-  padding: .5rem;
-  font-size: 1.4rem;
-  background-color: #030303;
-  color: white;
-  text-decoration: none; /* Link এর আন্ডারলাইন সরানোর জন্য */
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  font-weight: bold;
-}
-.checkoutButton :hover{
-  background-color: #ccc;
-}
-/* --- রেসপন্সিভ ডিজাইনের জন্য নতুন কোড --- */
-
-@media (max-width: 900px) {
-  .cartLayout {
-    /* ট্যাবলেট স্ক্রিনের জন্য দুই কলামের পরিবর্তে এক কলাম */
-    grid-template-columns: 1fr;
-  }
-  
-  .cartSummary {
-    /* এক কলাম হলে সামারি নিচে চলে আসবে */
-     /* সামারিকে উপরে দেখানোর জন্য */
-    position: static; /* sticky পজিশন বন্ধ করা হলো */
-  }
-}
-
-@media (max-width: 600px) {
-  .container {
-    padding: 1rem;
-  }
-  
-  .title {
-    font-size: 1.6rem;
-  }
-
-  /* --- মোবাইল স্ক্রিনের জন্য আইটেমের লেআউট সম্পূর্ণ নতুন করে লেখা হয়েছে --- */
-  .cartItem {
-    display: flex; /* Flexbox ব্যবহার করা হচ্ছে */
-    align-items: flex-start; /* আইটেমগুলোকে উপরে অ্যালাইন করা হচ্ছে */
-    gap: 1rem;
-    position: relative; /* Remove বাটনকে পজিশন করার জন্য */
-  }
-
-  .itemImage {
-    width: 80px;
-    height: 80px;
-    flex-shrink: 0; /* ছবিটি যেন ছোট না হয়ে যায় */
-  }
-
-  /* নতুন ক্লাস */
-  .itemInfo {
-    flex-grow: 1; /* বাকি সব জায়গা নেবে */
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    padding-right: 70px; /* Remove বাটনের জন্য জায়গা রাখা হচ্ছে */
-  }
-  
-  .itemName {
-    font-size: 1rem;
-    line-height: 1.4;
-  }
-
-  /* নতুন ক্লাস */
-  .itemMeta {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start; /* দাম ও পরিমাণ বাম দিকে থাকবে */
-    gap: 0.5rem;
-  }
-  
-  .itemPrice {
-    font-size: 1rem; /* দামের ফন্ট সাইজ বাড়ানো হলো */
-    margin: 0;
-  }
-
-  .quantityControl {
-    margin-top: 0.5rem;
-  }
-
-  .itemActions {
-    position: absolute;
-    top: 3.5rem; /* উপরে ডান দিকে */
-    right: .5rem;
-  }
-  
-  .removeButton {
-    padding: 0.3rem 0.6rem;
-    font-size: 0.8rem;
-    align-items: center;
-  }
-  .checkoutButton {
-  padding: .5rem;
+  margin-bottom: 1rem;
   font-size: 1rem;
-  
+  color: #374151;
 }
+
+.grandTotal {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #111;
+  border-top: 2px solid #e5e7eb;
+  padding-top: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-
-/* Add this to CartPage.module.css */
-
+/* Coupon Section */
 .couponContainer {
-  margin: 20px 0;
-  width: 100%;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 1.5rem;
 }
 
 .couponForm {
   display: flex;
-  gap: 10px;
+  gap: 0.5rem;
 }
 
 .couponInput {
   flex-grow: 1;
-  padding: 10px;
-  border: 1px solid #ddd;
+  padding: 0.6rem;
+  border: 1px solid #d1d5db;
   border-radius: 4px;
+  font-size: 0.9rem;
 }
 
 .couponButton {
-  padding: 10px 20px;
-  background-color: #2c3e50;
+  padding: 0.6rem 1rem;
+  background-color: #374151;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
+.couponButton:hover:not(:disabled) { background-color: #111; }
 
-.couponButton:disabled {
-  background-color: #95a5a6;
-  cursor: not-allowed;
-}
-
-.couponButton:hover:not(:disabled) {
-  background-color: #34495e;
-}
-
-.couponValue {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
+.couponRow { color: #16a34a; font-size: 0.9rem; }
 .removeButtonSmall {
-    background: none;
-    border: none;
-    color: #e74c3c;
-    cursor: pointer;
-    font-size: 0.9em;
-    padding: 0;
+  background: none; border: none; color: #dc2626; cursor: pointer;
+  font-size: 0.8rem; margin-left: 5px; text-decoration: underline;
+}
+
+/* Checkout Button */
+.checkoutButton {
+  display: block;
+  text-align: center;
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+  background-color: #000;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 700;
+  transition: background-color 0.2s;
+  border: none;
+  cursor: pointer;
+}
+.checkoutButton:hover {
+  background-color: #333;
+}
+
+/* =========================================
+   4. RESPONSIVE DESIGN (Media Queries)
+   ========================================= */
+
+/* Tablet & Smaller Desktop (Max Width 900px) */
+@media (max-width: 900px) {
+  .cartLayout {
+    grid-template-columns: 1fr; /* ১ কলাম */
+    gap: 2rem;
+  }
+  
+  .cartSummary {
+    position: static; /* স্টিকি বন্ধ */
+    margin-top: 1rem;
+  }
+}
+
+/* Mobile (Max Width 600px) */
+@media (max-width: 600px) {
+  .container {
+    padding: 1rem; /* প্যাডিং কমানো */
+  }
+  
+  .title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .cartItem {
+    flex-direction: row; /* পাশাপাশি থাকবে */
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .itemImage {
+    width: 80px; /* মোবাইলে ইমেজ ছোট */
+    height: 80px;
+  }
+
+  .itemInfo {
+    gap: 0.3rem;
+  }
+  
+  .itemName {
+    font-size: 1rem;
+  }
+
+  /* মোবাইলেও Remove বাটন Quantity-এর নিচেই থাকবে */
+  .itemMeta {
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .quantityControl button {
+    padding: 0.3rem 0.6rem;
+  }
+
+  .removeButton {
+    font-size: 0.85rem;
+    margin-top: 5px;
+  }
 }
