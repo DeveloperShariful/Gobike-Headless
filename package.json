@@ -44,5 +44,17 @@
     "eslint-config-next": "15.5.2",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "overrides": {
+    "eslint-config-next": {
+      "next": "$next"
+    },
+    "@apollo/experimental-nextjs-app-support": {
+      "next": "$next"
+    },
+    "react-select": {
+      "react": "$react",
+      "react-dom": "$react-dom"
+    }
   }
 }
