@@ -4,10 +4,10 @@ import styles from '../GobikeSections.module.css';
 
 const overviewImages = [
   { src: 'https://gobikes.au/wp-content/uploads/2025/12/Gobike-24inch-Electric-Dirt-Bike-–-Durable-Kids-Electric-Bike-for-Trail-Riding-kids.webp', alt: 'GoBike 24 Pro hitting a jump on a dirt track. electric balance bike 24inch' },
-  { src: 'https://gobikes.au/wp-content/uploads/2025/11/24inch-Gobike-Kids-Electric-Bike-–-Best-Battery-Powered-Ebike-for-Boys.webp', alt: 'GoBike 24 Pro hitting a jump on a dirt track.' },
-  { src: 'https://gobikes.au/wp-content/uploads/2025/11/Gobike-Kids-Electric-Bike-–-24inch-Ebike-Childrens-Battery-Motorbike-Alternative.webp', alt: 'Teenager riding the GoBike 24 electric bike off-road.' },
-  { src: 'https://gobikes.au/wp-content/uploads/2025/11/Gobike-24inch-Kids-Electric-Bike-–-High-Performance-Ebike-for-Kids-Teens-Australia.webp', alt: 'Side view of the powerful GoBike 24 Inch Pro.' },
-  { src: 'https://gobikes.au/wp-content/uploads/2025/11/24inch-Gobike-Electric-Balance-Bike-–-Powerful-Childrens-Battery-Motorbike-for-Off-Road.webp', alt: 'Teenager riding GoBike 24 inch electric dirt bike on a forest trail with tall trees. GoBike 24 Inch Electric Balance Bike' },
+  //{ src: 'https://gobikes.au/wp-content/uploads/2025/11/24inch-Gobike-Kids-Electric-Bike-–-Best-Battery-Powered-Ebike-for-Boys.webp', alt: 'GoBike 24 Pro hitting a jump on a dirt track.' },
+  //{ src: 'https://gobikes.au/wp-content/uploads/2025/11/Gobike-Kids-Electric-Bike-–-24inch-Ebike-Childrens-Battery-Motorbike-Alternative.webp', alt: 'Teenager riding the GoBike 24 electric bike off-road.' },
+ // { src: 'https://gobikes.au/wp-content/uploads/2025/11/Gobike-24inch-Kids-Electric-Bike-–-High-Performance-Ebike-for-Kids-Teens-Australia.webp', alt: 'Side view of the powerful GoBike 24 Inch Pro.' },
+  //{ src: 'https://gobikes.au/wp-content/uploads/2025/11/24inch-Gobike-Electric-Balance-Bike-–-Powerful-Childrens-Battery-Motorbike-for-Off-Road.webp', alt: 'Teenager riding GoBike 24 inch electric dirt bike on a forest trail with tall trees. GoBike 24 Inch Electric Balance Bike' },
 ];
 
 export default function OverviewSection() {
