@@ -45,7 +45,7 @@ export default function PowerSection() {
           imageUrl="https://gobikes.au/wp-content/uploads/2025/11/Best-Off-Road-Ebike-for-Kids-–-24inch-Gobike-Electric-Mountain-Bike-on-Dirt-Trails.webp"
           imageAlt="48V Lithium battery on the GoBike 24."
           title="Long-Range 48-55V Power"
-          description="Ride longer with the 48V 10Ah lithium-ion battery. Secured safely within the frame yet easily removable, it powers your adventures for up to 3hours on a single charge."
+          description="Ride longer with the 48V 15Ah lithium-ion battery. Secured safely within the frame yet easily removable, it powers your adventures for up to 3hours on a single charge."
           reverse={true} 
         />
 

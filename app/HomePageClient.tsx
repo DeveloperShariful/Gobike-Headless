@@ -27,48 +27,122 @@ const HeroSlider = () => {
 
   return (
     <section className={styles.heroSliderSection}>
-      <div className={styles.finalSplitSliderContainer}>
+     <div className={styles.finalSplitSliderContainer}>
+        {/* Updated Radio Inputs for 4 Slides */}
         <input type="radio" id="slide-radio-1" name="slider-radio" className="visually-hidden" checked={currentSlide === 1} onChange={() => handleRadioChange(1)} />
         <input type="radio" id="slide-radio-2" name="slider-radio" className="visually-hidden" checked={currentSlide === 2} onChange={() => handleRadioChange(2)} />
         <input type="radio" id="slide-radio-3" name="slider-radio" className="visually-hidden" checked={currentSlide === 3} onChange={() => handleRadioChange(3)} />
+        <input type="radio" id="slide-radio-4" name="slider-radio" className="visually-hidden" checked={currentSlide === 4} onChange={() => handleRadioChange(4)} />
 
-        <div className={styles.finalSplitSliderWrapper} style={{ transform: `translateX(-${(currentSlide - 1) * 100}%)` }}>
-          <div className={styles.finalSplitSlide}>
-            <div className={styles.finalSplitImageWrapper}><Image className={styles.finalSplitImage} loading="eager" src="https://gobikes.au/wp-content/uploads/2025/08/Gobike-electric-bike-kids-ebike20-inch-ages-for10-16-1-1.webp"  alt="GoBike 20 Electric Bike for teens" width={1000} height={774} priority sizes="(max-width: 768px) 100vw, 50vw" fetchPriority="high" /></div>
-            <div className={styles.finalSplitContent}>
-              <p className={styles.finalSlideSubtitle}>The Ultimate Weapon</p>
-              <h2 className={styles.finalSlideTitle}>GOBIKE 20</h2>
-              <p className={styles.finalSlideDescription}>The best 20-inch kids electric bike on the market. Built tough for young adventurers and teens, it delivers powerful performance, long battery life with a 10Ah battery, and reliable fun every ride. The ultimate e-bike for confidence, freedom, and excitement.</p>
-              <Link href="product/20-inch-electric-bikes-for-sale-ebike-for-kids" className={styles.finalSlideButton}>Shop Now</Link>
+          {/* Slider Wrapper: Transform logic remains the same, just showing new content order */}
+       <div className={styles.finalSplitSliderWrapper} style={{ transform: `translateX(-${(currentSlide - 1) * 100}%)` }}>
+      
+          {/* SLIDE 1: NEW GOBIKE 24 */}
+         <div className={styles.finalSplitSlide}>
+            <div className={styles.finalSplitImageWrapper}>
+              <Image 
+                className={styles.finalSplitImage} 
+                loading="eager" 
+                src="https://gobikes.au/wp-content/uploads/2025/12/Slider-1-scaled.webp" 
+                alt="GoBike 24 Inch Electric Dirt Bike for Teens and Adults" 
+                width={1000} 
+                height={774} 
+                priority 
+                sizes="(max-width: 768px) 100vw, 50vw" 
+                fetchPriority="high" 
+              />
             </div>
-          </div>
-          <div className={styles.finalSplitSlide}>
-              <div className={styles.finalSplitImageWrapper}><Image className={styles.finalSplitImage} loading="eager" src="https://gobikes.au/wp-content/uploads/2025/08/Gobike-electric-bike-kids-ebike20-inch-ages-for10-16-2.webp" alt="GoBike 16 Electric Bike for kids" width={1000} height={849} sizes="(max-width: 768px) 100vw, 50vw" /></div>
-              <div className={styles.finalSplitContent}>
-                  <p className={styles.finalSlideSubtitle}>The All-Rounder</p>
-                  <h2 className={styles.finalSlideTitle}>GOBIKE 16</h2>
-                  <p className={styles.finalSlideDescription}>The fastest 16-inch kids electric bike on the market! Designed for confident young riders. Three speed modes, hydraulic disc brakes, and front suspension for the perfect balance of performance, safety, and fun.</p>
-                  <Link href="product/ebike-for-sale-16-inch-gobike-ages-5-9" className={styles.finalSlideButton}>Shop Now</Link>
-              </div>
-          </div>
-          <div className={styles.finalSplitSlide}>
-              <div className={styles.finalSplitImageWrapper}><Image className={styles.finalSplitImage} loading="lazy" src="https://gobikes.au/wp-content/uploads/2025/08/Gobike-electric-bike-kids-ebike12-inch-ages-for-2-5-1.webp" alt="GoBike 12 Electric Bike for toddlers" width={1000} height={803} sizes="(max-width: 768px) 100vw, 50vw"/></div>
-              <div className={styles.finalSplitContent}>
-                  <p className={styles.finalSlideSubtitle}>The Everyday GoBike Range</p>
-                  <h2 className={styles.finalSlideTitle}>GOBIKE 12</h2>
-                  <p className={styles.finalSlideDescription}>The perfect first electric bike for toddlers aged 2 years and above transitioning from a balance bike. Features an extra-slow learning mode for beginners, easy handling, long ride time, adjustable seat height, and a lightweight, reliable design that grows with your child.</p>
-                  <Link href="product/ebike-for-kids-12-inch-electric-bike-ages-2-5" className={styles.finalSlideButton}>Shop Now</Link>
-              </div>
-          </div>
-        </div>
+            <div className={styles.finalSplitContent}>
+              <p className={styles.finalSlideSubtitle}>The Extreme Machine</p>
+              <h2 className={styles.finalSlideTitle}>GOBIKE 24</h2>
+              <p className={styles.finalSlideDescription}>
+              The ultimate electric dirt bike for teens and adults aged 12+. Unleash raw power with a massive 2500W motor hitting top speeds of 61km/h. Featuring fully adjustable hydraulic suspension and 24-inch Kenda fat tires, it’s built for adrenaline, speed, and total off-road dominance.
+             </p>
+             <Link href="product/gobike-24-inch-electric-bike-teens-high-speed-performance-for-ages-13" className={styles.finalSlideButton}>Shop Now</Link>
+           </div>
+         </div>
 
-        <div className={styles.finalSplitSliderNav}>
-          <label htmlFor="slide-radio-1" className={styles.finalSplitSliderDot} aria-label="Go to slide 1"></label>
-          <label htmlFor="slide-radio-2" className={styles.finalSplitSliderDot} aria-label="Go to slide 2"></label>
-          <label htmlFor="slide-radio-3" className={styles.finalSplitSliderDot} aria-label="Go to slide 3"></label>
+      {/* SLIDE 2: GOBIKE 20 (Previously Slide 1) */}
+      <div className={styles.finalSplitSlide}>
+        <div className={styles.finalSplitImageWrapper}>
+          <Image 
+            className={styles.finalSplitImage} 
+            loading="eager" 
+            src="https://gobikes.au/wp-content/uploads/2025/08/Gobike-electric-bike-kids-ebike20-inch-ages-for10-16-1-1.webp" 
+            alt="GoBike 20 Electric Bike for teens" 
+            width={1000} 
+            height={774} 
+            priority 
+            sizes="(max-width: 768px) 100vw, 50vw" 
+          />
+        </div>
+        <div className={styles.finalSplitContent}>
+          <p className={styles.finalSlideSubtitle}>The Ultimate Weapon</p>
+          <h2 className={styles.finalSlideTitle}>GOBIKE 20</h2>
+          <p className={styles.finalSlideDescription}>
+            The best 20-inch kids electric bike on the market. Built tough for young adventurers and teens, it delivers powerful performance, long battery life with a 10Ah battery, and reliable fun every ride. The ultimate e-bike for confidence, freedom, and excitement.
+          </p>
+          <Link href="product/20-inch-electric-bikes-for-sale-ebike-for-kids" className={styles.finalSlideButton}>Shop Now</Link>
         </div>
       </div>
-    </section>
+
+      {/* SLIDE 3: GOBIKE 16 (Previously Slide 2) */}
+      <div className={styles.finalSplitSlide}>
+        <div className={styles.finalSplitImageWrapper}>
+          <Image 
+            className={styles.finalSplitImage} 
+            loading="lazy" 
+            src="https://gobikes.au/wp-content/uploads/2025/08/Gobike-electric-bike-kids-ebike20-inch-ages-for10-16-2.webp" 
+            alt="GoBike 16 Electric Bike for kids" 
+            width={1000} 
+            height={849} 
+            sizes="(max-width: 768px) 100vw, 50vw" 
+          />
+        </div>
+        <div className={styles.finalSplitContent}>
+          <p className={styles.finalSlideSubtitle}>The All-Rounder</p>
+          <h2 className={styles.finalSlideTitle}>GOBIKE 16</h2>
+          <p className={styles.finalSlideDescription}>
+            The fastest 16-inch kids electric bike on the market! Designed for confident young riders. Three speed modes, hydraulic disc brakes, and front suspension for the perfect balance of performance, safety, and fun.
+          </p>
+          <Link href="product/ebike-for-sale-16-inch-gobike-ages-5-9" className={styles.finalSlideButton}>Shop Now</Link>
+        </div>
+      </div>
+
+      {/* SLIDE 4: GOBIKE 12 (Previously Slide 3) */}
+      <div className={styles.finalSplitSlide}>
+        <div className={styles.finalSplitImageWrapper}>
+          <Image 
+            className={styles.finalSplitImage} 
+            loading="lazy" 
+            src="https://gobikes.au/wp-content/uploads/2025/08/Gobike-electric-bike-kids-ebike12-inch-ages-for-2-5-1.webp" 
+            alt="GoBike 12 Electric Bike for toddlers" 
+            width={1000} 
+            height={803} 
+            sizes="(max-width: 768px) 100vw, 50vw"
+          />
+        </div>
+        <div className={styles.finalSplitContent}>
+          <p className={styles.finalSlideSubtitle}>The Everyday GoBike Range</p>
+          <h2 className={styles.finalSlideTitle}>GOBIKE 12</h2>
+          <p className={styles.finalSlideDescription}>
+            The perfect first electric bike for toddlers aged 2 years and above transitioning from a balance bike. Features an extra-slow learning mode for beginners, easy handling, long ride time, adjustable seat height, and a lightweight, reliable design that grows with your child.
+          </p>
+          <Link href="product/ebike-for-kids-12-inch-electric-bike-ages-2-5" className={styles.finalSlideButton}>Shop Now</Link>
+        </div>
+      </div>
+
+    </div>
+
+    {/* Updated Navigation Dots */}
+    <div className={styles.finalSplitSliderNav}>
+      <label htmlFor="slide-radio-1" className={styles.finalSplitSliderDot} aria-label="Go to slide 1"></label>
+      <label htmlFor="slide-radio-2" className={styles.finalSplitSliderDot} aria-label="Go to slide 2"></label>
+      <label htmlFor="slide-radio-3" className={styles.finalSplitSliderDot} aria-label="Go to slide 3"></label>
+      <label htmlFor="slide-radio-4" className={styles.finalSplitSliderDot} aria-label="Go to slide 4"></label>
+    </div>
+  </div>
+</section>
   );
 }
 
