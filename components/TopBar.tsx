@@ -7,7 +7,7 @@ export default function TopBar() {
     <div className={styles.topBar}>
       <div className={styles.content}>
         <span className={styles.text}> 
-          ALL ORDERS WILL LEAVE WAREHOUSE ON 29TH OF DECEMBER FROM NEW STOCK
+          Same-day dispatch. Fast Australia-wide shipping.
           <span className={styles.highlight}> ORDER NOW AND GET A FREE GOBIKE CREW TSHIRT</span>
         </span>
       </div>

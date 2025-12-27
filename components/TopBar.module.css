@@ -31,7 +31,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 15px;
+  gap: 30px;
   font-size: 14px;
   font-weight: 800;
   letter-spacing: 0.5px;
@@ -52,22 +52,6 @@
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
   display: inline-block;
   animation: attentionPop 2s infinite;
-}
-
-.icon {
-  font-size: 22px;
-  display: inline-block;
-  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
-  flex-shrink: 0; /* আইকন যাতে চ্যাপ্টা না হয়ে যায় */
-}
-
-.iconLeft {
-  animation: swing 3s ease-in-out infinite;
-  transform-origin: bottom center;
-}
-
-.iconRight {
-  animation: bounceJump 2s infinite;
 }
 
 /* --- ANIMATIONS --- */
@@ -132,7 +116,7 @@
     white-space: normal; /* প্রয়োজনে টেক্সট র‍্যাপ হবে */
     line-height: 1.2;
     text-align: center;
-    flex-grow: 1; /* মাঝখানের জায়গা দখল করবে */
+    flex-grow: 1; 
   }
 
   .highlight {

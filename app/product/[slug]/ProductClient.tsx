@@ -260,7 +260,7 @@ export default function ProductClient({ product }: { product: Product }) {
             )}
         </div>
         
-       {/* <div className={styles.stockInfo}>
+        <div className={styles.stockInfo}>
             {product.stockStatus === 'IN_STOCK' ? (
                 product.stockQuantity && product.stockQuantity > 0 && product.stockQuantity <= 5 ? 
                     <span className={styles.lowStock}>Hurry! Only {product.stockQuantity} left in stock!</span> :
@@ -270,7 +270,7 @@ export default function ProductClient({ product }: { product: Product }) {
             ) : product.stockStatus === 'ON_BACKORDER' ? (
                 <span className={styles.onBackorder}>Available on Backorder</span>
             ) : null}
-        </div>*/}
+        </div>
 
         {product.shortDescription && (
             <div 
