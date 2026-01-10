@@ -10,17 +10,13 @@ interface PayPalGatewayProps {
   total: number;
   isPlacingOrder: boolean;
   onPlaceOrder: (paymentData: { transaction_id: string }) => Promise<{ orderId: number; orderKey: string } | void | null>;
-  // ★★★ পরিবর্তন: isShippingSelected prop-টি এখানে যোগ করা হয়েছে ★★★
   isShippingSelected: boolean;
 }
 
-// ★★★ পরিবর্তন: props গুলোকে destructure করা হয়েছে ★★★
 export default function PayPalPaymentGateway({ total, isPlacingOrder, onPlaceOrder, isShippingSelected }: PayPalGatewayProps) {
   return (
-    
       <PayPalButtons
         style={{ layout: "vertical", color: 'gold', shape: 'rect', label: 'paypal', height: 48 }}
-        // ★★★ পরিবর্তন: !isShippingSelected শর্তটি এখানে যোগ করা হয়েছে ★★★
         disabled={isPlacingOrder || total <= 0 || !isShippingSelected}
         forceReRender={[total]}
         createOrder={(_, actions) => {
@@ -47,7 +43,6 @@ export default function PayPalPaymentGateway({ total, isPlacingOrder, onPlaceOrd
             } else {
               toast.error("Could not verify the transaction. Please contact support.");
             }
-            
           } else {
             toast.error("Could not capture the PayPal order.");
           }
@@ -57,6 +52,5 @@ export default function PayPalPaymentGateway({ total, isPlacingOrder, onPlaceOrd
           toast.error("A PayPal error occurred. Please try again.");
         }}
       />
-    
   );
 }

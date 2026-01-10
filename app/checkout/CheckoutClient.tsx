@@ -1,4 +1,5 @@
 //app/checkout/CheckoutClient.tsx
+
 'use client';
 
 import { Elements } from '@stripe/react-stripe-js';
@@ -9,7 +10,7 @@ import { useRouter } from 'next/navigation';
 import { gql } from '@apollo/client';
 import client from '../../lib/apolloClient';
 import toast from 'react-hot-toast';
-import styles from './CheckoutClient.module.css';
+// CSS Module import removed: import styles from './CheckoutClient.module.css';
 import OrderNotes from './components/OrderNotes';
 import ShippingForm from './components/ShippingForm';
 import OrderSummary from './components/OrderSummary';
@@ -18,7 +19,7 @@ import PaymentMethods from './components/PaymentMethods';
 // --- Interfaces, GraphQL Queries, Reducer ---
 interface GraphQLError {
   message: string;
-  [key: string]: unknown; // অন্যান্য প্রপার্টি থাকতে পারে
+  [key: string]: unknown;
 }
 
 interface ApolloErrorLike {
@@ -176,13 +177,13 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
     // ২. বর্তমান বিলিং এবং শিপিং ডেটা প্রস্তুত করা
     const updatedBilling = { ...customerInfoRef.current, ...address };
     
-    // লজিক: যদি 'shipToDifferentAddress' সত্য হয়, তবে শিপিং ডেটা আগেরটাই থাকবে (Shipping Form থেকে)।
-    // আর যদি মিথ্যা হয়, তবে বিলিং ডেটাই শিপিং ডেটা হিসেবে যাবে।
+    // লজিক: যদি 'shipToDifferentAddress' সত্য হয়, তবে শিপিং ডেটা আগেরটাই থাকবে (Shipping Form থেকে)।
+    // আর যদি মিথ্যা হয়, তবে বিলিং ডেটাই শিপিং ডেটা হিসেবে যাবে।
     const updatedShipping = shipToDifferentAddress 
         ? shippingInfoRef.current 
         : updatedBilling;
 
-    // ৩. সার্ভারে ডেটা পাঠানো (যদি প্রয়োজনীয় তথ্য থাকে)
+    // ৩. সার্ভারে ডেটা পাঠানো (যদি প্রয়োজনীয় তথ্য থাকে)
     if (updatedBilling.city && updatedBilling.postcode && updatedBilling.state) { 
         dispatch({ type: 'SET_LOADING', key: 'shipping', payload: true }); 
         try { 
@@ -207,16 +208,16 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
   const handleApplyCoupon = async (couponCode: string) => { if (cartData?.appliedCoupons && cartData.appliedCoupons.length > 0) { toast.error("Only one coupon can be applied per order."); return; } dispatch({ type: 'SET_LOADING', key: 'applyingCoupon', payload: true }); toast.loading('Applying coupon...'); try { await client.mutate({ mutation: APPLY_COUPON_MUTATION, variables: { input: { code: couponCode } } }); await refetchCartData(); toast.dismiss(); toast.success('Coupon applied!'); } catch (error) { toast.dismiss(); toast.error(getErrorMessage(error)); } finally { dispatch({ type: 'SET_LOADING', key: 'applyingCoupon', payload: false }); } };
   const handleRemoveCoupon = async (couponCode: string) => { if (loading.removingCoupon) return; dispatch({ type: 'SET_LOADING', key: 'removingCoupon', payload: true }); toast.loading('Removing coupon...'); try { await client.mutate({ mutation: REMOVE_COUPON_MUTATION, variables: { input: { codes: [couponCode] } } }); await refetchCartData(); toast.dismiss(); toast.success('Coupon removed.'); } catch (error) { toast.dismiss(); toast.error(getErrorMessage(error)); } finally { dispatch({ type: 'SET_LOADING', key: 'removingCoupon', payload: false }); } };
   const handleShippingSelect = (rateId: string) => {  dispatch({ type: 'SET_SELECTED_SHIPPING', payload: rateId }); const selectedRate = shippingRates.find(rate => rate.id === rateId); if (cartData && selectedRate) { const subtotal = parseFloat(cartData.subtotal.replace(/[^0-9.]/g, '')) || 0; const discount = parseFloat(cartData.discountTotal.replace(/[^0-9.]/g, '')) || 0; const shippingCost = parseFloat(selectedRate.cost) || 0; const newTotal = (subtotal - discount) + shippingCost; dispatch({ type: 'UPDATE_TOTALS', payload: { shippingTotal: `$${shippingCost.toFixed(2)}`, total: `$${newTotal.toFixed(2)}` } }); } client.mutate({ mutation: UPDATE_SHIPPING_METHOD_MUTATION, variables: { input: { shippingMethods: [rateId] } }, }).catch(err => { console.error("Failed to sync shipping method with server:", err); toast.error("Could not save shipping preference."); }); };
- 
+  
   const handleShippingAddressChange = useCallback(async (address: Partial<ShippingFormData>) => {
     // ১. লোকাল স্টেট আপডেট
     dispatch({ type: 'SET_SHIPPING_INFO', payload: address });
 
-    // ২. আপডেটেড শিপিং এবং বর্তমান বিলিং ডেটা নেওয়া
+    // ২. আপডেটেড শিপিং এবং বর্তমান বিলিং ডেটা নেওয়া
     const updatedShipping = { ...shippingInfoRef.current, ...address };
     const currentBilling = customerInfoRef.current;
 
-    // ৩. সার্ভারে আপডেট পাঠানো (শুধুমাত্র যদি প্রয়োজনীয় ফিল্ড থাকে)
+    // ৩. সার্ভারে আপডেট পাঠানো (শুধুমাত্র যদি প্রয়োজনীয় ফিল্ড থাকে)
     if (updatedShipping.city && updatedShipping.postcode && updatedShipping.state) {
         dispatch({ type: 'SET_LOADING', key: 'shipping', payload: true });
         try {
@@ -229,7 +230,7 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
                     }
                 }
             });
-            await refetchCartData(); // নতুন শিপিং কস্ট নিয়ে আসবে
+            await refetchCartData(); // নতুন শিপিং কস্ট নিয়ে আসবে
         } catch (err) {
             console.error("Error updating shipping address:", err);
             toast.error('Could not update shipping cost.');
@@ -245,7 +246,7 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
     // ১. স্টেট আপডেট
     dispatch({ type: 'SET_SHIP_TO_DIFFERENT_ADDRESS', payload: isChecked });
 
-    // ২. যদি ইউজার চেকবক্সটি **তুলে দেয় (Uncheck)**, তবে শিপিং এড্রেস আবার বিলিং এড্রেস হয়ে যাবে।
+    // ২. যদি ইউজার চেকবক্সটি **তুলে দেয় (Uncheck)**, তবে শিপিং এড্রেস আবার বিলিং এড্রেস হয়ে যাবে।
     // তাই সার্ভারকে জানাতে হবে।
     if (!isChecked) {
         const billing = customerInfoRef.current;
@@ -272,7 +273,7 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
     }
   };
 
-  // ★★★ পরিবর্তন: paymentData অবজেক্টে paymentMethodId যোগ করা হয়েছে ★★★
+  // ★★★ পরিবর্তন: paymentData অবজেক্টে paymentMethodId যোগ করা হয়েছে ★★★
   const handlePlaceOrder = async (paymentData?: { 
     transaction_id?: string; 
     shippingAddress?: Partial<ShippingFormData>; 
@@ -440,7 +441,7 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
                     variables: { id: result.order.id }
                   });
               
-              // ★★★ পরিবর্তন: এখানে Optional Chaining (`?.`) ব্যবহার করা হয়েছে ★★★
+              // ★★★ পরিবর্তন: এখানে Optional Chaining (`?.`) ব্যবহার করা হয়েছে ★★★
               const paymentIntentId = mutationInput.transactionId.startsWith('pi_')
                 ? mutationInput.transactionId
                 : queryResponse?.data?.order?.transactionId;
@@ -474,31 +475,32 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
   };
   const total = cartData?.total ? parseFloat(cartData.total.replace(/[^0-9.]/g, '')) : 0;
   const isShippingSelected = !!selectedShipping;
-  if (loading.cart && !cartData) { return ( <div className={styles.pageLoader}><h1 className={styles.loaderTitle}>Checkout</h1></div> ); }
+  if (loading.cart && !cartData) { return ( <div className="flex justify-center items-center min-h-[50vh] text-2xl"><h1 className="text-gray-700">Checkout</h1></div> ); }
 
   return (
-    <div className={styles.checkoutLayout}>
-      <div className={styles.leftColumn}>
+    <div className="grid grid-cols-1 gap-8 w-full max-w-[1400px] mx-auto px-4 py-4 md:gap-10 lg:grid-cols-[1fr_550px] lg:gap-12">
+      <div className="flex flex-col gap-8">
         <ShippingForm
             title={shipToDifferentAddress ? "Billing Details" : "Billing & Shipping Details"}
             onAddressChange={handleAddressChange}
             defaultValues={customerInfo}
         />
         
-        <div className={styles.checkboxContainer}>
-            <label htmlFor="ship-to-different-address">
+        <div className="mt-[5px] p-4 bg-[#f9f9f9] border border-[#ddd]">
+            <label htmlFor="ship-to-different-address" className="flex items-center font-semibold cursor-pointer">
                 <input
                     type="checkbox"
                     id="ship-to-different-address"
                     checked={shipToDifferentAddress}
                     onChange={handleToggleShipToDifferent}
+                    className="mr-3 w-[18px] h-[18px]"
                 />
                 <span>Ship to a different address?</span>
             </label>
         </div>
 
         {shipToDifferentAddress && (
-            <div className={styles.differentShippingSection}>
+            <div className="mt-6">
                 <ShippingForm
                     title="Shipping Details"
                     onAddressChange={handleShippingAddressChange}
@@ -509,7 +511,7 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
 
         <OrderNotes notes={orderNotes} onNotesChange={(notes) => dispatch({ type: 'SET_ORDER_NOTES', payload: notes })} />
       </div>
-      <div className={styles.rightColumn}>
+      <div className="flex flex-col gap-8">
         <OrderSummary 
           cartItems={cartItems}
           cartData={cartData}
@@ -545,7 +547,7 @@ export default function CheckoutClient(props: { paymentGateways: PaymentGateway[
             : null
     );
     if (!stripePromise) {
-        return <div className={styles.pageLoader}>Loading Payment Gateway...</div>;
+        return <div className="flex justify-center items-center min-h-[50vh] text-2xl">Loading Payment Gateway...</div>;
     }
     
     return (

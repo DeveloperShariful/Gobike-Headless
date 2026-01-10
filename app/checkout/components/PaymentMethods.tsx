@@ -1,7 +1,8 @@
+// app/checkout/components/paymentMethod.tsx
+
 'use client';
 import Image from 'next/image';
 import React, { useRef } from 'react';
-import styles from './PaymentMethods.module.css';
 import ExpressCheckouts from './ExpressCheckouts';
 import PayPalPaymentGateway from './PayPalPaymentGateway';
 import StripePaymentGateway from './StripePaymentGateway'; 
@@ -43,10 +44,10 @@ interface PaymentMethodsProps {
     transaction_id?: string; 
     shippingAddress?: Partial<ShippingFormData>; 
     redirect_needed?: boolean;
-    paymentMethodId?: string; // আগের সমাধান থেকে এটি এখানে রয়ে গেছে
+    paymentMethodId?: string; 
   }) => Promise<{ orderId: number; orderKey: string } | void | null>;
   isPlacingOrder: boolean;
-  // ★★★ পরিবর্তন: isShippingSelected prop-টি এখানে যোগ করা হয়েছে ★★★
+  // ★★★ পরিবর্তন: isShippingSelected prop-টি এখানে যোগ করা হয়েছে ★★★
   isShippingSelected: boolean;
   total: number;
   customerInfo: CustomerInfo;
@@ -77,20 +78,20 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
 
   const getGatewayIcon = (id: string): React.ReactNode => {
     if (id.includes('ppcp-gateway')) {
-      return <Image src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal" width={80} height={20} className={styles.gatewayIcon} unoptimized />;
+      return <Image src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal" width={80} height={20} className="h-6 w-auto" unoptimized />;
     }
     if (id.includes('klarna')) {
-      return <Image src="https://x.klarnacdn.net/payment-method/assets/badges/generic/klarna.svg" alt="Klarna" width={50} height={20} className={styles.gatewayIcon} />;
+      return <Image src="https://x.klarnacdn.net/payment-method/assets/badges/generic/klarna.svg" alt="Klarna" width={50} height={20} className="h-6 w-auto" />;
     }
     if (id.includes('afterpay')) {
-      return <Image src="https://static.afterpay.com/integration/logo-afterpay-colour.svg" alt="Afterpay" width={80} height={20} className={styles.gatewayIcon} unoptimized />;
+      return <Image src="https://static.afterpay.com/integration/logo-afterpay-colour.svg" alt="Afterpay" width={80} height={20} className="h-6 w-auto" unoptimized />;
     }
     if (id.includes('stripe')) {
       return (
-        <span className={styles.cardIcons}>
-          <Image src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" width={30} height={20} />
-          <Image src="https://js.stripe.com/v3/fingerprinted/img/mastercard-4d8844094130711885b5e41b28c9848f.svg" alt="Mastercard" width={30} height={20} />
-          <Image src="https://www.americanexpress.com/content/dam/amex/us/merchant/supplies-uplift/product/images/Amex_Bluebox-Logo.png" alt="American Express" width={30} height={20} unoptimized />
+        <span className="flex items-center gap-1">
+          <Image src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" width={30} height={20} className="h-5 w-5 rounded-[2px] md:h-[25px] md:w-[30px]" />
+          <Image src="https://js.stripe.com/v3/fingerprinted/img/mastercard-4d8844094130711885b5e41b28c9848f.svg" alt="Mastercard" width={30} height={20} className="h-5 w-5 rounded-[2px] md:h-[25px] md:w-[30px]" />
+          <Image src="https://www.americanexpress.com/content/dam/amex/us/merchant/supplies-uplift/product/images/Amex_Bluebox-Logo.png" alt="American Express" width={30} height={20} className="h-5 w-5 rounded-[2px] md:h-[25px] md:w-[30px]" unoptimized />
         </span>
       );
     }
@@ -117,34 +118,45 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
 
   return (
     <PayPalScriptProvider options={initialOptions}>
-      <div className={styles.paymentContainer}>
-      {/* ★★★ পরিবর্তন: isShippingSelected prop-টি ExpressCheckouts-এ পাস করা হয়েছে ★★★ */}
-      <ExpressCheckouts total={total} onOrderPlace={onPlaceOrder } isShippingSelected={isShippingSelected} />
+      <div className="w-full flex flex-col gap-2.5">
+      {/* ★★★ পরিবর্তন: isShippingSelected prop-টি ExpressCheckouts-এ পাস করা হয়েছে ★★★ */}
+      <div className="w-full">
+        <ExpressCheckouts total={total} onOrderPlace={onPlaceOrder } isShippingSelected={isShippingSelected} />
+      </div>
+      
       <PayPalMessage total={total} />
-      <div className={styles.gatewayList}>
+      
+      <div className="border border-[#e0e0e0] rounded-lg overflow-hidden flex flex-col">
         {availableGateways.map(gateway => (
-          <div key={gateway.id} className={styles.gatewayWrapper}>
-            <div className={styles.gatewayOption} onClick={() => onPaymentMethodChange(gateway.id)}>
-              <input type="radio" id={gateway.id} name="payment_method" value={gateway.id} checked={selectedPaymentMethod === gateway.id} readOnly />
-              <label htmlFor={gateway.id}>{gateway.title}</label>
-              <div className={styles.iconContainer}>
+          <div key={gateway.id} className="border-b border-[#e0e0e0] last:border-b-0">
+            <div 
+                className="flex items-center p-[18px_20px] cursor-pointer bg-[#f9f9f9] transition-colors duration-200 hover:bg-[#f0f0f0]" 
+                onClick={() => onPaymentMethodChange(gateway.id)}
+            >
+              <input type="radio" id={gateway.id} name="payment_method" value={gateway.id} checked={selectedPaymentMethod === gateway.id} readOnly className="w-[18px] h-[18px] mr-[15px] shrink-0 accent-[#ff0000]" />
+              <label htmlFor={gateway.id} className="font-semibold text-base grow cursor-pointer">{gateway.title}</label>
+              <div className="ml-[15px]">
                 {getGatewayIcon(gateway.id)}
               </div>
             </div>
             {selectedPaymentMethod === gateway.id && gateway.id.includes('stripe') && (
-              <div className={styles.gatewayDetails}>
+              <div className="p-[10px_5px_5px_5px] bg-[#f9f9f9] border-t border-[#e0e0e0]">
                 <StripePaymentGateway ref={stripeFormRef} selectedPaymentMethod={selectedPaymentMethod} onPlaceOrder={onPlaceOrder} customerInfo={customerInfo} total={total} />
               </div>
             )}
             {selectedPaymentMethod === gateway.id && !gateway.id.includes('stripe') && gateway.description && (
-               <div className={styles.gatewayDetails}><div className={styles.offlinePayment}><p dangerouslySetInnerHTML={{ __html: gateway.description }} /></div></div>
+               <div className="p-[10px_5px_5px_5px] bg-[#f9f9f9] border-t border-[#e0e0e0]">
+                   <div className="w-full">
+                       <p className="text-sm text-[#555] leading-normal m-0" dangerouslySetInnerHTML={{ __html: gateway.description }} />
+                   </div>
+               </div>
             )}
           </div>
         ))}
       </div>
-      <div className={styles.finalActionArea}>
+      <div className="w-full mt-2.5">
         {isPayPalSelected ? (
-          <div className={styles.paypalContainer}>
+          <div className="min-h-[150px]">
             <PayPalPaymentGateway
               total={total}
               isPlacingOrder={isPlacingOrder}
@@ -157,7 +169,7 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
             <button
               onClick={handlePlaceOrderClick}
               disabled={isPlacingOrder || !isShippingSelected}
-              className={styles.placeOrderButton}
+              className="w-full p-3.5 bg-[#1a1a1a] text-white border-none rounded-lg text-base font-semibold cursor-pointer mt-5 transition-colors duration-200 hover:bg-[#333] disabled:bg-[#cccccc] disabled:cursor-not-allowed disabled:opacity-70"
             >
               {isPlacingOrder ? 'Processing...' : `Place Order`}
             </button>

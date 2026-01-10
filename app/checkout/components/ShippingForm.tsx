@@ -1,10 +1,10 @@
+//app/checkout/components/ShippingForm.tsx
+
 'use client';
 
-import { useState, useEffect,useCallback } from 'react'; 
+import { useState, useEffect, useCallback } from 'react'; 
 import AsyncSelect from 'react-select/async';
-
-import styles from './ShippingForm.module.css';
-import type { CSSObject } from '@emotion/react'; // ★ টাইপ-নিরাপদ স্টাইলিং এর জন্য
+import type { CSSObject } from '@emotion/react';
 
 // --- Interfaces ---
 interface ShippingFormData {
@@ -14,7 +14,6 @@ interface ShippingFormData {
 interface AddressOption {
   value: string; label: string; suburb: string; postcode: string; state: string;
 }
-// ★★★ নতুন: API থেকে আসা ডেটার জন্য Interface ★★★
 interface ApiAddressItem {
   value: string;
   label: string;
@@ -29,7 +28,6 @@ interface ShippingFormProps {
 }
 
 const selectStyles = {
-  // ★★★ পরিবর্তন: 'any'-এর পরিবর্তে সঠিক টাইপ ব্যবহার করা হয়েছে ★★★
   control: (provided: CSSObject) => ({
     ...provided,
     minHeight: '48px',
@@ -38,23 +36,21 @@ const selectStyles = {
     '&:hover': { borderColor: '#aaa' },
   }),
 };
+
 const FORM_DATA_SESSION_KEY = 'checkoutShippingFormData';
+
 export default function ShippingForm({ title, onAddressChange, defaultValues = {} }: ShippingFormProps) {
   
-  // ★★★ পরিবর্তন: useState-কে একটি ফাংশন দিয়ে ইনিশিয়ালাইজ করা হচ্ছে ★★★
   const [formData, setFormData] = useState<ShippingFormData>(() => {
     try {
-      // ক্লায়েন্ট সাইডে sessionStorage থেকে ডেটা লোড করার চেষ্টা করা হচ্ছে
       const savedData = sessionStorage.getItem(FORM_DATA_SESSION_KEY);
       if (savedData) {
         return JSON.parse(savedData);
       }
     } catch (error) {
-      // যদি কোনো কারণে sessionStorage কাজ না করে (যেমন প্রাইভেট মোড)
       console.error("Could not load form data from session storage", error);
     }
     
-    // যদি কোনো সেভ করা ডেটা না থাকে, তাহলে ডিফল্ট ভ্যালু ব্যবহার করা হবে
     return {
       firstName: '', lastName: '', address1: '', city: '',
       state: '', postcode: '', email: '', phone: '',
@@ -63,16 +59,12 @@ export default function ShippingForm({ title, onAddressChange, defaultValues = {
   });
 
   useEffect(() => {
-    // যখনই formData পরিবর্তিত হবে, onAddressChange কল করা হবে
     onAddressChange(formData);
-    
-    // ★★★ পরিবর্তন: formData-কে sessionStorage-এ সেভ করা হচ্ছে ★★★
     try {
       sessionStorage.setItem(FORM_DATA_SESSION_KEY, JSON.stringify(formData));
     } catch (error) {
       console.error("Could not save form data to session storage", error);
     }
-
   }, [formData, onAddressChange]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,13 +83,11 @@ export default function ShippingForm({ title, onAddressChange, defaultValues = {
     }
   };
 
-  // ★ useCallback ব্যবহার করা হয়েছে কারণ এটি একটি stable ফাংশন হওয়া উচিত
   const loadAddressOptions = useCallback(async (inputValue: string): Promise<AddressOption[]> => {
     if (inputValue.trim().length < 1) return [];
     try {
       const response = await fetch(`/api/address-lookup?query=${inputValue}`);
       const data = await response.json();
-      // ★★★ পরিবর্তন: 'any'-এর পরিবর্তে ApiAddressItem টাইপ ব্যবহার করা হয়েছে ★★★
       return data.map((item: ApiAddressItem) => ({ ...item, label: item.value }));
     } catch (error) {
       console.error('Address lookup failed:', error);
@@ -109,41 +99,53 @@ export default function ShippingForm({ title, onAddressChange, defaultValues = {
     (inputValue: string, callback: (options: AddressOption[]) => void) => {
       loadAddressOptions(inputValue).then(options => callback(options));
     },
-    [loadAddressOptions] // loadAddressOptions এখন একটি dependency
+    [loadAddressOptions]
   );
+
+  const labelClass = "block text-sm font-semibold mb-2 text-[#333]";
+  const inputClass = "w-full h-[48px] px-3 border border-[#ddd] rounded-[5px] text-base transition-colors duration-200 focus:outline-none focus:border-[#007bff] focus:ring-[2px] focus:ring-[#007bff]/20 read-only:bg-[#f5f5f5] read-only:cursor-not-allowed read-only:text-[#555]";
+
   return (
-    <div className={styles.shippingFormContainer}>
-      {/* ★★★ পরিবর্তন: title prop ব্যবহার করা হয়েছে ★★★ */}
-      <h2 className={styles.title}>{title}</h2>
+    <div className="w-full flex flex-col gap-6">
+      <h2 className="text-[1.4rem] font-extrabold text-center md:text-[1.75rem] md:font-bold md:text-left m-0 border-b border-[#e0e0e0] pb-3 md:pb-4">
+        {title}
+      </h2>
       
-      {/* --- বাকি সব ইনপুট ফিল্ড অপরিবর্তিত থাকবে --- */}
-      <div className={styles.formGrid}>
-        <div className={styles.countryRegion}>
-          <label>Country / Region *</label>
-          <input type="text" value="Australia" readOnly className={styles.inputField} />
+      {/* Grid Layout Change: 
+          grid-cols-2 used directly.
+          col-span-2 used for full-width items on ALL screens.
+      */}
+      <div className="grid grid-cols-2 gap-5">
+        <div className="col-span-2">
+          <label className={labelClass}>Country / Region *</label>
+          <input type="text" value="Australia" readOnly className={inputClass} />
         </div>
-        <div className={styles.fullWidth}>
-          <label>Email address *</label>
-          <input name="email" type="email" value={formData.email} onChange={handleInputChange} className={styles.inputField} required />
+        <div className="col-span-2">
+          <label className={labelClass}>Email address *</label>
+          <input name="email" type="email" value={formData.email} onChange={handleInputChange} className={inputClass} required />
         </div>
       </div>
       
-      <div className={styles.formGrid}>
+      <div className="grid grid-cols-2 gap-5">
+        {/* First Name & Last Name (Side by Side on Mobile & Desktop) */}
         <div>
-          <label>First name *</label>
-          <input name="firstName" value={formData.firstName} onChange={handleInputChange} className={styles.inputField} required />
+          <label className={labelClass}>First name *</label>
+          <input name="firstName" value={formData.firstName} onChange={handleInputChange} className={inputClass} required />
         </div>
         <div>
-          <label>Last name *</label>
-          <input name="lastName" value={formData.lastName} onChange={handleInputChange} className={styles.inputField} required />
+          <label className={labelClass}>Last name *</label>
+          <input name="lastName" value={formData.lastName} onChange={handleInputChange} className={inputClass} required />
         </div>
-        <div className={styles.fullWidth}>
-          <label>Street address *</label>
-          <input name="address1" placeholder="House number and street name" value={formData.address1} onChange={handleInputChange} className={styles.inputField} required />
+        
+        {/* Address: Full Width */}
+        <div className="col-span-2">
+          <label className={labelClass}>Street address *</label>
+          <input name="address1" placeholder="House number and street name" value={formData.address1} onChange={handleInputChange} className={inputClass} required />
         </div>
 
-        <div className={styles.fullWidth}>
-          <label>Suburb / Postcode *</label>
+        {/* Suburb/Postcode Select: Full Width */}
+        <div className="col-span-2">
+          <label className={labelClass}>Suburb / Postcode *</label>
           <AsyncSelect
             key={formData.city + formData.postcode}
             cacheOptions defaultOptions
@@ -157,18 +159,20 @@ export default function ShippingForm({ title, onAddressChange, defaultValues = {
           />
         </div>
 
+        {/* State & Postcode (Side by Side on Mobile & Desktop) */}
         <div>
-          <label>State *</label>
-          <input name="state" value={formData.state} onChange={handleInputChange} className={styles.inputField} required />
+          <label className={labelClass}>State *</label>
+          <input name="state" value={formData.state} onChange={handleInputChange} className={inputClass} required />
         </div>
         <div>
-          <label>Postcode *</label>
-          <input name="postcode" value={formData.postcode} onChange={handleInputChange} className={styles.inputField} required />
+          <label className={labelClass}>Postcode *</label>
+          <input name="postcode" value={formData.postcode} onChange={handleInputChange} className={inputClass} required />
         </div>
 
-        <div className={styles.fullWidth}>
-          <label>Phone *</label>
-          <input name="phone" type="tel" value={formData.phone} onChange={handleInputChange} className={styles.inputField} required />
+        {/* Phone: Full Width */}
+        <div className="col-span-2">
+          <label className={labelClass}>Phone *</label>
+          <input name="phone" type="tel" value={formData.phone} onChange={handleInputChange} className={inputClass} required />
         </div>
       </div>
     </div>

@@ -5,7 +5,8 @@ import Stripe from 'stripe';
 
 // আপনার Stripe ভার্সন এবং ইনিশিয়ালাইজেশন অপরিবর্তিত থাকবে
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-09-30.clover', // অনুগ্রহ করে একটি স্থিতিশীল API ভার্সন ব্যবহার করুন
+  apiVersion: "2025-01-27.acacia" as any, 
+      typescript: true, // অনুগ্রহ করে একটি স্থিতিশীল API ভার্সন ব্যবহার করুন
 });
 
 export async function POST(request: Request) {

@@ -5,12 +5,12 @@
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, ExpressCheckoutElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import styles from './PaymentMethods.module.css';
 import toast from 'react-hot-toast';
 
 const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
   ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) 
   : null;
+
 interface ShippingFormData {
   firstName: string;
   lastName: string;
@@ -26,9 +26,8 @@ interface ExpressCheckoutsProps {
   onOrderPlace: (paymentData: { 
     transaction_id: string; 
     shippingAddress?: Partial<ShippingFormData>;
-    paymentMethodId?: string; // আগের সমাধান থেকে এটি এখানে রয়ে গেছে
+    paymentMethodId?: string; 
   }) => Promise<{ orderId: number; orderKey: string } | void | null>;
-  // ★★★ পরিবর্তন: isShippingSelected prop-টি এখানে যোগ করা হয়েছে ★★★
   isShippingSelected: boolean;
 }
 
@@ -82,7 +81,7 @@ const CheckoutForm = ({ onOrderPlace, clientSecret }: { onOrderPlace: ExpressChe
 
   return <ExpressCheckoutElement onConfirm={onConfirm} />;
 }
-// ★★★ পরিবর্তন: isShippingSelected prop-টি এখানে Destructure করা হয়েছে ★★★
+
 export default function ExpressCheckouts({ total, onOrderPlace, isShippingSelected }: ExpressCheckoutsProps) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
@@ -127,7 +126,8 @@ export default function ExpressCheckouts({ total, onOrderPlace, isShippingSelect
   }, [total, paymentIntentId]);
 
   if (!clientSecret || !stripePromise) {
-    return <div className={styles.expressCheckoutLoader}></div>;
+    // Replaced styles.expressCheckoutLoader with Tailwind classes
+    return <div className="h-12 w-full bg-[#f0f0f0] rounded-lg animate-pulse"></div>;
   }
 
   const options = {
@@ -144,26 +144,20 @@ export default function ExpressCheckouts({ total, onOrderPlace, isShippingSelect
   };
 
   return (
-    // ★★★ পরিবর্তন: এখানে একটি Relative কন্টেইনার এবং শর্তসাপেক্ষ Overlay যোগ করা হয়েছে ★★★
-    <div className={styles.expressCheckoutContainer} style={{ position: 'relative' }}>
+    // Replaced styles.expressCheckoutContainer and inline styles with Tailwind
+    <div className="w-full relative">
       {!isShippingSelected && (
         <div
           onClick={() => toast.error('Please select a shipping option first.')}
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            zIndex: 10,
-            cursor: 'not-allowed',
-          }}
+          // Replaced inline styles for overlay with Tailwind classes
+          className="absolute top-0 left-0 w-full h-full z-10 cursor-not-allowed"
         />
       )}
       <Elements key={remountKey} options={options} stripe={stripePromise}>
         <CheckoutForm onOrderPlace={onOrderPlace} clientSecret={clientSecret} />
       </Elements>
-      <div className={styles.orSeparator}>— OR —</div>
+      {/* Replaced styles.orSeparator with Tailwind classes */}
+      <div className="text-center text-[#6b7280] font-medium text-sm mt-2.5">— OR —</div>
     </div>
   );
 }

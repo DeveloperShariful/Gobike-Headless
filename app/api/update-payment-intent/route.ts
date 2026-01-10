@@ -4,7 +4,8 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-09-30.clover', 
+  apiVersion: "2025-01-27.acacia" as any, 
+  typescript: true,
 });
 
 export async function POST(request: Request) {
@@ -23,12 +24,8 @@ export async function POST(request: Request) {
       updateData.amount = Math.round(amount * 100);
     }
     
-    // ★★★ Zip-এর জন্য Order ID আপডেট (সবচেয়ে গুরুত্বপূর্ণ অংশ) ★★★
     if (orderId) {
-      // 1. Description আপডেট করুন (স্ট্রাইপ ড্যাশবোর্ডে দেখার জন্য)
-      updateData.description = `Order #${orderId} for GOBIKE`;
-      
-      // 2. Metadata আপডেট করুন (Verify API-তে চেক করার জন্য) - এটা মিস করা যাবে না!
+      updateData.description = `Order #${orderId} for GOBIKE`; 
       updateData.metadata = {
           order_id: orderId.toString()
       };

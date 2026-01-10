@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import toast from 'react-hot-toast';
-import styles from './PaymentMethods.module.css';
 
 interface CustomerInfo {
   firstName?: string;
@@ -31,7 +30,6 @@ interface ShippingFormData {
 
 interface StripePaymentGatewayProps {
   selectedPaymentMethod: string;
-  // ★★★ পরিবর্তন: onPlaceOrder এর টাইপ-এ 'is_embedded_redirect' যোগ করা হয়েছে ★★★
   onPlaceOrder: (paymentData?: { 
     transaction_id?: string;
     shippingAddress?: Partial<ShippingFormData>; 
@@ -76,10 +74,9 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
 
       if (isRedirectFlow) {
         try {
-          // ★★★ পরিবর্তন: onPlaceOrder কল করার সময় শর্তসাপেক্ষে is_embedded_redirect পাঠানো হচ্ছে ★★★
           const orderDetails = await onPlaceOrder({ 
             redirect_needed: true,
-            is_embedded_redirect: isRedirectFromElement // <-- শুধুমাত্র PaymentElement এর ভেতরের ফ্লো-এর জন্য true হবে
+            is_embedded_redirect: isRedirectFromElement 
           });
 
           if (!orderDetails || !orderDetails.orderId || !orderDetails.orderKey) {
@@ -150,10 +147,8 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
           return;
         }
 
-        // ★★★ ZIP Payment Specific Logic ★★★
         if (internalStripeMethod === 'zip') {
             try {
-                // ১. আগে অর্ডার ক্রিয়েট করা (REST API দিয়ে)
                 const orderDetails = await onPlaceOrder({ 
                     redirect_needed: true,
                     is_embedded_redirect: true,
@@ -164,8 +159,6 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
                     throw new Error("Could not create order before redirection.");
                 }
 
-                // ২. বিদ্যমান PaymentIntent আপডেট করা (Order ID লিংক করা)
-                // clientSecret থেকে ID বের করা হচ্ছে (format: pi_xxxx_secret_yyyy)
                 const paymentIntentId = clientSecret.split('_secret_')[0];
                 
                 await fetch('/api/update-payment-intent', {
@@ -177,7 +170,6 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
                     })
                 });
 
-                // ৩. পেমেন্ট কনফার্ম এবং রিডাইরেক্ট করা
                 const { error } = await stripe.confirmPayment({
                     elements,
                     clientSecret,
@@ -191,7 +183,6 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
                     toast.error(error.message || "Payment failed");
                     setIsProcessing(false);
                 }
-                // সফল হলে অটোমেটিক রিডাইরেক্ট হয়ে যাবে।
 
             } catch (err) {
                 toast.dismiss();
@@ -200,7 +191,6 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
             }
         }
         
-        // ★★★ Card Payment Logic (Default) ★★★
         else {
             const { error, paymentIntent } = await stripe.confirmPayment({
               elements,
@@ -232,7 +222,7 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
     const renderPaymentUI = () => {
       if (selectedPaymentMethod === 'stripe') {
         return (
-          <div className={styles.cardElementContainer}>
+          <div className="p-3 border border-[#ccc] rounded-[5px] bg-white">
             <PaymentElement onChange={(e) => setInternalStripeMethod(e.value.type)} />
           </div>
         );
@@ -241,22 +231,22 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
       if (selectedPaymentMethod === 'stripe_klarna') {
         const installment = (total / 4).toFixed(2);
         return (
-          <div className={styles.redirectInfoBox}>
+          <div className="flex items-center gap-[15px] p-[15px] border border-[#e0e0e0] rounded-[5px] bg-[#f9f9f9]">
             <Image src="https://x.klarnacdn.net/payment-method/assets/badges/generic/klarna.svg" alt="Klarna" width={40} height={20} />
-             <div className={styles.infoText}>
-               <span>Pay now, or in 4 interest-free payments of <strong>A${installment}</strong>. <a href="https://www.klarna.com/au/payments/pay-in-4/" target="_blank" rel="noopener noreferrer">Learn more</a></span>
-               <small>After submission, you will be redirected to securely complete next steps.</small>
-              </div>
-         </div>
+             <div className="flex flex-col gap-[5px] text-sm text-[#333]">
+               <span>Pay now, or in 4 interest-free payments of <strong>A${installment}</strong>. <a href="https://www.klarna.com/au/payments/pay-in-4/" target="_blank" rel="noopener noreferrer" className="underline text-[#007bff]">Learn more</a></span>
+               <small className="text-xs text-[#777]">After submission, you will be redirected to securely complete next steps.</small>
+             </div>
+          </div>
         );
       }
   
       if (selectedPaymentMethod === 'stripe_afterpay_clearpay') {
         const installment = (total).toFixed(2);
         return (
-         <div className={styles.redirectInfoBox}>
+          <div className="flex items-center gap-[15px] p-[15px] border border-[#e0e0e0] rounded-[5px] bg-[#f9f9f9]">
             <Image src="https://static.afterpay.com/integration/logo-afterpay-colour.svg" alt="Afterpay" width={60} height={20} unoptimized/>
-            <div className={styles.infoText}>
+            <div className="flex flex-col gap-[5px] text-sm text-[#333]">
               <span>Pay <strong>A${installment}</strong> -<strong>You can pay Up to 2000AUD</strong>-After submission, you will be redirected to securely complete next steps.</span>
             </div>
           </div>
@@ -301,12 +291,12 @@ const StripePaymentGateway = forwardRef<HTMLFormElement, StripePaymentGatewayPro
     }, [props.total, props.selectedPaymentMethod, clientSecret]);
 
     if (!stripePromise) {
-        return <div className={styles.loader}>Loading Stripe...</div>;
+        return <div className="p-5 text-center text-[#555] bg-[#f9f9f9] rounded-lg">Loading Stripe...</div>;
     }
 
     if (props.selectedPaymentMethod === 'stripe') {
         if (!clientSecret) {
-            return <div className={styles.loader}>Initializing Payment Options...</div>;
+            return <div className="p-5 text-center text-[#555] bg-[#f9f9f9] rounded-lg">Initializing Payment Options...</div>;
         }
         return (
             <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'stripe' } }}>
