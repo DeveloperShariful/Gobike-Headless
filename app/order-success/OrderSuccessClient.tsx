@@ -3,7 +3,6 @@
 
 import { useEffect, useState } from 'react';
 import { useCart } from '../../context/CartContext';
-// import styles from './OrderSuccessClient.module.css'; // CSS Module সরানো হয়েছে
 import Image from 'next/image';
 import Link from 'next/link';
 import { gtmPurchase } from '../../lib/gtm';
