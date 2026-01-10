@@ -3,8 +3,8 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import styles from './FeatureSlider.module.css';
-import { useWindowSize } from './useWindowSize'; // <-- নতুন hook import করা হয়েছে
+// import styles from './FeatureSlider.module.css'; // CSS Module সরানো হয়েছে
+import { useWindowSize } from './useWindowSize';
 
 interface Feature {
   imageSrc: string;
@@ -20,9 +20,9 @@ interface FeatureSliderProps {
 
 export default function FeatureSlider({ title, features }: FeatureSliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const { width } = useWindowSize(); // <-- স্ক্রিনের প্রস্থ জানা হচ্ছে
+  const { width } = useWindowSize();
 
-  // === মূল পরিবর্তন: স্ক্রিন সাইজ অনুযায়ী কতগুলো আইটেম দেখাবে তা নির্ধারণ করা ===
+  // === মূল পরিবর্তন: স্ক্রিন সাইজ অনুযায়ী কতগুলো আইটেম দেখাবে তা নির্ধারণ করা ===
   const [itemsPerPage, setItemsPerPage] = useState(3);
 
   useEffect(() => {
@@ -53,20 +53,37 @@ export default function FeatureSlider({ title, features }: FeatureSliderProps) {
   };
 
   return (
-    <div className={styles.sliderComponent}>
-      <div className={styles.header}>
-        <h2 className={styles.title}>{title}</h2>
+    // .sliderComponent replaced
+    <div className="w-full">
+      {/* .header replaced */}
+      <div className="flex justify-between items-center mb-10 px-2">
+        {/* .title replaced */}
+        <h2 className="text-2xl md:text-[2rem] font-bold text-slate-900">{title}</h2>
         {canSlide && (
-          <div className={styles.navArrows}>
-            <button onClick={goToPrevious} className={styles.arrow}>&#10094;</button>
-            <button onClick={goToNext} className={styles.arrow}>&#10095;</button>
+          // .navArrows replaced
+          <div className="flex gap-2">
+            <button 
+                onClick={goToPrevious} 
+                // .arrow replaced
+                className="w-10 h-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-lg text-slate-600 cursor-pointer transition-all duration-200 ease-in-out hover:bg-slate-200 hover:text-slate-900"
+            >
+                &#10094;
+            </button>
+            <button 
+                onClick={goToNext} 
+                className="w-10 h-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-lg text-slate-600 cursor-pointer transition-all duration-200 ease-in-out hover:bg-slate-200 hover:text-slate-900"
+            >
+                &#10095;
+            </button>
           </div>
         )}
       </div>
 
-      <div className={styles.sliderContainer}>
+      {/* .sliderContainer replaced */}
+      <div className="relative w-full overflow-hidden">
         <div 
-          className={styles.sliderTrack}
+          // .sliderTrack replaced
+          className="flex transition-transform duration-500 ease-in-out"
           // === মূল পরিবর্তন: স্লাইড করার দূরত্ব এখন ডাইনামিক ===
           style={{ 
             width: `${(100 / itemsPerPage) * features.length}%`,
@@ -74,14 +91,20 @@ export default function FeatureSlider({ title, features }: FeatureSliderProps) {
           }}
         >
           {features.map((feature, index) => (
-            <div key={index} className={styles.slide}>
-              <div className={styles.card}>
-                <div className={styles.imageWrapper}>
+            // .slide replaced
+            <div key={index} className="box-border px-2">
+              {/* .card replaced */}
+              <div className="rounded-xl overflow-hidden bg-white border border-slate-200 h-full">
+                {/* .imageWrapper replaced */}
+                <div className="relative w-full pt-[60%] bg-slate-50">
                   <Image src={feature.imageSrc} alt={feature.imageAlt} fill style={{ objectFit: 'cover' }} sizes="33vw"/>
                 </div>
-                <div className={styles.contentWrapper}>
-                  <h3 className={styles.featureTitle}>{feature.title}</h3>
-                  <p className={styles.description}>{feature.description}</p>
+                {/* .contentWrapper replaced */}
+                <div className="p-6">
+                  {/* .featureTitle replaced */}
+                  <h3 className="text-xl font-semibold mb-2 text-slate-800">{feature.title}</h3>
+                  {/* .description replaced */}
+                  <p className="text-[0.95rem] text-slate-500 leading-relaxed m-0">{feature.description}</p>
                 </div>
               </div>
             </div>
@@ -90,9 +113,11 @@ export default function FeatureSlider({ title, features }: FeatureSliderProps) {
       </div>
       
       {canSlide && (
-        <div className={styles.progressBarContainer}>
+        // .progressBarContainer replaced
+        <div className="w-[calc(100%-1rem)] h-1 bg-slate-200 rounded-sm mx-auto mt-8">
             <div 
-                className={styles.progressFill}
+                // .progressFill replaced
+                className="h-full bg-sky-500 rounded-sm transition-[width] duration-300 ease-in-out"
                 style={{ width: `${(100 / (features.length - itemsPerPage + 1)) * (currentIndex + 1)}%` }}
             ></div>
         </div>

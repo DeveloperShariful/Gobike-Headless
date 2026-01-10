@@ -4,7 +4,7 @@ import path from 'path';
 import matter from 'gray-matter';
 import Link from 'next/link';
 import Image from 'next/image';
-import styles from './BlogListPage.module.css';
+// import styles from './BlogListPage.module.css'; // CSS Module সরানো হয়েছে
 import Breadcrumbs from '../../components/Breadcrumbs';
 import type { Metadata } from 'next';
 
@@ -36,7 +36,7 @@ export default function BlogPage() {
   const blogDir = 'blogs';
   const files = fs.readdirSync(path.join(process.cwd(), blogDir));
 
-  // পোস্টগুলোকে তারিখ অনুযায়ী সাজানো (নতুন থেকে পুরোনো)
+  // পোস্টগুলোকে তারিখ অনুযায়ী সাজানো (নতুন থেকে পুরোনো)
   const posts = files.map(filename => {
     const slug = filename.replace(/\.(md|mdx)$/, '');
     const markdownWithMeta = fs.readFileSync(path.join(blogDir, filename), 'utf-8');
@@ -50,47 +50,73 @@ export default function BlogPage() {
 
   return (
     <div>
-          <Breadcrumbs />
-    <div className={styles.pageContainer}>
-      <header className={styles.pageHeader}>
-        {/* --- কার্যকরী সমাধান: নতুন SEO-বান্ধব শিরোনাম --- */}
-        <h1 className={styles.pageTitle}>GoBike Kids E-Bike Blog</h1>
-        <p className={styles.pageSubtitle}>
-          Expert tips, safety guides, and inspiring stories for your little riders next big adventure.
-        </p>
-      </header>
+      <Breadcrumbs />
+      {/* .pageContainer replaced */}
+      <div className="max-w-[1200px] mx-auto mb-20 px-4">
+        
+        {/* .pageHeader replaced */}
+        <header className="text-center mb-10">
+          {/* --- কার্যকরী সমাধান: নতুন SEO-বান্ধব শিরোনাম --- */}
+          {/* .pageTitle replaced */}
+          <h1 className="text-[2rem] font-extrabold mb-[0.8rem] tracking-tight text-gray-900">
+            GoBike Kids E-Bike Blog
+          </h1>
+          {/* .pageSubtitle replaced */}
+          <p className="text-[1.2rem] text-[#555] max-w-[650px] mx-auto leading-[1.6]">
+            Expert tips, safety guides, and inspiring stories for your little riders next big adventure.
+          </p>
+        </header>
       
-      <main>
-        <div className={styles.postsGrid}>
-          {posts.map(post => (
-            <Link key={post.slug} href={`/blog/${post.slug}`} className={styles.postCard}>
-              
-              {/* --- কার্যকরী সমাধান: কভার ইমেজ --- */}
-              <div className={styles.imageContainer}>
-                {post.frontmatter.cover_image && (
-                  <Image
-                    src={post.frontmatter.cover_image}
-                    alt={post.frontmatter.title}
-                    fill
-                    className={styles.postImage}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
-                )}
-              </div>
+        <main>
+          {/* .postsGrid replaced */}
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(350px,1fr))] gap-10">
+            {posts.map(post => (
+              <Link 
+                key={post.slug} 
+                href={`/blog/${post.slug}`} 
+                // .postCard replaced
+                className="group no-underline text-inherit bg-white border border-[#e7e7e7] rounded-2xl overflow-hidden flex flex-col shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-[0_12px_28px_rgba(0,0,0,0.1)]"
+              >
+                
+                {/* --- কার্যকরী সমাধান: কভার ইমেজ --- */}
+                {/* .imageContainer replaced */}
+                <div className="relative w-full pt-[56.25%] bg-[#f0f0f0]">
+                  {post.frontmatter.cover_image && (
+                    <Image
+                      src={post.frontmatter.cover_image}
+                      alt={post.frontmatter.title}
+                      fill
+                      // .postImage replaced
+                      className="absolute top-0 left-0 w-full h-full object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                  )}
+                </div>
 
-              <div className={styles.contentContainer}>
-                <h2 className={styles.postTitleCard}>{post.frontmatter.title}</h2>
-                <p className={styles.postMeta}>
-                  By {post.frontmatter.author} on {post.frontmatter.date}
-                </p>
-                <p className={styles.postExcerpt}>{post.frontmatter.excerpt}</p>
-                <span className={styles.readMore}>Read More →</span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </main>
-    </div>
+                {/* .contentContainer replaced */}
+                <div className="p-6 md:px-[1.8rem] md:py-[1.5rem] flex flex-col flex-grow">
+                  {/* .postTitleCard replaced */}
+                  <h2 className="text-[1.5rem] font-bold mb-3 leading-[1.4]">
+                    {post.frontmatter.title}
+                  </h2>
+                  {/* .postMeta replaced */}
+                  <p className="text-[0.9rem] text-[#777] mb-4">
+                    By {post.frontmatter.author} on {post.frontmatter.date}
+                  </p>
+                  {/* .postExcerpt replaced */}
+                  <p className="flex-grow mb-6 text-[#444] leading-[1.7]">
+                    {post.frontmatter.excerpt}
+                  </p>
+                  {/* .readMore replaced */}
+                  <span className="font-bold text-black no-underline transition-colors duration-200 group-hover:text-[#0070f3]">
+                    Read More →
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

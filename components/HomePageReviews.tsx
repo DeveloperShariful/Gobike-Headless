@@ -2,14 +2,11 @@
 
 'use client';
 
-// --- পরিবর্তন ১: useRef ইম্পোর্ট করা হয়েছে ---
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaStar } from 'react-icons/fa';
-import styles from './HomePageReviews.module.css';
 
-// --- টাইপ ইন্টারফেস (অপরিবর্তিত) ---
 interface ReviewSummary {
   review_count: number;
   average_rating: number;
@@ -30,28 +27,30 @@ interface ReviewsData {
   reviews: Review[];
 }
 
-// --- স্টার রেটিং কম্পোনেন্ট (অপরিবর্তিত) ---
-const StarRating = ({ rating, size = 1 }: { rating: number, size?: number }) => {
+// --- স্টার রেটিং কম্পোনেন্ট ---
+const StarRating = ({ rating, size = 1, alignLeft = false }: { rating: number, size?: number, alignLeft?: boolean }) => {
     const totalStars = 5;
     const fullStars = Math.floor(rating);
     const emptyStars = totalStars - fullStars;
     return (
-        <div className={styles.starRating} style={{ fontSize: `${size}rem` }}>
+        // .starRating replaced
+        <div 
+            className={`flex gap-1 text-black mt-[0.1rem] ${alignLeft ? 'justify-start' : 'justify-center'}`} 
+            style={{ fontSize: `${size}rem` }}
+        >
             {[...Array(fullStars)].map((_, i) => <FaStar key={`full-${i}`} />)}
-            {[...Array(emptyStars)].map((_, i) => <FaStar key={`empty-${i}`} style={{ color: '#e4e5e9' }} />)}
+            {[...Array(emptyStars)].map((_, i) => <FaStar key={`empty-${i}`} className="text-[#e4e5e9]" />)}
         </div>
     );
 };
 
-
-// --- মূল রিভিউ সেকশন কম্পוננט ---
+// --- মূল রিভিউ সেকশন কম্পোনেন্ট ---
 export default function HomePageReviews() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [visibleReviews, setVisibleReviews] = useState(3);
   const [summary, setSummary] = useState<ReviewSummary | null>(null);
   
-  // --- পরিবর্তন ২: স্লাইডার কন্টেইনারের জন্য ref তৈরি করা হয়েছে ---
   const sliderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -75,22 +74,25 @@ export default function HomePageReviews() {
     fetchReviewsData();
   }, []);
 
-  // --- পরিবর্তন ৩: স্ক্রল করার জন্য ফাংশন যোগ করা হয়েছে ---
   const scroll = (direction: 'left' | 'right') => {
       if (sliderRef.current) {
           const { current } = sliderRef;
-          // প্রতিটি কার্ডের প্রস্থ এবং গ্যাপ অনুযায়ী স্ক্রল করা হবে
           const scrollAmount = direction === 'left' 
-              ? -(current.offsetWidth * 0.9) // একবারে একটি কার্ডের সমান বামে যাবে
-              : (current.offsetWidth * 0.9); // একবারে একটি কার্ডের সমান ডানে যাবে
+              ? -(current.offsetWidth * 0.9) 
+              : (current.offsetWidth * 0.9);
           
           current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
       }
   };
 
-
   if (loading) {
-    return <section className={styles.reviewsSection}><div className={styles.container}><p>Loading Reviews...</p></div></section>;
+    return (
+        <section className="pb-12 bg-white">
+            <div className="max-w-[1500px] mx-auto px-4">
+                <p>Loading Reviews...</p>
+            </div>
+        </section>
+    );
   }
 
   if (reviews.length === 0) {
@@ -102,77 +104,142 @@ export default function HomePageReviews() {
   );
 
   return (
-    <section className={styles.reviewsSection}>
-      <div className={styles.container}>
-        <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>What our customers are saying about Gobike</h2>
+    // .reviewsSection replaced
+    <section className="pb-12 bg-white font-sans">
+      {/* .container replaced */}
+      <div className="max-w-[1500px] mx-auto px-4">
+        
+        {/* .sectionHeader replaced */}
+        <div className="text-center mb-12 mt-4">
+          {/* .sectionTitle replaced */}
+          <h2 className="text-[1.7rem] md:text-[2rem] font-extrabold mb-2 tracking-tight text-[#1a1a1a]">
+            What our customers are saying about Gobike
+          </h2>
         </div>
 
         {summary && summary.review_count > 0 && (
-          <div className={styles.summaryBox}>
-              <div className={styles.summaryAverage}>
-                  <div className={styles.averageRatingValue}>{summary.average_rating.toFixed(1)}</div>
+          // .summaryBox replaced
+          <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr_auto] gap-y-8 gap-x-12 items-center p-6 lg:p-10 bg-[#f8f9fa] rounded-[20px] mb-16 border border-[#e7e7e7]">
+              
+              {/* .summaryAverage replaced */}
+              <div className="text-center pr-0 lg:pr-12 border-b lg:border-b-0 lg:border-r border-[#e0e0e0] pb-8 lg:pb-0">
+                  {/* .averageRatingValue replaced */}
+                  <div className="text-[4rem] font-extrabold leading-none text-black">{summary.average_rating.toFixed(1)}</div>
                   <StarRating rating={summary.average_rating} size={1.2} />
-                  <div className={styles.basedOnReviews}>Based on {summary.review_count} reviews</div>
+                  {/* .basedOnReviews replaced */}
+                  <div className="text-[0.9rem] text-[#555] mt-4">Based on {summary.review_count} reviews</div>
               </div>
-              <div className={styles.summaryBreakdown}>
+              
+              {/* .summaryBreakdown replaced */}
+              <div className="flex flex-col gap-3 w-full">
                   {ratingPercentages?.map((percent, index) => (
-                      <div className={styles.ratingBarRow} key={5 - index}>
-                          <span>{5 - index} star</span>
-                          <div className={styles.ratingBar}><div style={{ width: `${percent}%` }}></div></div>
+                      // .ratingBarRow replaced
+                      <div className="flex items-center gap-4 text-[0.9rem] text-[#555]" key={5 - index}>
+                          <span className="w-[50px]">{5 - index} star</span>
+                          {/* .ratingBar replaced */}
+                          <div className="flex-grow h-2 bg-[#e9ecef] rounded overflow-hidden">
+                              <div className="h-full bg-[#f5b327]" style={{ width: `${percent}%` }}></div>
+                          </div>
                           <span>{Math.round(percent)}%</span>
                       </div>
                   ))}
               </div>
-              <div className={styles.addReviewWrapper}>
-                  <span className={styles.addReviewButton}>Add a review</span>
+              
+              {/* .addReviewWrapper replaced */}
+              <div className="text-center pl-0 lg:pl-12 border-t lg:border-t-0 lg:border-l border-[#e0e0e0] pt-8 lg:pt-0">
+                  {/* .addReviewButton replaced */}
+                  <span className="inline-block bg-[#1a1a1a] text-white border-none py-[0.9rem] px-8 rounded-lg cursor-pointer font-semibold transition-colors duration-200 hover:bg-[#333]">
+                    Add a review
+                  </span>
               </div>
           </div>
         )}
 
-        {/* --- পরিবর্তন ৪: স্লাইডার কন্টেইনার এবং নেভিগেশন বাটন যোগ করা হয়েছে --- */}
-        <div className={styles.reviewsSliderContainer}>
-            <div className={styles.reviewsGrid} ref={sliderRef}>
+        {/* .reviewsSliderContainer replaced */}
+        <div className="relative">
+            {/* .reviewsGrid replaced */}
+            {/* Desktop: Grid layout | Mobile: Horizontal Scroll Snap layout */}
+            <div 
+                className="
+                    grid grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(350px,1fr))] gap-8 
+                    md:overflow-visible
+                    max-md:flex max-md:overflow-x-auto max-md:snap-x max-md:snap-mandatory max-md:scrollbar-none max-md:gap-4 max-md:-mx-4 max-md:px-4 max-md:pb-4
+                " 
+                ref={sliderRef}
+            >
             {reviews.slice(0, visibleReviews).map((review) => {
                 const productSlug = review.product_permalink.split('/').filter(Boolean).pop() || '';
                 return (
-                    <div key={review.id} className={styles.reviewCard}>
-                        <div className={styles.reviewCardHeader}>
-                            <div className={styles.authorAvatar}>{review.reviewer.substring(0, 1)}</div>
-                            <div className={styles.authorDetails}>
-                                <strong>{review.reviewer}</strong>
-                                <span className={styles.verifiedBadge}>✓ Verified</span>
+                    // .reviewCard replaced
+                    <div 
+                        key={review.id} 
+                        className="
+                            bg-[#f8f9fa] rounded-2xl p-6 border border-[#e7e7e7] flex flex-col shadow-[0_4px_12px_rgba(0,0,0,0.03)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.07)]
+                            max-md:flex-none max-md:w-[90%] max-md:snap-start
+                        "
+                    >
+                        {/* .reviewCardHeader replaced */}
+                        <div className="flex items-center mb-4 gap-3">
+                            {/* .authorAvatar replaced */}
+                            <div className="w-10 h-10 rounded-full bg-[#e9ecef] text-[#333] flex items-center justify-center font-bold text-[1.1rem] flex-shrink-0">
+                                {review.reviewer.substring(0, 1)}
+                            </div>
+                            {/* .authorDetails replaced */}
+                            <div className="flex flex-col items-start">
+                                <strong className="font-semibold text-base">{review.reviewer}</strong>
+                                {/* .verifiedBadge replaced */}
+                                <span className="text-[0.8rem] text-[#17a2b8] font-medium">✓ Verified</span>
                             </div>
                         </div>
 
-                        <StarRating rating={review.rating} />
+                        <StarRating rating={review.rating} alignLeft={true} />
                         
+                        {/* .reviewContent replaced */}
                         <div 
-                            className={styles.reviewContent}
+                            className="text-[#333] leading-[1.6] text-[0.95rem] mb-4 flex-grow [&>p:last-child]:mb-0"
                             dangerouslySetInnerHTML={{ __html: review.review }}
                         />
 
-                        <div className={styles.reviewProductInfo}>
+                        {/* .reviewProductInfo replaced */}
+                        <div className="flex items-center gap-3 text-[0.9rem] text-[#555] mt-auto pt-4 border-t border-[#e9ecef]">
                             {review.product_image && (
                                 <Link href={`/product/${productSlug}`}>
-                                    <Image src={review.product_image} alt={review.product_name} width={40} height={40} />
+                                    <Image src={review.product_image} alt={review.product_name} width={40} height={40} className="rounded-md" />
                                 </Link>
                             )}
-                            <span>on <Link href={`/product/${productSlug}`}>{review.product_name}</Link></span>
+                            <span>on <Link href={`/product/${productSlug}`} className="text-[#1a1a1a] font-semibold hover:underline">{review.product_name}</Link></span>
                         </div>
                     </div>
                 );
             })}
             </div>
 
-            {/* স্লাইডার নেভিগেশন বাটন */}
-            <button onClick={() => scroll('left')} className={`${styles.reviewsNav} ${styles.prev}`} aria-label="Previous review">&#10094;</button>
-            <button onClick={() => scroll('right')} className={`${styles.reviewsNav} ${styles.next}`} aria-label="Next review">&#10095;</button>
+            {/* .reviewsNav replaced */}
+            {/* Mobile Navigation Buttons (Hidden on Desktop) */}
+            <button 
+                onClick={() => scroll('left')} 
+                className="md:hidden absolute top-1/2 -translate-y-1/2 left-0 bg-black/50 text-white border-none rounded-full w-10 h-10 text-lg cursor-pointer z-10 transition-colors duration-300 flex items-center justify-center hover:bg-black/80"
+                aria-label="Previous review"
+            >
+                &#10094;
+            </button>
+            <button 
+                onClick={() => scroll('right')} 
+                className="md:hidden absolute top-1/2 -translate-y-1/2 right-0 bg-black/50 text-white border-none rounded-full w-10 h-10 text-lg cursor-pointer z-10 transition-colors duration-300 flex items-center justify-center hover:bg-black/80"
+                aria-label="Next review"
+            >
+                &#10095;
+            </button>
         </div>
         
         {reviews.length > visibleReviews && (
-            <div className={styles.showMoreContainer}>
-                <button onClick={() => setVisibleReviews(reviews.length)} className={styles.showMoreButton}>
+            // .showMoreContainer replaced
+            <div className="text-center mt-12">
+                {/* .showMoreButton replaced */}
+                <button 
+                    onClick={() => setVisibleReviews(reviews.length)} 
+                    className="bg-transparent border border-[#ccc] py-[0.8rem] px-10 rounded-lg cursor-pointer font-semibold text-base text-[#1a1a1a] transition-all duration-200 hover:bg-[#f0f0f0] hover:border-[#aaa]"
+                >
                     Show more reviews ({reviews.length - visibleReviews} more)
                 </button>
             </div>

@@ -12,15 +12,23 @@ const overviewImages = [
 
 export default function OverviewSection() {
   return (
-    <section className={styles.sectionContainer}>
-      <div className={styles.overviewGrid}>
-        <div className={styles.overviewText}>
-          <h2 className={styles.mainTitle}>GoBike 24 Pro: The Ultimate Machine</h2>
-          <p className={styles.mainDescription}>
-            Ready to level up? The **GoBike 24 Inch Pro** is built for teens and adults who demand power. With a massive **2500W motor**, top speeds of **61km/h**, and **fully adjustable suspension**, this isn't just a bike—it's a dirt-shredding beast. Whether hitting jumps or exploring trails, the GoBike 24 delivers pro-level performance and adrenaline-pumping fun.
+    // .sectionContainer replaced
+    <section className="w-full py-12 px-[5%] md:px-[1%] box-border">
+      {/* .overviewGrid replaced */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-10 lg:gap-12 items-center max-w-[1200px] mx-auto">
+        {/* .overviewText replaced */}
+        <div className="text-center lg:text-left lg:pr-8">
+          {/* .mainTitle replaced */}
+          <h2 className="text-[2.2rem] lg:text-[3rem] font-extrabold leading-[1.2] mb-6 text-[#1a202c]">
+            GoBike 12: The Easiest Way to Teach Your Kid to Ride
+          </h2>
+          {/* .mainDescription replaced */}
+          <p className="text-[1.1rem] leading-[1.7] text-[#4a5568]">
+            Say goodbye to tears and tricky training wheels. The GoBike 12 (ages 2-5) is engineered to be the safest, easiest way for your child to learn. This is not just a bike; it is a confidence-builder. By focusing on balance first, your little rider will master the basics in no time. It is light, durable, and ready for every Aussie backyard. Give the gift of confidence and start their riding journey today.
           </p>
         </div>
-        <div className={styles.overviewSlider}>
+        {/* .overviewSlider replaced */}
+        <div className="w-full">
           <ImageSlider images={overviewImages} />
         </div>
       </div>

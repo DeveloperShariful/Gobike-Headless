@@ -4,8 +4,20 @@ import Image from 'next/image';
 import FeaturedBikes from '../components/FeaturedBikes';
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
-import styles from './page.module.css';
-import HomePageReviews from '../components/HomePageReviews'; 
+import HomePageReviews from '../components/HomePageReviews';
+
+// ====================================================================
+// Shared Components / Icons
+// ====================================================================
+const ReturnIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 1-9 9H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3"/><path d="M21 12v3a2 2 0 0 1-2 2H5"/><path d="m16 5 3-3-3-3"/><path d="M3 10h13"/><path d="M12 21a9 9 0 0 0 9-9h-3"/><path d="m16 19 3 3-3 3"/></svg>;
+const WarrantyIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="m9 16 2 2 4-4"/></svg>;
+const SecureIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>;
+const PerformanceIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 6.5l.3-.3a1.5 1.5 0 0 1 2.4 2l-3.2 3.2-1.3-1.3a1.5 1.5 0 0 1 2-2.3zM8.5 10.5l-1.3-1.3a1.5 1.5 0 0 1 2-2.3l.3-.3a1.5 1.5 0 0 1 2.4 2l-3.2 3.2z"/><path d="M12 15.5l.3-.3a1.5 1.5 0 0 1 2.4 2l-3.2 3.2-1.3-1.3a1.5 1.5 0 0 1 2-2.3zM8.5 14.5l-1.3-1.3a1.5 1.5 0 0 1 2-2.3l.3-.3a1.5 1.5 0 0 1 2.4 2l-3.2 3.2z"/><path d="M15.5 12.5l-.3.3a1.5 1.5 0 0 1-2.4-2l3.2-3.2 1.3 1.3a1.5 1.5 0 0 1-2 2.3z"/><path d="M10.5 8.5l1.3 1.3a1.5 1.5 0 0 1-2 2.3l-.3.3a1.5 1.5 0 0 1-2.4-2l3.2-3.2z"/><path d="M19 12h-2"/><path d="M5 12H3"/></svg>;
+const ShippingIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 16.5V8a2 2 0 0 0-2-2h-1a2 2 0 0 0-2 2v2M18 16.5v-3.5a2 2 0 0 0-2-2h-1a2 2 0 0 0-2 2v1.5M6 12v6h2l2-3-2-3H6"/><path d="M3 12h3"/><path d="M21 12h-3"/></svg>;
+const SupportIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6"/><path d="M22 11h-4"/></svg>;
+
+const TickMark = () => <span className="text-red-600 font-bold text-xl">✓</span>;
+const CrossMark = () => <span className="text-black font-bold text-xl">✗</span>;
 
 // ====================================================================
 // HeroSlider Component
@@ -26,136 +38,135 @@ const HeroSlider = () => {
   };
 
   return (
-    <section className={styles.heroSliderSection}>
-     <div className={styles.finalSplitSliderContainer}>
-        {/* Updated Radio Inputs for 4 Slides */}
-        <input type="radio" id="slide-radio-1" name="slider-radio" className="visually-hidden" checked={currentSlide === 1} onChange={() => handleRadioChange(1)} />
-        <input type="radio" id="slide-radio-2" name="slider-radio" className="visually-hidden" checked={currentSlide === 2} onChange={() => handleRadioChange(2)} />
-        <input type="radio" id="slide-radio-3" name="slider-radio" className="visually-hidden" checked={currentSlide === 3} onChange={() => handleRadioChange(3)} />
-        <input type="radio" id="slide-radio-4" name="slider-radio" className="visually-hidden" checked={currentSlide === 4} onChange={() => handleRadioChange(4)} />
+    <section className="bg-black">
+      <div className="relative w-full overflow-hidden bg-black">
+        {/* Radio Inputs (Hidden logic) */}
+        {[1, 2, 3, 4].map((num) => (
+            <input 
+                key={num}
+                type="radio" 
+                name="slider-radio" 
+                className="hidden" 
+                checked={currentSlide === num} 
+                onChange={() => handleRadioChange(num)} 
+            />
+        ))}
 
-          {/* Slider Wrapper: Transform logic remains the same, just showing new content order */}
-       <div className={styles.finalSplitSliderWrapper} style={{ transform: `translateX(-${(currentSlide - 1) * 100}%)` }}>
+        {/* Slider Wrapper */}
+        <div 
+            className="flex transition-transform duration-[800ms] ease-[cubic-bezier(0.25,1,0.5,1)]" 
+            style={{ transform: `translateX(-${(currentSlide - 1) * 100}%)` }}
+        >
       
           {/* SLIDE 1: NEW GOBIKE 24 */}
-         <div className={styles.finalSplitSlide}>
-            <div className={styles.finalSplitImageWrapper}>
+          <div className="min-w-full box-border text-white flex flex-col lg:flex-row lg:h-[70vh] lg:min-h-[550px]">
+            <div className="w-full lg:w-[55%] order-1 lg:order-2 flex items-center justify-center">
               <Image 
-                className={styles.finalSplitImage} 
+                className="w-full h-auto max-h-[400px] lg:max-h-full object-contain" 
                 loading="eager" 
                 src="https://gobikes.au/wp-content/uploads/2025/12/Slider-1-scaled.webp" 
-                alt="GoBike 24 Inch Electric Dirt Bike for Teens and Adults" 
-                width={1000} 
-                height={774} 
-                priority 
+                alt="GoBike 24 Inch Electric Dirt Bike" 
+                width={1000} height={774} priority 
                 sizes="(max-width: 768px) 100vw, 50vw" 
-                fetchPriority="high" 
               />
             </div>
-            <div className={styles.finalSplitContent}>
-              <p className={styles.finalSlideSubtitle}>The Extreme Machine</p>
-              <h2 className={styles.finalSlideTitle}>GOBIKE 24</h2>
-              <p className={styles.finalSlideDescription}>
-              The ultimate electric dirt bike for teens and adults aged 12+. Unleash raw power with a massive 2500W motor hitting top speeds of 61km/h. Featuring fully adjustable hydraulic suspension and 24-inch Kenda fat tires, it’s built for adrenaline, speed, and total off-road dominance.
-             </p>
-             <Link href="product/gobike-24-inch-electric-bike-teens-high-speed-performance-for-ages-13" className={styles.finalSlideButton}>Shop Now</Link>
-           </div>
-         </div>
+            <div className="w-full lg:w-[45%] order-2 lg:order-1 p-10 lg:p-[50px] flex flex-col justify-center text-center lg:text-left lg:items-start">
+              <p className="text-sm font-semibold uppercase tracking-[1.5px] mb-2.5 text-[#ccc]">The Extreme Machine</p>
+              <h2 className="text-white text-[48px] font-extrabold mb-5 leading-[1.1]">GOBIKE 24</h2>
+              <p className="text-lg leading-[1.7] mb-4 max-w-[480px] lg:max-w-none mx-auto lg:mx-0">
+                The ultimate electric dirt bike for teens and adults aged 12+. Unleash raw power with a massive 2500W motor hitting top speeds of 61km/h. Featuring fully adjustable hydraulic suspension and 24-inch Kenda fat tires.
+              </p>
+              <Link href="product/gobike-24-inch-electric-bike-teens-high-speed-performance-for-ages-13" className="inline-block bg-white text-black py-3.5 px-9 rounded-full font-bold text-base transition-all duration-300 hover:bg-[#ddd] hover:scale-105 self-center lg:self-start">Shop Now</Link>
+            </div>
+          </div>
 
-      {/* SLIDE 2: GOBIKE 20 (Previously Slide 1) */}
-      <div className={styles.finalSplitSlide}>
-        <div className={styles.finalSplitImageWrapper}>
-          <Image 
-            className={styles.finalSplitImage} 
-            loading="eager" 
-            src="https://gobikes.au/wp-content/uploads/2025/08/Gobike-electric-bike-kids-ebike20-inch-ages-for10-16-1-1.webp" 
-            alt="GoBike 20 Electric Bike for teens" 
-            width={1000} 
-            height={774} 
-            priority 
-            sizes="(max-width: 768px) 100vw, 50vw" 
-          />
+          {/* SLIDE 2: GOBIKE 20 */}
+          <div className="min-w-full box-border text-white flex flex-col lg:flex-row lg:h-[70vh] lg:min-h-[550px]">
+            <div className="w-full lg:w-[55%] order-1 lg:order-2 flex items-center justify-center">
+              <Image 
+                className="w-full h-auto max-h-[400px] lg:max-h-full object-contain" 
+                loading="eager" 
+                src="https://gobikes.au/wp-content/uploads/2025/08/Gobike-electric-bike-kids-ebike20-inch-ages-for10-16-1-1.webp" 
+                alt="GoBike 20 Electric Bike" 
+                width={1000} height={774} priority 
+                sizes="(max-width: 768px) 100vw, 50vw" 
+              />
+            </div>
+            <div className="w-full lg:w-[45%] order-2 lg:order-1 p-10 lg:p-[50px] flex flex-col justify-center text-center lg:text-left lg:items-start">
+              <p className="text-sm font-semibold uppercase tracking-[1.5px] mb-2.5 text-[#ccc]">The Ultimate Weapon</p>
+              <h2 className="text-white text-[48px] font-extrabold mb-5 leading-[1.1]">GOBIKE 20</h2>
+              <p className="text-lg leading-[1.7] mb-4 max-w-[480px] lg:max-w-none mx-auto lg:mx-0">
+                The best 20-inch kids electric bike on the market. Built tough for young adventurers and teens, it delivers powerful performance, long battery life with a 10Ah battery, and reliable fun every ride.
+              </p>
+              <Link href="product/20-inch-electric-bikes-for-sale-ebike-for-kids" className="inline-block bg-white text-black py-3.5 px-9 rounded-full font-bold text-base transition-all duration-300 hover:bg-[#ddd] hover:scale-105 self-center lg:self-start">Shop Now</Link>
+            </div>
+          </div>
+
+          {/* SLIDE 3: GOBIKE 16 */}
+          <div className="min-w-full box-border text-white flex flex-col lg:flex-row lg:h-[70vh] lg:min-h-[550px]">
+            <div className="w-full lg:w-[55%] order-1 lg:order-2 flex items-center justify-center">
+              <Image 
+                className="w-full h-auto max-h-[400px] lg:max-h-full object-contain" 
+                loading="lazy" 
+                src="https://gobikes.au/wp-content/uploads/2025/08/Gobike-electric-bike-kids-ebike20-inch-ages-for10-16-2.webp" 
+                alt="GoBike 16 Electric Bike" 
+                width={1000} height={849} 
+                sizes="(max-width: 768px) 100vw, 50vw" 
+              />
+            </div>
+            <div className="w-full lg:w-[45%] order-2 lg:order-1 p-10 lg:p-[50px] flex flex-col justify-center text-center lg:text-left lg:items-start">
+              <p className="text-sm font-semibold uppercase tracking-[1.5px] mb-2.5 text-[#ccc]">The All-Rounder</p>
+              <h2 className="text-white text-[48px] font-extrabold mb-5 leading-[1.1]">GOBIKE 16</h2>
+              <p className="text-lg leading-[1.7] mb-4 max-w-[480px] lg:max-w-none mx-auto lg:mx-0">
+                The fastest 16-inch kids electric bike on the market! Designed for confident young riders. Three speed modes, hydraulic disc brakes, and front suspension.
+              </p>
+              <Link href="product/ebike-for-sale-16-inch-gobike-ages-5-9" className="inline-block bg-white text-black py-3.5 px-9 rounded-full font-bold text-base transition-all duration-300 hover:bg-[#ddd] hover:scale-105 self-center lg:self-start">Shop Now</Link>
+            </div>
+          </div>
+
+          {/* SLIDE 4: GOBIKE 12 */}
+          <div className="min-w-full box-border text-white flex flex-col lg:flex-row lg:h-[70vh] lg:min-h-[550px]">
+            <div className="w-full lg:w-[55%] order-1 lg:order-2 flex items-center justify-center">
+              <Image 
+                className="w-full h-auto max-h-[400px] lg:max-h-full object-contain" 
+                loading="lazy" 
+                src="https://gobikes.au/wp-content/uploads/2025/08/Gobike-electric-bike-kids-ebike12-inch-ages-for-2-5-1.webp" 
+                alt="GoBike 12 Electric Bike" 
+                width={1000} height={803} 
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            </div>
+            <div className="w-full lg:w-[45%] order-2 lg:order-1 p-10 lg:p-[50px] flex flex-col justify-center text-center lg:text-left lg:items-start">
+              <p className="text-sm font-semibold uppercase tracking-[1.5px] mb-2.5 text-[#ccc]">The Everyday GoBike Range</p>
+              <h2 className="text-white text-[48px] font-extrabold mb-5 leading-[1.1]">GOBIKE 12</h2>
+              <p className="text-lg leading-[1.7] mb-4 max-w-[480px] lg:max-w-none mx-auto lg:mx-0">
+                The perfect first electric bike for toddlers aged 2 years and above transitioning from a balance bike. Features an extra-slow learning mode for beginners.
+              </p>
+              <Link href="product/ebike-for-kids-12-inch-electric-bike-ages-2-5" className="inline-block bg-white text-black py-3.5 px-9 rounded-full font-bold text-base transition-all duration-300 hover:bg-[#ddd] hover:scale-105 self-center lg:self-start">Shop Now</Link>
+            </div>
+          </div>
+
         </div>
-        <div className={styles.finalSplitContent}>
-          <p className={styles.finalSlideSubtitle}>The Ultimate Weapon</p>
-          <h2 className={styles.finalSlideTitle}>GOBIKE 20</h2>
-          <p className={styles.finalSlideDescription}>
-            The best 20-inch kids electric bike on the market. Built tough for young adventurers and teens, it delivers powerful performance, long battery life with a 10Ah battery, and reliable fun every ride. The ultimate e-bike for confidence, freedom, and excitement.
-          </p>
-          <Link href="product/20-inch-electric-bikes-for-sale-ebike-for-kids" className={styles.finalSlideButton}>Shop Now</Link>
+
+        {/* Navigation Dots */}
+        <div className="absolute bottom-[25px] left-1/2 -translate-x-1/2 z-[4] flex gap-3 lg:left-[22.5%] lg:transform-none">
+          {[1, 2, 3, 4].map(num => (
+             <label 
+                key={num}
+                htmlFor={`slide-radio-${num}`} 
+                className={`w-2.5 h-2.5 rounded-full border border-[#888] cursor-pointer transition-all duration-300 ${currentSlide === num ? 'bg-white border-white' : 'bg-transparent'}`}
+                aria-label={`Go to slide ${num}`}
+             ></label>
+          ))}
         </div>
       </div>
-
-      {/* SLIDE 3: GOBIKE 16 (Previously Slide 2) */}
-      <div className={styles.finalSplitSlide}>
-        <div className={styles.finalSplitImageWrapper}>
-          <Image 
-            className={styles.finalSplitImage} 
-            loading="lazy" 
-            src="https://gobikes.au/wp-content/uploads/2025/08/Gobike-electric-bike-kids-ebike20-inch-ages-for10-16-2.webp" 
-            alt="GoBike 16 Electric Bike for kids" 
-            width={1000} 
-            height={849} 
-            sizes="(max-width: 768px) 100vw, 50vw" 
-          />
-        </div>
-        <div className={styles.finalSplitContent}>
-          <p className={styles.finalSlideSubtitle}>The All-Rounder</p>
-          <h2 className={styles.finalSlideTitle}>GOBIKE 16</h2>
-          <p className={styles.finalSlideDescription}>
-            The fastest 16-inch kids electric bike on the market! Designed for confident young riders. Three speed modes, hydraulic disc brakes, and front suspension for the perfect balance of performance, safety, and fun.
-          </p>
-          <Link href="product/ebike-for-sale-16-inch-gobike-ages-5-9" className={styles.finalSlideButton}>Shop Now</Link>
-        </div>
-      </div>
-
-      {/* SLIDE 4: GOBIKE 12 (Previously Slide 3) */}
-      <div className={styles.finalSplitSlide}>
-        <div className={styles.finalSplitImageWrapper}>
-          <Image 
-            className={styles.finalSplitImage} 
-            loading="lazy" 
-            src="https://gobikes.au/wp-content/uploads/2025/08/Gobike-electric-bike-kids-ebike12-inch-ages-for-2-5-1.webp" 
-            alt="GoBike 12 Electric Bike for toddlers" 
-            width={1000} 
-            height={803} 
-            sizes="(max-width: 768px) 100vw, 50vw"
-          />
-        </div>
-        <div className={styles.finalSplitContent}>
-          <p className={styles.finalSlideSubtitle}>The Everyday GoBike Range</p>
-          <h2 className={styles.finalSlideTitle}>GOBIKE 12</h2>
-          <p className={styles.finalSlideDescription}>
-            The perfect first electric bike for toddlers aged 2 years and above transitioning from a balance bike. Features an extra-slow learning mode for beginners, easy handling, long ride time, adjustable seat height, and a lightweight, reliable design that grows with your child.
-          </p>
-          <Link href="product/ebike-for-kids-12-inch-electric-bike-ages-2-5" className={styles.finalSlideButton}>Shop Now</Link>
-        </div>
-      </div>
-
-    </div>
-
-    {/* Updated Navigation Dots */}
-    <div className={styles.finalSplitSliderNav}>
-      <label htmlFor="slide-radio-1" className={styles.finalSplitSliderDot} aria-label="Go to slide 1"></label>
-      <label htmlFor="slide-radio-2" className={styles.finalSplitSliderDot} aria-label="Go to slide 2"></label>
-      <label htmlFor="slide-radio-3" className={styles.finalSplitSliderDot} aria-label="Go to slide 3"></label>
-      <label htmlFor="slide-radio-4" className={styles.finalSplitSliderDot} aria-label="Go to slide 4"></label>
-    </div>
-  </div>
-</section>
+    </section>
   );
 }
 
 // ====================================================================
 // TrustBadges Component
 // ====================================================================
-const ReturnIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 1-9 9H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3"/><path d="M21 12v3a2 2 0 0 1-2 2H5"/><path d="m16 5 3-3-3-3"/><path d="M3 10h13"/><path d="M12 21a9 9 0 0 0 9-9h-3"/><path d="m16 19 3 3-3 3"/></svg>;
-const WarrantyIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="m9 16 2 2 4-4"/></svg>;
-const SecureIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>;
-const PerformanceIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 6.5l.3-.3a1.5 1.5 0 0 1 2.4 2l-3.2 3.2-1.3-1.3a1.5 1.5 0 0 1 2-2.3zM8.5 10.5l-1.3-1.3a1.5 1.5 0 0 1 2-2.3l.3-.3a1.5 1.5 0 0 1 2.4 2l-3.2 3.2z"/><path d="M12 15.5l.3-.3a1.5 1.5 0 0 1 2.4 2l-3.2 3.2-1.3-1.3a1.5 1.5 0 0 1 2-2.3zM8.5 14.5l-1.3-1.3a1.5 1.5 0 0 1 2-2.3l.3-.3a1.5 1.5 0 0 1 2.4 2l-3.2 3.2z"/><path d="M15.5 12.5l-.3.3a1.5 1.5 0 0 1-2.4-2l3.2-3.2 1.3 1.3a1.5 1.5 0 0 1-2 2.3z"/><path d="M10.5 8.5l1.3 1.3a1.5 1.5 0 0 1-2 2.3l-.3.3a1.5 1.5 0 0 1-2.4-2l3.2-3.2z"/><path d="M19 12h-2"/><path d="M5 12H3"/></svg>;
-const ShippingIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 16.5V8a2 2 0 0 0-2-2h-1a2 2 0 0 0-2 2v2M18 16.5v-3.5a2 2 0 0 0-2-2h-1a2 2 0 0 0-2 2v1.5M6 12v6h2l2-3-2-3H6"/><path d="M3 12h3"/><path d="M21 12h-3"/></svg>;
-const SupportIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6"/><path d="M22 11h-4"/></svg>;
-
 const trustItems = [
     { icon: <ReturnIcon />, title: "Easy 30-Day Returns", description: "Not a perfect fit? No worries. We offer a 30-day money-back guarantee." },
     { icon: <WarrantyIcon />, title: "Full 1-Year Warranty", description: "Every GoBike kids electric bike is covered by a full one-year local warranty." },
@@ -167,19 +178,19 @@ const trustItems = [
 
 const TrustBadges = () => {
   return (
-    <section className={styles.gobikeSection}>
-      <div className={styles.container1500}>
-        <div className={styles.sectionHeader}>
-          <h1 className={styles.sectionTitle}>The GoBike Promise: Australias Best Kids Electric Bike</h1>
-          <p className={styles.sectionSubtitle}>We are committed to providing an unmatched riding experience, backed by guarantees you can count on. Here’s why GoBike is the choice for Aussie families. Electric balance bike</p>
+    <section className="py-12 px-2.5 font-sans">
+      <div className="max-w-[1500px] mx-auto px-2.5">
+        <div className="text-center mb-8">
+          <h1 className="text-[32px] font-bold text-[#1a1a1a] mb-3 tracking-tight">The GoBike Promise: Australias Best Kids Electric Bike</h1>
+          <p className="text-lg text-[#666] max-w-[800px] mx-auto leading-[1.5]">We are committed to providing an unmatched riding experience, backed by guarantees you can count on. Here’s why GoBike is the choice for Aussie families. Electric balance bike</p>
         </div>
-        <div className={styles.finalTrustGrid}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-[30px] gap-y-[40px]">
           {trustItems.map((item, index) => (
-            <div className={styles.trustItem} key={index}>
-              <div className={styles.trustIcon}>{item.icon}</div>
+            <div className="flex items-start gap-4" key={index}>
+              <div className="flex-shrink-0 w-8 h-8">{item.icon}</div>
               <div>
-                <h3 className={styles.trustTitle}>{item.title}</h3>
-                <p className={styles.trustDescription}>{item.description}</p>
+                <h3 className="text-base font-bold text-[#1a1a1a] mb-1.5">{item.title}</h3>
+                <p className="text-[15px] text-[#666] m-0 leading-[1.6]">{item.description}</p>
               </div>
             </div>
           ))}
@@ -200,26 +211,26 @@ const products = [
 
 const ProductCollection = () => {
   return (
-    <section className={styles.productCollectionSection}>
-      <div className={styles.productCollectionContainer}>
-        <h2 className={styles.collectionTitle}>The GoBike Electric Bike Latest Collection</h2>
-        <div className={styles.productGrid}>
+    <section className="py-5">
+      <div className="max-w-[1500px] mx-auto px-2.5">
+        <h2 className="text-center text-[30px] font-bold text-[#1a1a1a] mb-5">The GoBike Electric Bike Latest Collection</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[30px]">
           {products.map((product, index) => (
-            <Link href={product.link} className={styles.productCard} key={index}>
-              <div className={styles.productImageContainer}>
-                <Image loading="lazy" src={product.imgSrc} alt={product.altText} width={2560} height={1850} sizes="(max-width: 768px) 100vw, 33vw"/>
+            <Link href={product.link} className="text-center border border-[#e9e9e9] rounded-lg overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-lg flex flex-col justify-between no-underline text-inherit" key={index}>
+              <div className="bg-[#f7f7f7] p-1.5">
+                <Image loading="lazy" src={product.imgSrc} alt={product.altText} width={2560} height={1850} sizes="(max-width: 768px) 100vw, 33vw" className="w-full h-auto aspect-square object-cover rounded-[5px]"/>
               </div>
-              <div className={styles.productInfo}>
-                <h3 className={styles.productName}>{product.name}</h3>
-                <p className={styles.productFeature}>{product.feature}</p>
-                <div className={styles.productPrice}></div>
-                <span className={styles.productButton}>View Details</span>
+              <div className="p-1.5 flex flex-col flex-grow">
+                <h3 className="text-[20px] font-bold text-[#1a1a1a] m-0">{product.name}</h3>
+                <p className="text-[17px] font-semibold text-black my-2.5 flex-grow">{product.feature}</p>
+                <div className="text-[18px] font-bold text-[#1a1a1a] mb-4"></div>
+                <span className="inline-block bg-black text-white py-3 px-5 rounded-[5px] font-semibold transition-colors duration-300 hover:bg-[#333]">View Details</span>
               </div>
             </Link>
           ))}
         </div>
-        <div className={styles.viewAllButtonContainer}>
-          <Link href="/bikes" className={styles.btnPrimary}>View All Bikes</Link>
+        <div className="text-center mt-10">
+          <Link href="/bikes" className="inline-block bg-black text-white py-3.5 px-9 rounded-full font-bold text-base border-2 border-transparent transition-all duration-300 hover:bg-white hover:text-black hover:border-black">View All Bikes</Link>
         </div>
       </div>
     </section>
@@ -231,21 +242,21 @@ const ProductCollection = () => {
 // ====================================================================
 const OurStory = () => {
   return (
-    <section className={styles.gobikeSection}>
-      <div className={styles.container1500}>
-        <div className={styles.originStoryGrid}>
-          <div className={styles.originStoryImage}>
-            <Image loading="lazy" src="https://gobikes.au/wp-content/uploads/2025/08/gobike-scaled-1.webp" alt="Two Australian dads with their kids and electric balance bikes, representing the founders of GoBike" width={2049} height={2560} sizes="(max-width: 768px) 100vw, 50vw" />
+    <section className="py-12 px-2.5 font-sans">
+      <div className="max-w-[1500px] mx-auto px-2.5">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-10 lg:gap-20 items-center">
+          <div className="w-full">
+            <Image loading="lazy" src="https://gobikes.au/wp-content/uploads/2025/08/gobike-scaled-1.webp" alt="Two Australian dads with their kids and electric balance bikes" width={2049} height={2560} sizes="(max-width: 768px) 100vw, 50vw" className="w-full h-auto block rounded-2xl" />
           </div>
-          <div className={styles.originStoryText}>
-            <p className={styles.storyTagline}>Our Story</p>
-            <h2 className={styles.storyTitle}>Founded by Two Dads, Fuelled by Fun GoBike</h2>
-            <p className={styles.storyDescription}>Welcome to GoBike! We are a proud Australian brand, founded in 2023 by two mates in the Macarthur Region of NSW. Our journey began from a simple observation: seeing the pure joy on our kids faces as they rode their first electric balance bikes.</p>
-            <p className={styles.storyDescription}>That spark, motivated us to design an even better <strong>kids electric bike</strong> One that elevates their riding experience while giving parents total peace of mind. We are committed to being the <strong>best electric balance bike</strong> brand through top-tier performance, reliability and unbeatable customer service.</p>
-            <div className={styles.stickerNotice}>
-              <p><strong>A Splash of Fun:</strong> Every GoBike comes shipped with <strong>7 different colour sticker kits</strong>, so your child can customize their ride right out of the box!</p>
+          <div className="text-left">
+            <p className="text-[20px] font-black text-black mb-2.5 uppercase tracking-[1px]">Our Story</p>
+            <h2 className="text-[34px] font-extrabold text-black mb-5 tracking-tight leading-[1.2]">Founded by Two Dads, Fuelled by Fun GoBike</h2>
+            <p className="text-[17px] text-[#333] leading-[1.8] mb-5">Welcome to GoBike! We are a proud Australian brand, founded in 2023 by two mates in the Macarthur Region of NSW. Our journey began from a simple observation: seeing the pure joy on our kids faces as they rode their first electric balance bikes.</p>
+            <p className="text-[17px] text-[#333] leading-[1.8] mb-5">That spark, motivated us to design an even better <strong>kids electric bike</strong> One that elevates their riding experience while giving parents total peace of mind. We are committed to being the <strong>best electric balance bike</strong> brand through top-tier performance, reliability and unbeatable customer service.</p>
+            <div className="bg-[#f0f8ff] border-l-4 border-[#007bff] p-5 rounded-r-lg mb-8">
+              <p className="m-0 text-base text-[#333] leading-[1.6]"><strong>A Splash of Fun:</strong> Every GoBike comes shipped with <strong>7 different colour sticker kits</strong>, so your child can customize their ride right out of the box!</p>
             </div>
-            <Link href="/about" className={styles.storyButton}>Read More About GoBike</Link>
+            <Link href="/about" className="inline-block bg-black text-white py-3 px-8 rounded-full font-semibold text-base transition-transform duration-300 hover:scale-105 no-underline">Read More About GoBike</Link>
           </div>
         </div>
       </div>
@@ -254,90 +265,87 @@ const OurStory = () => {
 }
 
 // ====================================================================
-// SmarterChoice Component ( *** পরিবর্তিত সেকশন *** )
+// SmarterChoice Component
 // ====================================================================
 const choices = [
     { 
       imageSrc: "https://gobikes.au/wp-content/uploads/2025/08/Gobike-kids-electric-bikes-electric-bike-for-kids-ebike-kids-electric-bike-Final-1.webp", 
       width: 1500, height: 1200,
-      label: "A child wearing a helmet, representing GoBike's commitment to safety", 
+      label: "A child wearing a helmet", 
       title: "Safety is Our Foundation", 
       description: "From a gentle, slow-start mode for beginners to responsive, powerful brakes for confident riders, every detail is engineered to keep your child safe on their adventures." 
     },
     { 
       imageSrc: "https://gobikes.au/wp-content/uploads/2025/02/Electric-Balance-Bike-Electric-bike-Balance-Bike-Bike-baby-bike-E-bike-Electric-bike-E-bike-review-Electric-bike-review-Buy-e-bike-Buy-electric-bike-E-bike-price-Electric-bike-price-E-b-scaled-2.webp", 
       width: 2560, height: 1706,
-      label: "A tough GoBike frame, representing durability", 
+      label: "A tough GoBike frame", 
       title: "Built for Real Kids", 
       description: "Kids play hard. We get it. That's why GoBikes are built with durable, high-quality frames and components that can handle bumps, skids, and years of relentless fun."
     },
     { 
       imageSrc: "https://gobikes.au/wp-content/uploads/2025/02/Electric-Balance-Bike-Electric-bike-Balance-Bike-Bike-baby-bike-E-bike-Electric-bike-E-bike-review-Electric-bike-review-Buy-e-bike-Buy-electric-bike-E-bike-price-Electric-bike-price-E-b-1-1-2.webp", 
       width: 1941, height: 1294,
-      label: "A GoBike battery, representing long ride times", 
+      label: "A GoBike battery", 
       title: "More Riding, Less Waiting", 
       description: "Our high-efficiency batteries offer the longest run-times available, so the adventure doesn't have to stop. More time on the bike, less time plugged into the wall."
     },
     { 
       imageSrc: "https://gobikes.au/wp-content/uploads/2025/02/Electric-Balance-Bike-Electric-bike-Balance-Bike-scaled-1.webp", 
       width: 1920, height: 1370,
-      label: "The Australian flag, representing Aussie ownership", 
+      label: "The Australian flag", 
       title: "Aussie Owned & Supported", 
       description: "We're not just a store, we're a team of Aussie parents right here to help. When you need support, you'll get real advice from people who actually use and love the product."
     }
 ];
 
 const SmarterChoice = () => {
-    // পরিবর্তন ১: স্লাইডার কন্টেইনারের জন্য একটি ref তৈরি করা হয়েছে
     const sliderRef = useRef<HTMLDivElement>(null);
 
-    // পরিবর্তন ২: স্ক্রল করার জন্য ফাংশন যোগ করা হয়েছে
     const scroll = (direction: 'left' | 'right') => {
         if (sliderRef.current) {
             const { current } = sliderRef;
-            // প্রতিটি কার্ডের প্রস্থ এবং গ্যাপ অনুযায়ী স্ক্রল করা হবে
             const scrollAmount = direction === 'left' 
-                ? -(current.offsetWidth * 0.9) // একবারে একটি কার্ডের সমান বামে যাবে
-                : (current.offsetWidth * 0.9); // একবারে একটি কার্ডের সমান ডানে যাবে
+                ? -(current.offsetWidth * 0.9) 
+                : (current.offsetWidth * 0.9);
             
             current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
         }
     };
 
   return (
-    <section className={`${styles.gobikeSection} ${styles.smarterChoiceSection} ${styles.sectionFullWidthBreakout}`}>
-      <div className={styles.container1500}>
-        <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Why GoBike is The Smarter Choice</h2>
-          <p className={styles.sectionSubtitle} style={{ color: '#000' }}>When we could not find the best kids electric bike for our own kids, we decided to build it. Every GoBike is a promise of, durability, performance and pure FUN.</p>
+    <section className="py-12 px-2.5 font-sans w-full ml-[calc(50%-50vw)] mr-[calc(50%-50vw)]">
+      <div className="max-w-[1500px] mx-auto px-2.5">
+        <div className="text-center mb-8">
+          <h2 className="text-[32px] font-bold text-[#1a1a1a] mb-3 tracking-tight">Why GoBike is The Smarter Choice</h2>
+          <p className="text-lg text-black max-w-[800px] mx-auto leading-[1.5]">When we could not find the best kids electric bike for our own kids, we decided to build it. Every GoBike is a promise of, durability, performance and pure FUN.</p>
         </div>
 
-        {/* পরিবর্তন ৩: স্লাইডারের মূল কন্টেইনার এবং নেভিগেশন বাটন যোগ করা হয়েছে */}
-        <div className={styles.smarterChoiceSliderContainer}>
-            <div className={styles.smarterChoiceGrid} ref={sliderRef}>
+        <div className="relative px-2.5">
+            {/* Grid / Slider */}
+            <div className="flex lg:grid overflow-x-auto lg:overflow-visible snap-x snap-mandatory scrollbar-none gap-6 lg:grid-cols-4 pb-2.5 lg:pb-0" ref={sliderRef}>
                 {choices.map((choice, index) => (
-                    <div className={styles.choiceCard} key={index}>
-                    <div className={styles.choiceCardImageWrapper}>
-                        <Image
-                        src={choice.imageSrc}
-                        alt={choice.label}
-                        width={choice.width}
-                        height={choice.height}
-                        sizes="(max-width: 767px) 90vw, (max-width: 992px) 50vw, 25vw"
-                        style={{ objectFit: 'cover', width: '100%', height: 'auto' }}
-                        />
-                    </div>
-                    <div className={styles.choiceCardContent}>
-                        <h3 className={styles.choiceCardTitle}>{choice.title}</h3>
-                        <p className={styles.choiceCardDescription}>{choice.description}</p>
-                    </div>
+                    <div className="flex-none w-[90%] lg:w-auto snap-start border border-[#e9e9e9] rounded-xl overflow-hidden bg-[#f8f9fa] flex flex-col transition-all duration-300 hover:-translate-y-2 hover:shadow-lg" key={index}>
+                        <div className="relative w-full bg-[#e0e0e0]">
+                            <Image
+                                src={choice.imageSrc}
+                                alt={choice.label}
+                                width={choice.width}
+                                height={choice.height}
+                                sizes="(max-width: 767px) 90vw, (max-width: 992px) 50vw, 25vw"
+                                style={{ objectFit: 'cover', width: '100%', height: 'auto' }}
+                            />
+                        </div>
+                        <div className="p-6 flex-grow">
+                            <h3 className="text-[1.3rem] font-bold mb-3">{choice.title}</h3>
+                            <p className="text-base text-[#444] leading-[1.6]">{choice.description}</p>
+                        </div>
                     </div>
                 ))}
             </div>
 
-            {/* স্লাইডার নেভিগেশন বাটন */}
-            <button onClick={() => scroll('left')} className={`${styles.smarterChoiceNav} ${styles.prev}`} aria-label="Previous choice">&#10094;</button>
-            <button onClick={() => scroll('right')} className={`${styles.smarterChoiceNav} ${styles.next}`} aria-label="Next choice">&#10095;</button>
+            {/* Navigation Buttons (Visible mostly on Mobile via CSS) */}
+            <button onClick={() => scroll('left')} className="md:hidden flex absolute top-[35%] -translate-y-1/2 left-[-5px] bg-black/60 text-white border-none rounded-full w-[45px] h-[45px] text-xl cursor-pointer z-10 transition-colors hover:bg-black/90 items-center justify-center" aria-label="Previous choice">&#10094;</button>
+            <button onClick={() => scroll('right')} className="md:hidden flex absolute top-[35%] -translate-y-1/2 right-[-5px] bg-black/60 text-white border-none rounded-full w-[45px] h-[45px] text-xl cursor-pointer z-10 transition-colors hover:bg-black/90 items-center justify-center" aria-label="Next choice">&#10095;</button>
         </div>
 
       </div>
@@ -352,35 +360,34 @@ const comparisonData = [
     { feature: "Long Run Time", isGoBike: true, isOthers: false }, { feature: "High Speed / Performance", isGoBike: true, isOthers: false }, { feature: "Slow Learning Mode", isGoBike: true, isOthers: false }, { feature: "Affordability", isGoBike: true, isOthers: false }, { feature: "Most Reliable", isGoBike: true, isOthers: false }, { feature: "Easy Spare Parts", isGoBike: true, isOthers: false }, { feature: "Best Support And Service", isGoBike: true, isOthers: false },
 ];
 
-const TickMark = () => <span className={styles.tickMarkPerfect}>✓</span>;
-const CrossMark = () => <span className={styles.crossMarkPerfect}>✗</span>;
-
 const DifferenceSection = () => {
   return (
-    <section className={styles.gobikeSection} style={{ backgroundColor: '#000', color: '#fff' }}>
-      <div style={{ maxWidth: '1450px', margin: '0 auto' }}>
-        <div className={styles.perfectComparisonSection}>
-          <div style={{ textAlign: 'left' }}>
-            <h2 className={styles.sectionTitle} style={{ color: '#fff', textAlign: 'center' }}>The GoBike Difference</h2>
-            <h3 className={styles.sectionSubtitle} style={{ color: '#fff', textAlign: 'center', fontWeight: 600 }}>Engineered Better. Built Stronger.</h3>
-            <p style={{ fontSize: '17px', lineHeight: 1.7, marginBottom: '20px' }}>While others cut corners, we deliver what matters: the <strong>highest-performance and most reliable kids electric bike</strong> on the market, backed by a <strong>1-year advanced replacement warranty.</strong></p>
-            <p style={{ fontSize: '17px', lineHeight: 1.7, marginBottom: '0px' }}>As a proud Aussie brand founded by two dads, we built the bikes we wanted for our own kids. That is the GoBike promise.</p>
+    <section className="py-12 px-2.5 font-sans bg-black text-white">
+      <div className="max-w-[1450px] mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-12 items-center">
+          <div className="text-left">
+            <h2 className="text-[32px] font-bold text-white mb-3 tracking-tight text-center">The GoBike Difference</h2>
+            <h3 className="text-[18px] text-white mt-0 max-w-[800px] mx-auto leading-[1.5] text-center font-semibold mb-3">Engineered Better. Built Stronger.</h3>
+            <p className="text-[17px] leading-[1.7] mb-5">While others cut corners, we deliver what matters: the <strong>highest-performance and most reliable kids electric bike</strong> on the market, backed by a <strong>1-year advanced replacement warranty.</strong></p>
+            <p className="text-[17px] leading-[1.7] mb-0">As a proud Aussie brand founded by two dads, we built the bikes we wanted for our own kids. That is the GoBike promise.</p>
           </div>
           <div>
-            <table className={styles.perfectComparisonTable}>
+            <table className="w-full border-collapse bg-white rounded-2xl overflow-hidden shadow-[0_15px_30px_rgba(255,255,255,0.1)]">
               <thead>
                 <tr>
-                  <th style={{ backgroundColor: 'transparent', borderColor: '#333' }}></th>
-                  <th style={{ borderColor: '#333' }}><Image src="https://gobikes.au/wp-content/uploads/2025/06/GOBIKE-Electric-Bike-for-kids-1.webp" width={1880} height={410} alt="GoBike Logo" style={{ maxHeight: '40px', display: 'inline-block' }} /></th>
-                  <th style={{ color: '#000', borderColor: '#333' }}>Others</th>
+                  <th className="bg-transparent border-b border-[#101010] p-1 md:p-4"></th>
+                  <th className="border-b border-[#101010] p-1 md:p-4">
+                    <Image src="https://gobikes.au/wp-content/uploads/2025/06/GOBIKE-Electric-Bike-for-kids-1.webp" width={1880} height={410} alt="GoBike Logo" className="max-h-[40px] inline-block w-auto" />
+                  </th>
+                  <th className="text-black border-b border-[#101010] p-1 md:p-4 text-base font-semibold">Others</th>
                 </tr>
               </thead>
               <tbody>
                 {comparisonData.map((item, index) => (
-                  <tr key={index}>
-                    <td>{item.feature}</td>
-                    <td className={styles.gobikeColPerfect}>{item.isGoBike ? <TickMark /> : <CrossMark />}</td>
-                    <td>{item.isOthers ? <TickMark /> : <CrossMark />}</td>
+                  <tr key={index} className="last:border-none">
+                    <td className="p-1 md:p-4 text-center border-b border-[#101010] text-[#1a1a1a] text-left font-medium text-sm md:text-base">{item.feature}</td>
+                    <td className="p-1 md:p-4 text-center border-b border-[#101010] bg-[#ff0] rounded-lg">{item.isGoBike ? <TickMark /> : <CrossMark />}</td>
+                    <td className="p-1 md:p-4 text-center border-b border-[#101010]">{item.isOthers ? <TickMark /> : <CrossMark />}</td>
                   </tr>
                 ))}
               </tbody>
@@ -397,18 +404,18 @@ const DifferenceSection = () => {
 // ====================================================================
 const CommunitySection = () => {
   return (
-    <section className={styles.gobikeSection} style={{ backgroundColor: '#f8f9fa' }}>
-      <div style={{ maxWidth: '1450px', margin: '0 auto' }}>
-        <div className={styles.finalCommunityGrid}>
-          <div className={styles.communityImage}>
-            <Image loading="lazy" src="https://gobikes.au/wp-content/uploads/2025/08/electric-bike-ebike-for-kids-1.webp" alt="A diverse group of happy kids and families, representing the GoBike community" width={2199} height={2560} sizes="(max-width: 768px) 100vw, 50vw" />
+    <section className="py-12 px-2.5 font-sans bg-[#f8f9fa]">
+      <div className="max-w-[1450px] mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-10 lg:gap-20 items-center p-2.5">
+          <div className="w-full">
+            <Image loading="lazy" src="https://gobikes.au/wp-content/uploads/2025/08/electric-bike-ebike-for-kids-1.webp" alt="GoBike community" width={2199} height={2560} sizes="(max-width: 768px) 100vw, 50vw" className="w-full h-auto block rounded-2xl" />
           </div>
-          <div className={styles.finalCommunityText}>
-            <h2 className={styles.communityTitle}>More Than a Bike - It is The GoBike Family</h2>
-            <p className={styles.communityDescription}>At GoBike, our passion is creating unforgettable riding experiences. We did not just set out to sell another kids ebike, we aimed to design the <strong>best electric bike for kids</strong> in Australia, ensuring a fun-filled adventure for them and a stress-free experience for parents.</p>
-            <p className={styles.communityDescription}>Every <strong>electric balance bike</strong> we create is a blend of fun, reliability, and safety. By choosing GoBike, you’re not just getting a top-quality <strong>kids electric motorbike</strong>; you’re joining a community that values adventure and family bonding.</p>
-            <p className={styles.communityCtaText}>Create lasting memories and join the adventure today!</p>
-            <Link href="/bikes" className={styles.btnPrimary}>Join The Community</Link>
+          <div className="text-center">
+            <h2 className="text-[32px] font-extrabold text-black mb-5 tracking-tight leading-[1.2]">More Than a Bike - It is The GoBike Family</h2>
+            <p className="text-[17px] text-[#333] leading-[1.8] mb-6 max-w-[700px] mx-auto text-left">At GoBike, our passion is creating unforgettable riding experiences. We did not just set out to sell another kids ebike, we aimed to design the <strong>best electric bike for kids</strong> in Australia, ensuring a fun-filled adventure for them and a stress-free experience for parents.</p>
+            <p className="text-[17px] text-[#333] leading-[1.8] mb-6 max-w-[700px] mx-auto text-left">Every <strong>electric balance bike</strong> we create is a blend of fun, reliability, and safety. By choosing GoBike, you’re not just getting a top-quality <strong>kids electric motorbike</strong>; you’re joining a community that values adventure and family bonding.</p>
+            <p className="text-[18px] text-black font-semibold mb-8">Create lasting memories and join the adventure today!</p>
+            <Link href="/bikes" className="inline-block bg-black text-white py-3.5 px-9 rounded-full font-bold text-base border-2 border-transparent transition-all duration-300 hover:bg-white hover:text-black hover:border-black">Join The Community</Link>
           </div>
         </div>
       </div>
@@ -422,143 +429,97 @@ const CommunitySection = () => {
 interface YouTubePlayerProps { youtubeId: string; thumbnailUrl: string; }
 
 function YouTubePlayer({ youtubeId, thumbnailUrl }: YouTubePlayerProps) {
-    'use client';
     const [showVideo, setShowVideo] = useState(false);
-    
-    // --- কার্যকরী সমাধান: Intersection Observer ব্যবহার করা হচ্ছে ---
     const [isIntersecting, setIntersecting] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
             ([entry]) => {
-                // যখন এলিমেন্টটি স্ক্রিনে আসবে, তখন isIntersecting-কে true করে দাও
                 if (entry.isIntersecting) {
                     setIntersecting(true);
-                    // একবার লোড হয়ে গেলে আর নিরীক্ষণ করার প্রয়োজন নেই
                     observer.unobserve(entry.target);
                 }
             },
-            {
-                // স্ক্রিনে আসার আগেই লোড শুরু করার জন্য
-                rootMargin: "50px",
-            }
+            { rootMargin: "50px" }
         );
 
         const currentRef = ref.current;
+        if (currentRef) observer.observe(currentRef);
 
-    if (currentRef) {
-        observer.observe(currentRef);
-    }
-
-    // --- সমাধান: cleanup ফাংশনের ভেতরে এখন নিরাপদ ভেরিয়েবলটি ব্যবহার করা হচ্ছে ---
-    return () => {
-        if (currentRef) {
-            observer.unobserve(currentRef);
-        }
-    };
-}, []);
-    // -----------------------------------------------------------------
+        return () => { if (currentRef) observer.unobserve(currentRef); };
+    }, []);
 
     if (showVideo) {
         return (
-            <div className={styles.lazyYoutubeFacade} style={{ aspectRatio: '16/9' }}>
-                <iframe src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1`} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+            <div className="relative block bg-cover bg-center rounded-2xl overflow-hidden cursor-pointer shadow-xl aspect-video">
+                <iframe className="absolute top-0 left-0 w-full h-full border-0" src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1`} title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
             </div>
         );
     }
 
     return (
         <div 
-            ref={ref} // <-- ref যোগ করা হয়েছে
-            className={styles.lazyYoutubeFacade} 
+            ref={ref} 
+            className="relative block bg-cover bg-center rounded-2xl overflow-hidden cursor-pointer shadow-xl aspect-video group" 
             onClick={() => setShowVideo(true)} 
-            // --- শুধুমাত্র isIntersecting=true হলেই backgroundImage লোড হবে ---
             style={{ 
-                aspectRatio: '16/9', 
                 backgroundImage: isIntersecting ? `url('${thumbnailUrl}')` : 'none',
-                backgroundColor: isIntersecting ? 'transparent' : '#e0e0e0' // লোড হওয়ার আগে একটি প্লেসহোল্ডার রঙ
+                backgroundColor: isIntersecting ? 'transparent' : '#e0e0e0' 
             }}
         >
-            {isIntersecting && <div className={styles.playIcon}></div>}
+            <div className="absolute inset-0 bg-black/20"></div>
+            {isIntersecting && (
+                <div className="w-20 h-14 bg-black/70 rounded-xl absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-200 flex items-center justify-center group-hover:scale-110 group-hover:bg-red-600/80">
+                    <div className="w-0 h-0 border-y-[12px] border-y-transparent border-l-[20px] border-l-white ml-1"></div>
+                </div>
+            )}
         </div>
     );
-} 
-// ====================================================================
-// VideoReviews Component (Updated with Slider Functionality)
-// ====================================================================
+}
+
 const VideoReviews = () => {
     const sliderRef = useRef<HTMLDivElement>(null);
-
     const videoData = [
-        {
-            youtubeId: "Fl8jEUxS_LU", 
-            thumbnailUrl: "https://i.ytimg.com/vi/Fl8jEUxS_LU/maxresdefault.jpg",
-            title: "Unboxing & First Ride: The GoBike 12 Experience",
-            description: "From first rides to pro-level tricks, our video reviews showcase the real-world performance and unbeatable fun of our kids electric bikes. See them in action!"
-        },
-        {
-            youtubeId: "BARebHNa3lY",
-            thumbnailUrl: "https://i.ytimg.com/vi/BARebHNa3lY/maxresdefault.jpg",
-            title: "GoBike 16: From Parks to Trails",
-            description: "A deep-dive review showing the GoBike 16 versatility and power on different terrains."
-        },
-        {
-            youtubeId: "CIevuTbyTlY",
-            thumbnailUrl: "https://i.ytimg.com/vi/CIevuTbyTlY/maxresdefault.jpg",
-            title: "Parents Guide: Choosing The Right GoBike",
-            description: "Confused between models? This helpful guide breaks down the features of each GoBike."
-        },
-        // --- প্রয়োজনে আরও ভিডিও যোগ করতে পারেন ---
-      
+        { youtubeId: "Fl8jEUxS_LU", thumbnailUrl: "https://i.ytimg.com/vi/Fl8jEUxS_LU/maxresdefault.jpg", title: "Unboxing & First Ride: The GoBike 12 Experience", description: "From first rides to pro-level tricks, our video reviews showcase the real-world performance and unbeatable fun." },
+        { youtubeId: "BARebHNa3lY", thumbnailUrl: "https://i.ytimg.com/vi/BARebHNa3lY/maxresdefault.jpg", title: "GoBike 16: From Parks to Trails", description: "A deep-dive review showing the GoBike 16 versatility and power on different terrains." },
+        { youtubeId: "CIevuTbyTlY", thumbnailUrl: "https://i.ytimg.com/vi/CIevuTbyTlY/maxresdefault.jpg", title: "Parents Guide: Choosing The Right GoBike", description: "Confused between models? This helpful guide breaks down the features of each GoBike." },
     ];
 
     const scroll = (direction: 'left' | 'right') => {
         if (sliderRef.current) {
             const { current } = sliderRef;
-            // প্রতিটি স্লাইডের প্রস্থ গণনা করা হচ্ছে (গ্যাপ সহ)
-            const slideWidth = current.children[0].clientWidth + 30; // 30px is the gap
+            const slideWidth = current.children[0].clientWidth + 30; 
             const scrollAmount = direction === 'left' ? -slideWidth : slideWidth;
             current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
         }
     };
 
     return (
-        <section className={`${styles.gobikeSection} ${styles.videoSection}`} style={{ backgroundColor: '#f8f9fa' }}>
-            <div className={styles.sectionHeader}>
-                <h2 className={styles.sectionTitle}>See Why Parents & Kids Love The GoBike</h2>
-                <p className={styles.sectionSubtitle} style={{ color: '#1a1a1a' }}>From first rides to pro-level tricks, our video reviews showcase the real-world performance and unbeatable fun of our kids electric bikes. See them in action!</p>
+        <section className="py-12 px-2.5 font-sans bg-[#f8f9fa]">
+            <div className="text-center mb-8">
+                <h2 className="text-[32px] font-bold text-[#1a1a1a] mb-3 tracking-tight">See Why Parents & Kids Love The GoBike</h2>
+                <p className="text-lg text-[#1a1a1a] max-w-[800px] mx-auto leading-[1.5]">From first rides to pro-level tricks, our video reviews showcase the real-world performance and unbeatable fun of our kids electric bikes. See them in action!</p>
             </div>
-            {/* --- প্রধান ভিডিওটি আগের মতোই থাকবে --- 
-            <div className={styles.videoMainWrapper}>
-                <YouTubePlayer youtubeId="Fl8jEUxS_LU" thumbnailUrl="https://i.ytimg.com/vi/Fl8jEUxS_LU/maxresdefault.jpg" />
-                <div className={styles.videoCaption}>
-                    <h3 className={styles.videoCaptionTitle}>Unboxing & First Ride: The GoBike 12 Experience</h3>
-                    <p className={styles.videoCaptionDescription}>Watch how easy it is to assemble the GoBike 12 and see a 3- year -olds real-time reaction on his first-ever electric bike ride.</p>
-                </div>
-            </div>*/}
-
-            {/* --- ভিডিও গ্রিডের পরিবর্তে নতুন স্লাইডার সেকশন --- */}
-            <div className={styles.videoSliderContainer}>
-                <div className={styles.videoSlider} ref={sliderRef}>
+            <div className="max-w-[1500px] mx-auto px-0.5 relative">
+                <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-none gap-[30px]" ref={sliderRef}>
                     {videoData.map((video, index) => (
-                        <div className={styles.videoSlide} key={index}>
+                        <div className="flex-none w-[95%] md:w-[48%] snap-start box-border" key={index}>
                             <YouTubePlayer youtubeId={video.youtubeId} thumbnailUrl={video.thumbnailUrl} />
-                            <div className={styles.videoCaption}>
-                                <h3 className={styles.videoCaptionTitle}>{video.title}</h3>
-                                <p className={styles.videoCaptionDescription}>{video.description}</p>
+                            <div className="mt-6 text-center">
+                                <h3 className="text-[22px] font-bold text-[#1a1a1a] mb-1.5">{video.title}</h3>
+                                <p className="text-base text-black m-0 leading-[1.6] max-w-[600px] mx-auto">{video.description}</p>
                             </div>
                         </div>
                     ))}
                 </div>
-                {/* স্লাইডার নেভিগেশন বাটন */}
-                <button onClick={() => scroll('left')} className={`${styles.sliderNav} ${styles.prev}`} aria-label="Previous video">&#10094;</button>
-                <button onClick={() => scroll('right')} className={`${styles.sliderNav} ${styles.next}`} aria-label="Next video">&#10095;</button>
+                <button onClick={() => scroll('left')} className="absolute top-[40%] -translate-y-1/2 -left-[5px] bg-black/60 text-white border-none rounded-full w-[45px] h-[45px] text-xl cursor-pointer z-10 transition-colors hover:bg-black/90 flex items-center justify-center">&#10094;</button>
+                <button onClick={() => scroll('right')} className="absolute top-[40%] -translate-y-1/2 -right-[5px] bg-black/60 text-white border-none rounded-full w-[45px] h-[45px] text-xl cursor-pointer z-10 transition-colors hover:bg-black/90 flex items-center justify-center">&#10095;</button>
             </div>
         </section>
     );
 }
-     
+      
 // ====================================================================
 // FaqSection Component
 // ====================================================================
@@ -572,128 +533,67 @@ const faqs = [
 
 const FaqSection = () => {
   return (
-    <section className={styles.gobikeSection}>
-      <div className={styles.premiumFaqContainer}>
-        <h2 className={styles.premiumFaqHeader}>Got Questions About Kids e-Bikes? We Have the Answers.</h2>
-        <p className={styles.premiumFaqIntro}>Got questions about the <strong>best kids electric bike</strong>? We have answered the most common ones below to help you choose the perfect GoBike for your child in Australia.</p>
+    <section className="py-12 px-2.5 font-sans">
+      <div className="max-w-[1500px] mx-auto px-2.5">
+        <h2 className="text-center mb-9 text-[#1a202c] font-sans text-[32px] font-semibold">Got Questions About Kids e-Bikes? We Have the Answers.</h2>
+        <p className="font-sans text-center text-[17px] text-[#4a5568] max-w-[650px] mx-auto -mt-4 mb-10 leading-[1.6]">Got questions about the <strong>best kids electric bike</strong>? We have answered the most common ones below to help you choose the perfect GoBike for your child in Australia.</p>
         
         {faqs.map((faq, index) => (
-          <details className={styles.premiumFaqItem} key={index}>
-            <summary className={styles.premiumFaqQuestion}>
+          <details className="group bg-white mb-4 rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-[#e2e8f0] transition-shadow duration-300 hover:shadow-[0_6px_25px_rgba(0,0,0,0.08)]" key={index}>
+            <summary className="w-full p-6 bg-transparent border-none text-left font-sans text-[18px] font-medium text-[#2d3748] cursor-pointer flex justify-between items-center group-open:text-[#0056b3]">
               <span>{faq.question}</span>
-              <span className={styles.faqIcon}>&gt;</span>
+              <span className="text-xl font-bold text-[#007bff] transition-transform duration-300 group-open:rotate-90">&gt;</span>
             </summary>
-            <div className={styles.premiumFaqAnswer}>
+            <div className="px-6 pb-6 overflow-hidden transition-all duration-400 ease-in-out text-[#4a5568] text-base leading-[1.7]">
               <p dangerouslySetInnerHTML={{ __html: faq.answer }}></p>
             </div>
           </details>
         ))}
         
-        <div className={styles.premiumFaqButtonContainer}>
-          <Link href="/faq" className={styles.premiumFaqButton}>View All FAQs</Link>
+        <div className="text-center mt-10">
+          <Link href="/faq" className="inline-block py-3.5 px-8 bg-black text-white font-sans text-base font-medium no-underline rounded-full transition-all duration-300 hover:text-white hover:-translate-y-1">View All FAQs</Link>
         </div>
       </div>
     </section>
   );
 }
 
-/*// ====================================================================
-// BlogSection Component
 // ====================================================================
-const blogPosts = [
-    { link: "/blog/gobike-maintenance-tips", imageSrc: "https://gobikes.au/wp-content/uploads/2025/08/Gobike-kids-electric-bike-ebike-for-kids-2-scaled-1.webp", altText: "A child standing with a GoBike 14, representing the future of fun for kids electric balance bikes", badge: "Buyer's Guide", title: "Electric Bikes: The Future of Fun for Aussie Kids?", excerpt: "Is an electric balance bike the right choice for your child? We break down the benefits, from safety features to building confidence." },
-    { link: "/blog/ebike-battery-care-tips", imageSrc: "https://gobikes.au/wp-content/uploads/2025/02/Electric-Balance-Bike-Electric-bike-Balance-Bike-Bike-baby-bikes-1-scaled.webp", altText: "A young child having outdoor fun on a GoBike electric balance bike, revolutionizing their playtime", badge: "Tips & Tricks", title: "Revolutionizing Kid's Outdoor Fun: The GoBike Guide", excerpt: "Discover how a GoBike can transform your child's outdoor playtime, encouraging adventure and developing crucial motor skills." },
-    { link: "/blog", imageSrc: "https://gobikes.au/wp-content/uploads/2025/08/Gobike-kids-electric-bike-ebike-for-kids-5-scaled-1.webp", altText: "A child giving a thumbs up on a GoBike, an eco-friendly ride for all ages", badge: "Lifestyle", title: "A Fun and Eco-Friendly Ride for the Whole Family", excerpt: "Learn why electric bikes are a fantastic, eco-friendly way for kids and teens to stay active and explore their world." }
-];
-
-const BlogSection = () => {
-  return (
-    <section className={styles.seoBlogSection}>
-      <div className={styles.container1500}>
-        <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>GoBike Guides & Pro Tips with Latest Blog</h2>
-          <p className={styles.sectionSubtitle} style={{ color: '#000' }}>From safety guides to choosing the right size, our blog is packed with expert advice to help you and your child get the most out of your ebike adventure.</p>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
-          {blogPosts.map((post, index) => (
-            <Link href={post.link} className={styles.seoBlogCard} key={index}>
-              <div className={styles.seoBlogImageWrapper}>
-                <Image loading="lazy" src={post.imageSrc} alt={post.altText} width={2560} height={1850} sizes="(max-width: 768px) 100vw, 33vw" />
-                <span className={styles.seoBlogBadge}>{post.badge}</span>
-              </div>
-              <div className={styles.seoBlogContent}>
-                <h3 className={styles.seoBlogTitle}>{post.title}</h3>
-                <p className={styles.seoBlogExcerpt}>{post.excerpt}</p>
-                <span className={styles.seoBlogReadMore}>Read The Full Story »</span>
-              </div>
-            </Link>
-          ))}
-        </div>
-        <div className={styles.viewAllButtonContainer}>
-          <Link href="/blog" className={styles.btnPrimary}>View All Posts</Link>
-        </div>
-      </div>
-    </section>
-  );
-}
-*/
+// Main Page Component
 // ====================================================================
-// Main Home Page Component
-// ====================================================================
-
 export default function HomePageClient() {
   return (
     <>
       <HeroSlider />
       <TrustBadges />
       
-      <div className={styles.sectionDividerWrapper}>
-        <hr className={styles.sectionDivider} />
-      </div>
+      <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
       <ProductCollection />
       
-      <div className={styles.sectionDividerWrapper}>
-        <hr className={styles.sectionDivider} />
-      </div>
+      <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
       <OurStory />
       
-      <div className={styles.sectionDividerWrapper}>
-        <hr className={styles.sectionDivider} />
-      </div>
+      <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
       <SmarterChoice />
       
-      <div className={styles.sectionDividerWrapper}>
-        <hr className={styles.sectionDivider} />
-      </div>
+      <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
       <FeaturedBikes />
       
-      <div className={styles.sectionDividerWrapper}>
-        <hr className={styles.sectionDivider} />
-      </div>
+      <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
       <DifferenceSection />
 
-      {/* --- সমাধান: প্রতিটি সেকশন এখন তার নিজের জায়গায় --- */}
       <CommunitySection />
       
-      <div className={styles.sectionDividerWrapper}>
-        <hr className={styles.sectionDivider} />
-      </div>
+      <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
       <HomePageReviews />
 
-      <div className={styles.sectionDividerWrapper}>
-        <hr className={styles.sectionDivider} />
-      </div>
+      <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
       <VideoReviews />
 
-      <div className={styles.sectionDividerWrapper}>
-        <hr className={styles.sectionDivider} />
-      </div>
+      <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
       <FaqSection />
       
-      <div className={styles.sectionDividerWrapper}>
-        <hr className={styles.sectionDivider} />
-      </div>
-      {/*<BlogSection />*/}
+      <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
     </>
   );
 }

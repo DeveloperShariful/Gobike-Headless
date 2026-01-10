@@ -14,15 +14,22 @@ const faqData = [
 
 export default function FaqSection() {
   return (
-    <section className={styles.sectionContainer}>
-      <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>Your Questions Answered</h2>
+    // .sectionContainer & .coloredBackground replaced
+    <section className="w-full py-12 px-[5%] md:px-[1%] box-border bg-[#f7fafc]">
+      {/* .sectionHeader (Special case for FAQ centered) replaced */}
+      <div className="flex justify-center items-center mx-auto mb-10 max-w-[800px]">
+        {/* .sectionTitle replaced */}
+        <h2 className="text-[1.5rem] md:text-[2rem] font-bold text-[#1a202c] text-center">Frequently Asked Questions</h2>
       </div>
+      
       <Accordion items={faqData} />
-      <div className={styles.seeMoreContainer}>
+      
+      {/* .seeMoreContainer replaced */}
+      <div className="mt-10 flex justify-center w-full">
         <Link 
-          href="/faq" // <-- পরিবর্তন: এখন এটি একটি ইন্টারনাল পাথ
-          className={styles.seeMoreButton}
+          href="/faq" 
+          // .seeMoreButton replaced
+          className="inline-block py-3 px-7 bg-black text-white text-center font-semibold rounded-lg transition-all duration-300 ease-in-out border border-transparent hover:bg-[#333] hover:-translate-y-0.5"
         >
           See More FAQs
         </Link>

@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import styles from './SearchOverlay.module.css';
+// import styles from './SearchOverlay.module.css'; // CSS Module সরানো হয়েছে
 import { IoClose } from 'react-icons/io5';
 import Image from 'next/image';
 
@@ -71,38 +71,63 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
   }, [searchTerm]);
 
   return (
-    // এখানে overlay-এর onClick ইভেন্টটি যুক্ত করা হয়েছে, যা কন্টেইনারের বাইরের অংশে ক্লিক করলে ওভারলে বন্ধ করবে
-    <div className={styles.overlay} onClick={onClose}> 
-      <button className={styles.closeButton} onClick={onClose}>
+    // .overlay replaced
+    <div 
+        className="fixed inset-0 w-full h-full bg-white/95 z-[10000] flex justify-center pt-[5vh] backdrop-blur-[5px]" 
+        onClick={onClose}
+    > 
+      {/* .closeButton replaced */}
+      <button 
+        className="absolute top-4 right-4 bg-transparent border-none cursor-pointer text-[#555] p-2 hover:text-black transition-colors" 
+        onClick={onClose}
+      >
         <IoClose size={40} />
       </button>
 
-      {/* searchContainer-এ onClick দিয়ে ইভেন্ট বাবলিং বন্ধ করা হয়েছে */}
-      <div className={styles.searchContainer} onClick={(e) => e.stopPropagation()}>
+      {/* .searchContainer replaced */}
+      <div 
+        className="w-full max-w-[600px] relative h-fit px-4" 
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* .searchInput replaced */}
         <input
           type="text"
-          className={styles.searchInput}
+          className="w-full p-4 text-[1.8rem] border-none border-b-2 border-[#ccc] bg-transparent outline-none focus:border-[#333]"
           placeholder="Search for products..."
           autoFocus
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <div className={styles.resultsContainer}>
-          {loading && <p>Searching...</p>}
+        
+        {/* .resultsContainer replaced */}
+        <div className="mt-8 max-h-[70vh] overflow-y-auto">
+          {loading && <p className="text-gray-500">Searching...</p>}
           {!loading && results.length > 0 && (
-            <ul>
+            <ul className="list-none p-0 m-0">
               {results.map(product => (
                 <li key={product.id}>
-                  <Link href={`/product/${product.slug}`} onClick={onClose}>
-                    <Image src={product.image?.sourceUrl || '/placeholder.png'} alt={product.name} width={50} height={50}  />
-                    <span>{product.name}</span>
+                  <Link 
+                    href={`/product/${product.slug}`} 
+                    onClick={onClose}
+                    // .resultsContainer li a replaced
+                    className="flex items-center p-4 no-underline text-[#333] rounded-lg transition-colors duration-200 ease-in-out hover:bg-[#f0f0f0]"
+                  >
+                    <Image 
+                        src={product.image?.sourceUrl || '/placeholder.png'} 
+                        alt={product.name} 
+                        width={50} 
+                        height={50}  
+                        // .resultsContainer img replaced
+                        className="w-[50px] h-[50px] object-cover mr-4 rounded"
+                    />
+                    <span className="font-medium text-lg">{product.name}</span>
                   </Link>
                 </li>
               ))}
             </ul>
           )}
           {!loading && results.length === 0 && searchTerm.length >= 3 && (
-            <p>No products found for “{searchTerm}”</p>
+            <p className="text-gray-500 text-lg">No products found for “{searchTerm}”</p>
           )}
         </div>
       </div>

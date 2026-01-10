@@ -1,17 +1,13 @@
 // ফাইল পাথ: app/product/custom-sections/Gobike-24/PowerSection.tsx
 import TextWithImage from '../../components/TextWithImage/TextWithImage';
-import styles from '../GobikeSections.module.css';
-
-const wrapperStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '4rem',
-} as const;
+// import styles from '../GobikeSections.module.css'; // CSS Module সরানো হয়েছে
 
 export default function PowerSection() {
   return (
-    <section className={`${styles.sectionContainer} ${styles.coloredBackground}`}>
-      <div style={wrapperStyle}>
+    // .sectionContainer & .coloredBackground replaced
+    <section className="w-full py-12 px-[5%] md:px-[1%] box-border bg-[#f7fafc]">
+      {/* wrapperStyle replaced */}
+      <div className="flex flex-col gap-16">
       
         {/* Section 1: 1500W Power */}
         <TextWithImage

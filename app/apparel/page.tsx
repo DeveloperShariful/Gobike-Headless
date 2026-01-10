@@ -1,13 +1,11 @@
-//app/bikes/page.tsx (or app/apparel/page.tsx)
+// app/apparel/page.tsx
+
 import { gql } from '@apollo/client';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
-
-// --- সমাধান: সঠিক ফাইল থেকে getClient import করা হচ্ছে ---
 import { getClient } from '../../lib/apollo-rsc-client';
-
-import styles from './ApparelPage.module.css';
+// import styles from './ApparelPage.module.css'; // CSS Module সরানো হয়েছে
 import ProductCard from '../products/ProductCard';
 import PaginationControls from '../products/PaginationControls';
 import Breadcrumbs from '../../components/Breadcrumbs';
@@ -50,7 +48,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title,
     description,
     alternates: {
-      canonical: '/apparel', // Changed from /bikes to /apparel assuming the route changed
+      canonical: '/apparel',
     },
     openGraph: {
       title: title,
@@ -162,13 +160,6 @@ export default async function ApparelPage({ searchParams }: {
           '@type': 'Brand',
           'name': 'GoBike'
         },
-        ...(product.reviewCount && product.reviewCount > 0 && {
-          'aggregateRating': {
-            '@type': 'AggregateRating',
-            'ratingValue': product.averageRating || 5,
-            'reviewCount': product.reviewCount
-          }
-        }),
         'offers': {
           '@type': 'Offer',
           'priceCurrency': 'AUD',
@@ -190,16 +181,21 @@ export default async function ApparelPage({ searchParams }: {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Breadcrumbs pageTitle="GoBike T-Shirts & Apparel" />
-      <div className={styles.pageContainer}>
+      
+      {/* Container with Tailwind */}
+      <div className="max-w-[1300px] mx-auto px-1.5 font-sans">
         
-        <header className={styles.header}>
-          <div className={styles.heroContent}>
-            <h1 className={styles.heroTitle}>Ride in Style with Official GoBike T-Shirts</h1>
-            <p className={styles.heroSubtitle}>
+        {/* Header / Hero Section */}
+        <header className="flex flex-col md:flex-row items-center gap-6 md:gap-12 mb-8 md:mb-12 bg-gray-50 rounded-lg md:rounded-xl p-4 md:p-12">
+          <div className="flex-1 text-center md:text-left w-full">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-3 md:mb-4 leading-tight">
+              Ride in Style with Official GoBike T-Shirts
+            </h1>
+            <p className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto md:mx-0">
               Complete the look! Our premium cotton T-shirts are designed for comfort, durability, and cool kids who love their electric bikes. Wear the adventure.
             </p>
           </div>
-          <div className={styles.heroImageContainer}>
+          <div className="flex-1 w-full max-w-[580px]">
               {/* TODO: Update src to an actual T-Shirt image URL */}
               <Image 
                   src="https://gobikes.au/wp-content/uploads/2025/09/Gobike-kids-electric-bike-ebike-for-kids-scaled.webp"
@@ -207,57 +203,89 @@ export default async function ApparelPage({ searchParams }: {
                   width={600}
                   height={600}
                   priority={true}
-                  className={styles.heroImage}
+                  className="w-full h-auto object-cover rounded-lg shadow-lg hover:scale-105 transition-transform duration-300"
               />
           </div>
         </header>
 
-        <main className={styles.productsGridContainer}>
+        {/* Products Grid */}
+        <main className="mb-16">
           {products.length > 0 ? (
-            <div className={styles.grid}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
               {products.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
           ) : (
-            <p>No apparel found.</p>
+            <p className="text-center text-gray-500 text-xl py-10">No apparel found.</p>
           )}
-          <PaginationControls pageInfo={pageInfo} basePath="/apparel" />
+          
+          <div className="mt-10 flex justify-center">
+            <PaginationControls pageInfo={pageInfo} basePath="/apparel" />
+          </div>
         </main>
 
-        <section className={styles.whyChooseUs}>
-          <div className={styles.whyChooseUsImage}>
+        {/* Why Choose Us Section */}
+        <section className="flex flex-col md:flex-row items-center gap-8 md:gap-16 bg-white border border-gray-100 rounded-lg md:rounded-xl p-4 py-8 md:p-10 shadow-sm mb-12 md:mb-16">
+          <div className="w-full md:w-1/2 flex justify-center">
                {/* TODO: Update src to an actual T-Shirt detail image URL */}
                <Image 
                   src="https://gobikes.au/wp-content/uploads/2025/08/Gobike-kids-electric-bike-ebike-for-kids-4-scaled-1.webp"
                   alt="Premium fabric quality of GoBike t-shirts"
                   width={500}
                   height={500}
-                  className={styles.sectionImage}
+                  className="w-full max-w-[450px] h-auto object-contain rounded-lg"
               />
           </div>
-          <div className={styles.whyChooseUsContent}>
-              <h2>Designed for Comfort, Built for Style.</h2>
-              <p>GoBike apparel isn&apos;t just merchandise; it&apos;s quality clothing made for active kids. Soft, breathable, and ready for any outdoor adventure.</p>
-              <ul>
+          <div className="w-full md:w-1/2">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+                Designed for Comfort, Built for Style.
+              </h2>
+              <p className="text-base text-gray-600 mb-6 leading-relaxed">
+                GoBike apparel isn&apos;t just merchandise; it&apos;s quality clothing made for active kids. Soft, breathable, and ready for any outdoor adventure.
+              </p>
+              <ul className="space-y-3 mb-8 text-gray-700 text-sm md:text-base list-disc list-inside marker:text-green-600">
                   <li><strong>Premium Cotton Blend:</strong> Soft on the skin, perfect for all-day wear while riding or playing.</li>
                   <li><strong>Durable Prints:</strong> High-quality logos and designs that withstand wash after wash.</li>
                   <li><strong>Breathable Fit:</strong> Keeps your child cool and comfortable during active play.</li>
                   <li><strong>Machine Washable:</strong> Easy to clean after a muddy day on the tracks.</li>
               </ul>
-               <Link href="/about" className={styles.secondaryButton}>About Our Brand</Link>
+               <Link 
+                href="/about" 
+                className="inline-block bg-gray-900 text-white font-semibold py-3 px-8 rounded-md hover:bg-gray-700 transition-colors w-full md:w-auto text-center"
+               >
+                About Our Brand
+               </Link>
           </div>
         </section>
 
-        <section className={styles.seoBottomSection}>
-          <h2>Wear Your Passion</h2>
-          <p>
+        {/* SEO Bottom Section */}
+        <section className="text-center bg-gray-50 rounded-xl p-8 md:p-12 mb-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Wear Your Passion
+          </h2>
+          <p className="text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed">
             At GoBike, we believe riding is a lifestyle. Our exclusive T-shirt collection allows young riders to show off their passion for electric bikes even when they are off the track. Join the GoBike family and gear up with the coolest apparel in Australia.
           </p>
-          <div className={styles.internalLinks}>
-            <Link href="/bikes" className={styles.internalLink}>Shop Electric Bikes</Link>
-            <Link href="/spare-parts" className={styles.internalLink}>Shop Spare Parts</Link>
-            <Link href="/contact" className={styles.internalLink}>Contact Support</Link>
+          <div className="flex flex-wrap justify-center gap-4 md:gap-6 mt-8">
+            <Link 
+              href="/bikes" 
+              className="px-8 py-3 bg-white text-gray-800 font-bold rounded-full border border-gray-200 shadow-sm hover:shadow-lg hover:border-blue-600 hover:text-blue-600 hover:-translate-y-0.5 transition-all duration-300"
+            >
+              Shop Electric Bikes
+            </Link>
+            <Link 
+              href="/spare-parts" 
+              className="px-8 py-3 bg-white text-gray-800 font-bold rounded-full border border-gray-200 shadow-sm hover:shadow-lg hover:border-blue-600 hover:text-blue-600 hover:-translate-y-0.5 transition-all duration-300"
+            >
+              Shop Spare Parts
+            </Link>
+            <Link 
+              href="/contact" 
+              className="px-8 py-3 bg-white text-gray-800 font-bold rounded-full border border-gray-200 shadow-sm hover:shadow-lg hover:border-blue-600 hover:text-blue-600 hover:-translate-y-0.5 transition-all duration-300"
+            >
+              Contact Support
+            </Link>
           </div>
         </section>
       </div>

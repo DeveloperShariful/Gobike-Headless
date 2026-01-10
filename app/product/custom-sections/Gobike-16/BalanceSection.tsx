@@ -1,18 +1,13 @@
 // ফাইল পাথ: app/product/custom-sections/Gobike-16/BalanceSection.tsx
 import TextWithImage from '../../components/TextWithImage/TextWithImage';
-import styles from '../GobikeSections.module.css';
-
-// সেকশনগুলোর মধ্যে স্পেস দেওয়ার জন্য একটি wrapper div
-const wrapperStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '4rem',
-} as const;
+// import styles from '../GobikeSections.module.css'; // CSS Module সরানো হয়েছে
 
 export default function BalanceSection() {
   return (
-    <section className={`${styles.sectionContainer} ${styles.coloredBackground}`}>
-      <div style={wrapperStyle}>
+    // .sectionContainer & .coloredBackground replaced
+    <section className="w-full py-12 px-[5%] md:px-[1%] box-border bg-[#f7fafc]">
+      {/* wrapperStyle replaced with flex-col & gap-16 */}
+      <div className="flex flex-col gap-16">
       
         {/* === সেকশন ১: Unleash Their Inner Trail Boss === */}
         <TextWithImage

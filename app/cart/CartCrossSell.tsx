@@ -1,10 +1,11 @@
-'use client'; // <-- কার্যকরী সমাধান: এটিকে একটি ক্লায়েন্ট কম্পোনেন্ট বানানো হয়েছে
+// app/cart/CartCrossSell.tsx
+
+'use client'; 
 
 import { useState, useEffect } from 'react';
 import { gql } from '@apollo/client';
 import client from '../../lib/apolloClient';
 import ProductCard from '../products/ProductCard';
-import styles from './CartCrossSell.module.css';
 
 // --- টাইপ ইন্টারফেস (অপরিবর্তিত) ---
 interface Product {
@@ -25,7 +26,7 @@ interface QueryData {
     nodes: Product[];
   } | null;
 }
-// --- GraphQL কোয়েরি (অপরিবর্তিত) ---
+// --- GraphQL কোয়েরি (অপরিবর্তিত) ---
 const GET_CROSS_SELL_PRODUCTS_QUERY = gql`
   query GetCrossSellProducts {
     products(where: { categoryIn: ["spare-parts"] }, first: 4) {
@@ -65,12 +66,12 @@ export default function CartCrossSell() {
       }
     }
     getCrossSellProducts();
-  }, []); // <-- খালি dependency array নিশ্চিত করে যে এটি শুধু একবারই রান করবে
+  }, []); 
 
   if (loading) {
     return (
-        <section className={styles.crossSellSection}>
-            <h2 className={styles.sectionTitle}>You Might Also Like</h2>
+        <section className="mt-16 pt-8 border-t border-gray-200">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">You Might Also Like</h2>
             <p style={{textAlign: 'center'}}>Loading products...</p>
         </section>
     );
@@ -81,9 +82,11 @@ export default function CartCrossSell() {
   }
 
   return (
-    <section className={styles.crossSellSection}>
-      <h2 className={styles.sectionTitle}>You Might Also Like</h2>
-      <div className={styles.productsGrid}>
+    <section className="mt-16 pt-8 border-t border-gray-200">
+      <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">You Might Also Like</h2>
+      
+      {/* Bikes/Spare Parts Page এর মতো রেসপন্সিভ গ্রিড */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
         {products.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}

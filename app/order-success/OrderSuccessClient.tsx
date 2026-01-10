@@ -1,8 +1,9 @@
+//app/order-success/OrderSuccessClient.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useCart } from '../../context/CartContext';
-import styles from './OrderSuccessClient.module.css';
+// import styles from './OrderSuccessClient.module.css'; // CSS Module সরানো হয়েছে
 import Image from 'next/image';
 import Link from 'next/link';
 import { gtmPurchase } from '../../lib/gtm';
@@ -129,13 +130,27 @@ export default function OrderSuccessClient({ orderId, orderKey }: { orderId: str
     }
   }, [order, trackingFired]);
 
-  if (loading) return <div className={styles.loadingContainer}><div className={styles.spinner}></div><p>Loading Order Details...</p></div>;
-  if (error) return <div className={styles.errorContainer}><p>Error: {error}</p></div>;
+  if (loading) return (
+    // .loadingContainer replaced
+    <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        {/* .spinner replaced */}
+        <div className="w-12 h-12 border-4 border-gray-200 border-t-black rounded-full animate-spin mb-4"></div>
+        <p className="text-gray-600 text-lg">Loading Order Details...</p>
+    </div>
+  );
+  
+  if (error) return (
+    // .errorContainer replaced
+    <div className="max-w-[600px] mx-auto mt-12 p-6 bg-red-50 border border-red-200 text-red-700 rounded-lg text-center">
+        <p>Error: {error}</p>
+    </div>
+  );
+  
   if (!order) return null;
 
   const formatAddress = (addr: Address) => (
     <>
-      <strong className={styles.addressName}>{addr.firstName} {addr.lastName}</strong><br />
+      <strong className="block mb-1 text-gray-800">{addr.firstName} {addr.lastName}</strong><br />
       {addr.address1}<br />
       {addr.address2 && <>{addr.address2}<br /></>}
       {addr.city}, {addr.state} {addr.postcode}<br />
@@ -144,63 +159,80 @@ export default function OrderSuccessClient({ orderId, orderKey }: { orderId: str
   );
 
   return (
-    <div className={styles.mainContainer}>
-      <div className={styles.successCard}>
+    // .mainContainer replaced
+    <div className="bg-gray-50 min-h-screen py-12 px-4">
+      {/* .successCard replaced */}
+      <div className="max-w-[900px] mx-auto bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
         
         {/* Header */}
-        <div className={styles.cardHeader}>
-          <div className={styles.iconCircle}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        {/* .cardHeader replaced */}
+        <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-10 text-center border-b border-gray-100">
+          {/* .iconCircle replaced */}
+          <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-green-200">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 text-white">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
           </div>
-          <h1 className={styles.title}>Order Confirmed!</h1>
-          <p className={styles.subtitle}>
+          {/* .title replaced */}
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Order Confirmed!</h1>
+          {/* .subtitle replaced */}
+          <p className="text-lg text-gray-600 max-w-[600px] mx-auto mb-2">
             Hi {order.billing.firstName}, your order <strong>#{order.databaseId}</strong> has been placed.
           </p>
-          {order.billing.email && <p className={styles.emailText}>We sent a confirmation email to <span>{order.billing.email}</span></p>}
+          {/* .emailText replaced */}
+          {order.billing.email && <p className="text-sm text-gray-500">We sent a confirmation email to <span className="font-semibold text-gray-700">{order.billing.email}</span></p>}
         </div>
 
         {/* Order Meta Data */}
-        <div className={styles.metaGrid}>
-           <div className={styles.metaItem}>
-              <span>Order Number</span>
-              <strong>#{order.databaseId}</strong>
+        {/* .metaGrid replaced */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 border-b border-gray-100 bg-white">
+           {/* .metaItem replaced */}
+           <div className="text-center p-2">
+              <span className="block text-xs uppercase tracking-wider text-gray-500 mb-1">Order Number</span>
+              <strong className="text-gray-800 text-lg">#{order.databaseId}</strong>
            </div>
-           <div className={styles.metaItem}>
-              <span>Date</span>
-              <strong>{new Date(order.date).toLocaleDateString()}</strong>
+           <div className="text-center p-2">
+              <span className="block text-xs uppercase tracking-wider text-gray-500 mb-1">Date</span>
+              <strong className="text-gray-800 text-lg">{new Date(order.date).toLocaleDateString()}</strong>
            </div>
-           <div className={styles.metaItem}>
-              <span>Total Amount</span>
-              <strong className={styles.highlightPrice} dangerouslySetInnerHTML={{ __html: order.total }} />
+           <div className="text-center p-2">
+              <span className="block text-xs uppercase tracking-wider text-gray-500 mb-1">Total Amount</span>
+              {/* .highlightPrice replaced */}
+              <strong className="text-green-600 text-xl font-bold" dangerouslySetInnerHTML={{ __html: order.total }} />
            </div>
-           <div className={styles.metaItem}>
-              <span>Payment Method</span>
-              <strong>{order.paymentMethodTitle}</strong>
+           <div className="text-center p-2">
+              <span className="block text-xs uppercase tracking-wider text-gray-500 mb-1">Payment Method</span>
+              <strong className="text-gray-800 text-lg">{order.paymentMethodTitle}</strong>
            </div>
         </div>
 
         {/* Product Table */}
-        <div className={styles.tableSection}>
-          <h2 className={styles.sectionHeading}>Items Ordered</h2>
-          <div className={styles.tableResponsive}>
-            <table className={styles.productTable}>
+        {/* .tableSection replaced */}
+        <div className="p-8">
+          {/* .sectionHeading replaced */}
+          <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-100">Items Ordered</h2>
+          {/* .tableResponsive replaced */}
+          <div className="overflow-x-auto">
+            {/* .productTable replaced */}
+            <table className="w-full border-collapse">
               <thead>
-                <tr>
-                  <th style={{width: '60%'}}>Product</th>
-                  <th style={{textAlign: 'center'}}>Qty</th>
-                  <th style={{textAlign: 'right'}}>Total</th>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left p-3 font-semibold text-gray-600 text-sm uppercase tracking-wider" style={{width: '60%'}}>Product</th>
+                  <th className="text-center p-3 font-semibold text-gray-600 text-sm uppercase tracking-wider">Qty</th>
+                  <th className="text-right p-3 font-semibold text-gray-600 text-sm uppercase tracking-wider">Total</th>
                 </tr>
               </thead>
               <tbody>
                 {order.lineItems.nodes.map((item, idx) => {
                   const isShipping = item.product.node.name.startsWith('Shipping:');
                   return (
-                    <tr key={idx}>
-                      <td className={styles.productInfoTd}>
-                        <div className={styles.productFlex}>
-                           <div className={styles.imgWrapper}>
+                    <tr key={idx} className="border-b border-gray-100 last:border-0">
+                      {/* .productInfoTd replaced */}
+                      <td className="p-4 pl-0">
+                        {/* .productFlex replaced */}
+                        <div className="flex items-center gap-4">
+                           {/* .imgWrapper replaced */}
+                           <div className="w-[50px] h-[50px] flex-shrink-0 border border-gray-200 rounded-md overflow-hidden bg-gray-50 flex items-center justify-center">
                               {isShipping ? (
                                 <Image src="/Transdirect.jpg" alt="Shipping" width={40} height={40} style={{objectFit:'contain'}}/>
                               ) : (
@@ -212,13 +244,14 @@ export default function OrderSuccessClient({ orderId, orderKey }: { orderId: str
                                 />
                               )}
                            </div>
-                           <span className={styles.productName}>{item.product.node.name}</span>
+                           {/* .productName replaced */}
+                           <span className="font-medium text-gray-800">{item.product.node.name}</span>
                         </div>
                       </td>
-                      <td style={{textAlign: 'center'}}>
-                         {isShipping ? '-' : item.quantity}
+                      <td className="p-4 text-center text-gray-600">
+                          {isShipping ? '-' : item.quantity}
                       </td>
-                      <td style={{textAlign: 'right', fontWeight: 'bold'}}>
+                      <td className="p-4 text-right font-bold text-gray-800">
                         <span dangerouslySetInnerHTML={{ __html: item.total }} />
                       </td>
                     </tr>
@@ -230,22 +263,25 @@ export default function OrderSuccessClient({ orderId, orderKey }: { orderId: str
         </div>
 
         {/* Addresses */}
-        <div className={styles.addressGrid}>
-          <div className={styles.addressBox}>
-            <h3>Billing Address</h3>
-            <address>{formatAddress(order.billing)}</address>
+        {/* .addressGrid replaced */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8 bg-gray-50 border-t border-gray-100">
+          {/* .addressBox replaced */}
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <h3 className="text-sm uppercase tracking-wider font-bold text-gray-500 mb-4 border-b border-gray-100 pb-2">Billing Address</h3>
+            <address className="not-italic text-gray-600 leading-relaxed text-sm">{formatAddress(order.billing)}</address>
           </div>
-          <div className={styles.addressBox}>
-            <h3>Shipping Address</h3>
-            <address>
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <h3 className="text-sm uppercase tracking-wider font-bold text-gray-500 mb-4 border-b border-gray-100 pb-2">Shipping Address</h3>
+            <address className="not-italic text-gray-600 leading-relaxed text-sm">
               {order.shipping?.address1 ? formatAddress(order.shipping) : "Same as Billing Address"}
             </address>
           </div>
         </div>
 
         {/* Button */}
-        <div className={styles.footerAction}>
-          <Link href="/products" className={styles.btnPrimary}>
+        {/* .footerAction replaced */}
+        <div className="p-8 text-center bg-white border-t border-gray-100">
+          <Link href="/products" className="inline-block bg-black text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 hover:bg-gray-800 hover:-translate-y-0.5 shadow-lg shadow-gray-200">
             Continue Shopping
           </Link>
         </div>

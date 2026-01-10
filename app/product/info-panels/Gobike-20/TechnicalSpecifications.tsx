@@ -1,5 +1,5 @@
 // ফাইল পাথ: app/product/info-panels/Gobike-20/TechnicalSpecifications.tsx
-import styles from '../PanelStyles.module.css';
+
 
 // ডেটা আপনার আগের ছবি থেকে হুবহু নেওয়া হয়েছে
 const specs = [
@@ -25,11 +25,15 @@ const specs = [
 
 export default function TechnicalSpecifications() {
   return (
-    <div className={styles.specTableContainer}>
+    // .specTableContainer replaced
+    <div className="flex flex-col">
       {specs.map(spec => (
-        <div key={spec.label} className={styles.specRow}>
-          <span className={styles.specLabel}>{spec.label}:</span>
-          <span className={styles.specValue}>{spec.value}</span>
+        // .specRow replaced
+        <div key={spec.label} className="grid grid-cols-[30%_1fr] gap-4 items-center py-2.5 border-b border-[#eeeeee] font-sans text-base last:border-b-0">
+          {/* .specLabel replaced */}
+          <span className="font-bold text-black text-left">{spec.label}:</span>
+          {/* .specValue replaced */}
+          <span className="font-semibold text-black text-left">{spec.value}</span>
         </div>
       ))}
     </div>

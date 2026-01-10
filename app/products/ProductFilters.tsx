@@ -1,8 +1,10 @@
+// app/products/ProductFilters.tsx
+
 'use client';
 
-import { useState,useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import styles from './filters.module.css';
+// import styles from './filters.module.css'; // CSS Module সরানো হয়েছে
 import { IoChevronDown } from 'react-icons/io5';
 
 interface Category {
@@ -25,7 +27,6 @@ export default function ProductFilters({ categories }: ProductFiltersProps) {
   const activeCategorySlug = searchParams.get('category') || 'all';
   const activeCategory = categories.find(c => c.slug === activeCategorySlug) || { name: 'All Products' };
 
-  // --- ড্রপডাউনের বাইরে ক্লিক করলে সেটি বন্ধ করার জন্য ---
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
@@ -46,22 +47,40 @@ export default function ProductFilters({ categories }: ProductFiltersProps) {
     params.delete('after');
     params.delete('before');
     router.push(`${pathname}?${params.toString()}`);
-    setIsOpen(false); // একটি আইটেম সিলেক্ট করার পর ড্রপডাউন বন্ধ করে দিন
+    setIsOpen(false); 
   };
 
   return (
-    <div className={styles.filterBar}>
-        <div className={styles.dropdownWrapper} ref={wrapperRef}>
-            <button className={styles.dropdownButton} onClick={() => setIsOpen(!isOpen)}>
+    // .filterBar replaced
+    <div className="flex justify-center mb-12">
+        {/* .dropdownWrapper replaced */}
+        <div className="relative w-[280px]" ref={wrapperRef}>
+            <button 
+                // .dropdownButton replaced
+                className="w-full flex justify-between items-center px-5 py-3 bg-white border border-gray-300 rounded-lg text-base font-medium cursor-pointer text-left hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
+                onClick={() => setIsOpen(!isOpen)}
+            >
                 <span>{activeCategory.name}</span>
-                <IoChevronDown style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+                <IoChevronDown 
+                    style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} 
+                />
             </button>
             
             {isOpen && (
-                <ul className={styles.dropdownMenu}>
-                    <li onClick={() => handleCategoryChange('all')}>All Products</li>
+                // .dropdownMenu replaced
+                <ul className="absolute top-[calc(100%+5px)] left-0 w-full bg-white border border-gray-200 rounded-lg shadow-lg list-none p-2 m-0 z-10 max-h-[300px] overflow-y-auto">
+                    <li 
+                        className="px-4 py-3 cursor-pointer rounded-md hover:bg-gray-100 transition-colors"
+                        onClick={() => handleCategoryChange('all')}
+                    >
+                        All Products
+                    </li>
                     {categories.map((category) => (
-                        <li key={category.id} onClick={() => handleCategoryChange(category.slug)}>
+                        <li 
+                            key={category.id} 
+                            className={`px-4 py-3 cursor-pointer rounded-md hover:bg-gray-100 transition-colors ${activeCategorySlug === category.slug ? 'bg-gray-50 font-semibold' : ''}`}
+                            onClick={() => handleCategoryChange(category.slug)}
+                        >
                             {category.name}
                         </li>
                     ))}

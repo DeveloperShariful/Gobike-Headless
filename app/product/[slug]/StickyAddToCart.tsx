@@ -3,7 +3,7 @@
 'use client';
 
 import Image from 'next/image';
-import styles from './StickyAddToCart.module.css';
+// import styles from './StickyAddToCart.module.css'; // CSS Module সরানো হয়েছে
 import StickyActions from './StickyActions';
 
 interface ProductForCart {
@@ -23,29 +23,44 @@ const StickyAddToCart = ({
 }: { 
   product: ProductForCart; 
   isVisible: boolean; 
-  isValid?: boolean; // এই লাইনটি মিসিং ছিল
+  isValid?: boolean; 
 }) => {
   if (!product) return null;
 
   return (
-    <div className={`${styles.stickyWrapper} ${isVisible ? styles.visible : ''}`}>
-      <div className={styles.productInfo}>
+    // .stickyWrapper replaced
+    <div 
+      className={`fixed bottom-0 left-0 w-full bg-white border-t border-[#e5e5e5] shadow-[0_-2px_10px_rgba(0,0,0,0.08)] z-[1000] flex items-center transition-transform duration-300 ease-in-out
+      ${isVisible ? 'translate-y-0 visible' : 'translate-y-full invisible'}
+      /* Mobile Styles (Default) */
+      justify-between p-[8px_10px] gap-[10px]
+      /* Desktop Styles (Min-width: 769px approx to md) */
+      md:justify-center md:gap-[10rem] md:p-[0px_5px]`}
+    >
+      {/* .productInfo replaced */}
+      <div className="flex items-center gap-0.5 min-w-0 flex-1 md:flex-initial">
         {product.image && (
           <Image
             src={product.image}
             alt={product.name}
             width={50}
             height={50}
-            className={styles.productImage}
+            // .productImage replaced
+            className="rounded-md shrink-0 w-[45px] h-[45px] md:w-[50px] md:h-[50px]"
           />
         )}
-        <div className={styles.textInfo}>
-             <span className={styles.productName}>{product.name}</span>
-             <span className={styles.productPrice} dangerouslySetInnerHTML={{ __html: product.price || '' }} />
+        <div className="flex flex-col">
+             {/* .productName replaced */}
+             <span className="font-semibold whitespace-nowrap overflow-hidden text-ellipsis text-[14px] md:text-[16px]">
+                {product.name}
+             </span>
+             {/* .productPrice replaced */}
+             <span className="hidden" dangerouslySetInnerHTML={{ __html: product.price || '' }} />
         </div>
       </div>
-      <div className={styles.actions}>
-        {/* isValid ভ্যালুটি Actions কম্পোনেন্টে পাঠানো হচ্ছে */}
+      
+      {/* .actions replaced */}
+      <div className="flex items-center shrink-0">
         <StickyActions product={product} isValid={isValid} /> 
       </div>
     </div>

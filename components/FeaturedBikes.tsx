@@ -1,14 +1,14 @@
+//components/FeaturedBikes.tsx
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { gql } from '@apollo/client';
-import client from '../lib/apolloClient'; // ক্লায়েন্ট কম্পোনেন্টের জন্য এটিই সঠিক
+import client from '../lib/apolloClient';
 import Link from 'next/link';
 import Image from 'next/image';
-import styles from './FeaturedBikes.module.css';
 import { useCart } from '../context/CartContext';
 
-// --- টাইপ ইন্টারফেস (সম্পূর্ণ এবং সঠিক) ---
 interface Product {
   id: string;
   databaseId: number;
@@ -29,8 +29,7 @@ interface QueryData {
   } | null;
 }
 
-// --- GraphQL কোয়েরি (অপরিবর্তিত) ---
-// --- GraphQL কোয়েরি (আপডেট করা হয়েছে) ---
+// --- GraphQL কোয়েরি ---
 const GET_FEATURED_BIKES_QUERY = gql`
   query GetFeaturedBikes {
     products(
@@ -64,7 +63,7 @@ const GET_FEATURED_BIKES_QUERY = gql`
   }
 `;
 
-// --- স্টার রেটিং কম্পוננט ---
+// --- স্টার রেটিং কম্পোনেন্ট ---
 const StarRating = ({ rating, count }: { rating: number, count: number }) => {
     const totalStars = 5;
     const fullStars = Math.floor(rating);
@@ -72,13 +71,15 @@ const StarRating = ({ rating, count }: { rating: number, count: number }) => {
     const emptyStars = totalStars - fullStars - (halfStar ? 1 : 0);
 
     return (
-        <div className={styles.featuredStarRating}>
-            {[...Array(fullStars)].map((_, i) => <span key={`full-${i}`}>★</span>)}
-            {halfStar && <span key="half">⭐</span>}
-            {[...Array(emptyStars)].map((_, i) => <span key={`empty-${i}`}>☆</span>)}
+        // .featuredStarRating replaced
+        <div className="flex justify-center items-center gap-[2px] text-black">
+            {[...Array(fullStars)].map((_, i) => <span key={`full-${i}`} className="text-[1.1rem]">★</span>)}
+            {halfStar && <span key="half" className="text-[1.1rem]">⭐</span>}
+            {[...Array(emptyStars)].map((_, i) => <span key={`empty-${i}`} className="text-[1.1rem]">☆</span>)}
             
             {count > 0 && (
-              <span className={styles.featuredReviewCount}>
+              // .featuredReviewCount replaced
+              <span className="text-[0.9rem] text-black ml-2">
                 ({rating.toFixed(1)}) ({count})
               </span>
             )}
@@ -96,7 +97,6 @@ const AddToCartButton = ({ product }: { product: Product }) => {
         e.stopPropagation();
         setIsAdding(true);
         try {
-            // --- সমাধান: addToCart-কে এখন সম্পূর্ণ ডেটা পাঠানো হচ্ছে ---
             await addToCart({
                 id: product.id,
                 databaseId: product.databaseId,
@@ -113,7 +113,12 @@ const AddToCartButton = ({ product }: { product: Product }) => {
     };
 
     return (
-        <button onClick={handleAddToCart} className={styles.featuredAddToCartBtn} disabled={isAdding}>
+        // .featuredAddToCartBtn replaced
+        <button 
+            onClick={handleAddToCart} 
+            className="w-full p-2 mt-4 bg-[#1a1a1a] text-white border-none rounded-full font-semibold text-[1.5rem] cursor-pointer transition-colors duration-200 hover:bg-[#333] disabled:opacity-70 disabled:cursor-not-allowed" 
+            disabled={isAdding}
+        >
             {isAdding ? 'Adding...' : 'Add to cart'}
         </button>
     );
@@ -145,9 +150,9 @@ export default function FeaturedBikes() {
 
   if (loading) {
     return (
-        <section className={styles.featuredBikesSection}>
-            <div className={styles.container}>
-                <p style={{ textAlign: 'center' }}>Loading Top Bikes...</p>
+        <section className="w-full py-16 bg-white">
+            <div className="max-w-[1200px] mx-auto px-4">
+                <p className="text-center">Loading Top Bikes...</p>
             </div>
         </section>
     );
@@ -158,16 +163,24 @@ export default function FeaturedBikes() {
   }
 
   return (
-    <section className={styles.featuredBikesSection}>
-      <div className={styles.container}>
-        <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Explore Our Top Kids Electric Bikes</h2>
-          <p className={styles.sectionSubtitle}>
+    // .featuredBikesSection replaced
+    <section className="w-full py-16 bg-white">
+      {/* .container replaced */}
+      <div className="max-w-[1500px] mx-auto px-1">
+        
+        {/* .sectionHeader replaced */}
+        <div className="text-center mb-12">
+          {/* .sectionTitle replaced */}
+          <h2 className="text-[2.5rem] font-extrabold mb-4 text-[#1a1a1a]">Explore Our Top Kids Electric Bikes</h2>
+          {/* .sectionSubtitle replaced */}
+          <p className="text-[1.1rem] text-[#555] max-w-[700px] mx-auto leading-[1.6]">
             Discover our best-selling Kids electric bike, engineered for safety, performance, and endless fun. 
             Each GoBike is built to grow with your child, making it the perfect choice for young Aussie adventurers.
           </p>
         </div>
-        <div className={styles.featuredGrid}>
+
+        {/* .featuredGrid replaced */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {products.map((product) => {
             const parsePrice = (priceStr?: string | null): number => {
                 if (!priceStr) return 0;
@@ -180,11 +193,15 @@ export default function FeaturedBikes() {
                 : 0;
             
             return (
-                <div key={product.id} className={styles.featuredProductCard}>
-                  <Link href={`/product/${product.slug}`}>
-                    <div className={styles.featuredImageWrapper}>
+                // .featuredProductCard replaced
+                <div key={product.id} className="text-center border border-[#e2e2e2] rounded-xl p-1 transition-all duration-300 bg-[#f3f3f3] flex flex-col hover:border-[#e0e0e0] hover:shadow-[0_8px_24px_rgba(0,0,0,0.07)]">
+                  <Link href={`/product/${product.slug}`} className="no-underline text-inherit flex flex-col flex-grow group">
+                    
+                    {/* .featuredImageWrapper replaced */}
+                    <div className="relative bg-[#f8f9fa] rounded-lg mb-4 overflow-hidden">
                       {product.onSale && discountPercent > 0 && (
-                          <div className={styles.featuredDiscountBadge}>-{discountPercent}%</div>
+                          // .featuredDiscountBadge replaced
+                          <div className="absolute top-0 left-0 bg-[#fc0505] text-white px-[0.6rem] py-1 rounded-md text-[1.2rem] font-bold z-10">-{discountPercent}%</div>
                       )}
                       {product.image?.sourceUrl && (
                         <Image
@@ -194,28 +211,36 @@ export default function FeaturedBikes() {
                           height={500}
                           sizes="(max-width: 768px) 100vw, 33vw"
                           style={{ objectFit: 'contain' }}
+                          className="w-full h-auto aspect-square transition-transform duration-300 ease-in-out group-hover:scale-105"
                         />
                       )}
                     </div>
-                    <div className={styles.featuredCardContent}>
-                      <h3 className={styles.featuredProductName}>{product.name}</h3>
+
+                    {/* .featuredCardContent replaced */}
+                    <div className="px-[0.4rem] flex-grow flex flex-col justify-between">
+                      {/* .featuredProductName replaced */}
+                      <h3 className="text-[1.5rem] font-semibold leading-[1.1] my-2 min-h-[3em]">{product.name}</h3>
                       
                       {typeof product.averageRating === 'number' ? (
                         <StarRating rating={product.averageRating} count={product.reviewCount || 0} />
                       ) : (
-                        <div className={styles.featuredStarRating}>
-                            {[...Array(5)].map((_, i) => <span key={`empty-${i}`}>☆</span>)}
+                        <div className="flex justify-center items-center gap-[2px] text-black">
+                            {[...Array(5)].map((_, i) => <span key={`empty-${i}`} className="text-[1.1rem]">☆</span>)}
                         </div>
                       )}
 
-                      <div className={styles.featuredPriceContainer}>
+                      {/* .featuredPriceContainer replaced */}
+                      <div className="flex justify-center items-baseline gap-2 my-[0.5rem] mb-4 h-9">
                           {product.onSale && product.salePrice ? (
                               <>
-                                  <span className={styles.featuredRegularPriceStriked} dangerouslySetInnerHTML={{ __html: product.regularPrice || '' }} />
-                                  <span className={styles.featuredSalePrice} dangerouslySetInnerHTML={{ __html: product.salePrice }} />
+                                  {/* .featuredRegularPriceStriked replaced */}
+                                  <span className="text-[1.2rem] font-semibold text-[#070707] line-through" dangerouslySetInnerHTML={{ __html: product.regularPrice || '' }} />
+                                  {/* .featuredSalePrice replaced */}
+                                  <span className="text-[1.5rem] font-bold text-[#ff0000]" dangerouslySetInnerHTML={{ __html: product.salePrice }} />
                               </>
                           ) : (
-                              <div className={styles.featuredProductPrice} dangerouslySetInnerHTML={{ __html: product.price || '' }} />
+                              // .featuredProductPrice replaced
+                              <div className="text-[1.5rem] font-bold my-[0.5rem] mb-4" dangerouslySetInnerHTML={{ __html: product.price || '' }} />
                           )}
                       </div>
                     </div>

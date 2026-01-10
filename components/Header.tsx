@@ -1,9 +1,9 @@
+// components/Header.tsx
 'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import styles from './Header.module.css';
 import { useCart } from '../context/CartContext';
 import SearchOverlay from './SearchOverlay';
 import MiniCart from './MiniCart';
@@ -26,84 +26,156 @@ export default function Header() {
 
   return (
     <>
-      <header className={styles.header}>
-        <div className={styles.container}>
+      <header className="bg-white border-b border-[#eaeaea] py-1.5 sticky top-[55px] z-50 transition-[top] duration-300 ease-in-out md:top-[48px]">
+        
+        {/* --- এখানে পরিবর্তন: flex এর বদলে grid ব্যবহার করা হয়েছে যাতে মেনু একদম মাঝখানে থাকে --- */}
+        <div className="max-w-[1400px] mx-auto px-6 flex lg:grid lg:grid-cols-3 items-center justify-between relative">
           
-          {/* --- বাম অংশ: ডেস্কটপে লোগো, মোবাইলে হ্যামবার্গার --- */}
-          <div className={styles.leftSection}>
-            <button onClick={() => setIsMenuOpen(true)} className={`${styles.iconButton} ${styles.hamburger}`}aria-label="Menu">
+          {/* --- বাম অংশ (Logo & Hamburger) --- */}
+          {/* flex-1 রাখা হয়েছে যাতে মোবাইলেও স্পেস ঠিক থাকে, Desktop এ justify-self-start */}
+          <div className="flex flex-1 lg:flex-none items-center justify-start">
+            <button 
+                onClick={() => setIsMenuOpen(true)} 
+                className="flex lg:hidden bg-transparent border-none cursor-pointer p-2 text-[#333] items-center mr-2"
+                aria-label="Menu"
+            >
                 <IoMenu size={35} />
             </button>
-            <div className={`${styles.logo} ${styles.desktopOnly}`}>
-              <Link href="/">
-                 <Image src="https://gobikes.au/wp-content/uploads/2025/06/GOBIKE-Electric-Bike-for-kids-1.webp" alt="GoBike Logo" width={1846} height={417} priority className={styles.logoImage} />
+            <div className="hidden lg:block">
+              <Link href="/" className="flex items-center no-underline">
+                  <Image 
+                    src="https://gobikes.au/wp-content/uploads/2025/06/GOBIKE-Electric-Bike-for-kids-1.webp" 
+                    alt="GoBike Logo" 
+                    width={1846} 
+                    height={417} 
+                    priority 
+                    className="h-[60px] w-auto max-w-full" 
+                  />
               </Link>
             </div>
           </div>
 
-          {/* --- মধ্যম অংশ: মোবাইলে লোগো, ডেস্কটপে নেভিগেশন --- */}
-          <div className={`${styles.logo} ${styles.mobileOnly}`}>
-            <Link href="/">
-               <Image src="https://gobikes.au/wp-content/uploads/2025/06/GOBIKE-Electric-Bike-for-kids-1.webp" alt="GoBike Logo" width={1846} height={417} priority className={styles.logoImage} />
+          {/* --- মধ্যম অংশ (Mobile Logo & Desktop Nav) --- */}
+          
+          {/* মোবাইল লোগো (Absolute Centered) */}
+          <div className="block lg:hidden absolute left-1/2 -translate-x-1/2">
+            <Link href="/" className="flex items-center no-underline">
+               <Image 
+                src="https://gobikes.au/wp-content/uploads/2025/06/GOBIKE-Electric-Bike-for-kids-1.webp" 
+                alt="GoBike Logo" 
+                width={1846} 
+                height={417} 
+                priority 
+                className="h-[50px] w-auto max-w-full" 
+               />
             </Link>
           </div>
-          <nav className={styles.desktopNavigation}>
-            <Link href="/" className={pathname === '/' ? styles.activeLink : ''}>Home</Link>
-            <Link href="/bikes" className={pathname === '/bikes' ? styles.activeLink : ''}>Bikes</Link>
-            <Link href="/spare-parts" className={pathname === '/spare-parts' ? styles.activeLink : ''}>Spare Parts</Link>
-            <Link href="/apparel" className={pathname === '/apparel' ? styles.activeLink : ''}>Apparel</Link>
-            <Link href="/about" className={pathname === '/about' ? styles.activeLink : ''}>About Us</Link>
-            <Link href="/contact" className={pathname === '/contact' ? styles.activeLink : ''}>Contact</Link>
-            <Link href="/faq" className={pathname === '/faq' ? styles.activeLink : ''}>FAQs</Link>
-            <Link href="/blog" className={pathname === '/blog' ? styles.activeLink : ''}>Blog</Link>
+          
+          {/* ডেস্কটপ নেভিগেশন (Grid Center) */}
+          {/* justify-self-center ব্যবহার করা হয়েছে */}
+          <nav className="hidden lg:flex gap-6 xl:gap-8 items-center justify-self-center">
+            {['/', '/bikes', '/spare-parts', '/apparel', '/about', '/contact', '/faq', '/blog'].map((path) => (
+                <Link 
+                    key={path}
+                    href={path} 
+                    className={`no-underline text-[15px] xl:text-[16px] font-medium transition-colors duration-200 ease-in-out hover:text-black hover:font-bold whitespace-nowrap ${pathname === path ? 'text-black font-bold' : 'text-[#353535]'}`}
+                >
+                    {path === '/' ? 'Home' : path.substring(1).replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                </Link>
+            ))}
           </nav>
 
-          {/* --- ডান অংশ: আইকন --- */}
-          <div className={styles.actionIcons}>
-            <button className={styles.iconButtons} onClick={() => setIsSearchOpen(true)} aria-label="search bar">
-              <IoSearch size={25} />
-              <span>Search products</span>
+          {/* --- ডান অংশ (Icons) --- */}
+          {/* justify-self-end ব্যবহার করা হয়েছে */}
+          <div className="flex flex-1 lg:flex-none items-center justify-end gap-2 justify-self-end">
+            <button 
+                className="hidden lg:flex items-center gap-2 bg-transparent border-b border-[#d8d8d8] cursor-pointer px-2 pb-0.5 text-[#333] hover:border-black transition-colors" 
+                onClick={() => setIsSearchOpen(true)} 
+                aria-label="search bar"
+            >
+              <IoSearch size={22} />
+              <span className="text-sm font-medium">Search</span>
             </button>
-            <Link href="/account" className={`${styles.iconButton} ${styles.desktopOnly}`}aria-label="My account link">
-              <IoPersonOutline size={25} />
+            
+            <Link 
+                href="/account" 
+                className="hidden lg:flex bg-transparent border-none cursor-pointer p-2 text-[#333] items-center hover:text-black transition-colors"
+                aria-label="My account link"
+            >
+              <IoPersonOutline size={24} />
             </Link>
-            <button className={styles.cartIcon} onClick={openMiniCart} aria-label="MiniCart" >
-              <span>🛒</span>
-              {totalItems > 0 && <span className={styles.cartCount}>{totalItems}</span>}
+            
+            <button 
+                className="bg-transparent border-none cursor-pointer relative text-[#333] p-2 hover:text-black transition-colors" 
+                onClick={openMiniCart} 
+                aria-label="MiniCart" 
+            >
+              <span className="text-[26px]">🛒</span>
+              {totalItems > 0 && (
+                <span className="absolute top-0 right-0 bg-black text-white rounded-full h-5 w-5 flex items-center justify-center text-[10px] font-bold">
+                    {totalItems}
+                </span>
+              )}
             </button>
           </div>
         </div>
       </header>
 
-      {/* --- মোবাইল মেনু প্যানেল --- */}
-      <div className={`${styles.mobileMenu} ${isMenuOpen ? styles.menuOpen : ''}`}>
-          <div className={styles.mobileMenuHeader}>
-             <button className={styles.mobileSearchButton} onClick={() => setIsSearchOpen(true) } aria-label="SearchBar">
+      {/* --- মোবাইল মেনু প্যানেল (অপরিবর্তিত) --- */}
+      <div 
+        className={`fixed top-0 left-0 w-[350px] h-[95vh] bg-white z-[1001] transition-transform duration-300 ease-in-out flex flex-col p-6 shadow-[5px_0_15px_rgba(0,0,0,0.1)] ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      >
+          <div className="flex justify-between items-center mb-8 border-b border-[#f0f0f0] pb-4">
+             <button 
+                className="flex items-center gap-3 w-full bg-transparent border-none border-b border-[#e0e0e0] p-3 mr-4 text-[1.1rem] font-medium text-[#333] cursor-pointer text-left" 
+                onClick={() => setIsSearchOpen(true) } 
+                aria-label="SearchBar"
+             >
               <IoSearch size={22} />
               <span>Search products</span>
             </button>
-            <button className={styles.closeMenuButton} onClick={() => setIsMenuOpen(false)} aria-label="Close Menu">
-        <IoClose size={28} />
-      </button>
+            <button 
+                className="bg-transparent border-none cursor-pointer text-[#333] flex items-center p-2" 
+                onClick={() => setIsMenuOpen(false)} 
+                aria-label="Close Menu"
+            >
+                <IoClose size={28} />
+            </button>
           </div>
-            <nav className={styles.mobileMenuLinks}>
-               <Link href="/" className={pathname === '/' ? styles.activeLink : ''} onClick={closeAllOverlays}>Home</Link>
-               <Link href="/bikes" className={pathname === '/bikes' ? styles.activeLink : ''} onClick={closeAllOverlays}>Bikes</Link>
-               <Link href="/spare-parts" className={pathname === '/spare-parts' ? styles.activeLink : ''} onClick={closeAllOverlays}>Spare Parts</Link>
-               <Link href="/apparel" className={pathname === '/apparel' ? styles.activeLink : ''} onClick={closeAllOverlays}>Apparel</Link>
-               <Link href="/about" className={pathname === '/about' ? styles.activeLink : ''} onClick={closeAllOverlays}>About</Link>
-               <Link href="/faq" className={pathname === '/faq' ? styles.activeLink : ''} onClick={closeAllOverlays}>FAQs</Link>
-               <Link href="/contact" className={pathname === '/contact' ? styles.activeLink : ''} onClick={closeAllOverlays}>Contact us</Link>
-               <Link href="/blog" className={pathname === '/blog' ? styles.activeLink : ''} onClick={closeAllOverlays}>Blog</Link>
+            
+            <nav className="flex flex-col gap-6 flex-grow overflow-y-auto">
+                {['/', '/bikes', '/spare-parts', '/apparel', '/about', '/faq', '/contact', '/blog'].map((path) => (
+                    <Link 
+                        key={path}
+                        href={path} 
+                        className={`text-[1.2rem] font-medium text-[#333] no-underline flex items-center gap-3 bg-transparent border-b border-[#ececec] w-full text-left cursor-pointer p-0 hover:text-black hover:font-bold ${pathname === path ? 'text-black font-bold' : ''}`}
+                        onClick={closeAllOverlays}
+                    >
+                        {path === '/' ? 'Home' : path === '/contact' ? 'Contact us' : path.substring(1).replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    </Link>
+                ))}
             </nav>
-          <div className={styles.mobileMenuFooter}>
-            <Link href="/account" className={pathname === '/account' ? styles.mobileMenuLink : ''} onClick={closeAllOverlays} aria-label="My account">
+          
+          <div className="border-t border-[#f0f0f0] pt-4 mt-6">
+            <Link 
+                href="/account" 
+                className={`text-[1.2rem] font-medium text-[#333] no-underline flex items-center gap-3 bg-transparent border-b border-[#ececec] w-full text-left cursor-pointer p-0 hover:text-black hover:font-bold ${pathname === '/account' ? 'text-black font-bold' : ''}`} 
+                onClick={closeAllOverlays} 
+                aria-label="My account"
+            >
                 <IoPersonOutline />
                 <span>My Account</span>
             </Link>
           </div>
       </div>
-      {isMenuOpen && <div className={styles.menuOverlay} onClick={() => setIsMenuOpen(false)} aria-label="Close"></div>}
+      
+      {isMenuOpen && (
+        <div 
+            className="fixed top-0 left-0 w-full h-full bg-black/50 z-[1000]" 
+            onClick={() => setIsMenuOpen(false)} 
+            aria-label="Close"
+        ></div>
+      )}
       
       {isSearchOpen && <SearchOverlay onClose={() => setIsSearchOpen(false)} aria-label="Close searchber"/>}
       <MiniCart isOpen={isMiniCartOpen} onClose={closeMiniCart} />

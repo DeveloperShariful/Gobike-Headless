@@ -1,10 +1,10 @@
-//app/cart/page.tsx
+// app/cart/page.tsx
 
 "use client";
 import Breadcrumbs from '../../components/Breadcrumbs';
 import { useCart } from '../../context/CartContext';
 import Link from 'next/link';
-import styles from './CartPage.module.css';
+// import styles from './CartPage.module.css'; // CSS Module সরানো হয়েছে
 import CartCrossSell from './CartCrossSell';
 import { gtmViewCart, gtmBeginCheckout } from '../../lib/gtm';
 import { useEffect, useState, useCallback } from 'react';
@@ -51,7 +51,7 @@ const REMOVE_COUPON_MUTATION = gql`
   }
 `;
 
-// --- Checkout বাটন কম্পোনেন্ট (অপরিবর্তিত) ---
+// --- Checkout বাটন কম্পোনেন্ট ---
 function CheckoutButton() {
     const { cartItems } = useCart();
     const handleCheckout = () => {
@@ -64,7 +64,11 @@ function CheckoutButton() {
         }
     };
     return (
-        <Link href="/checkout" className={styles.checkoutButton} onClick={handleCheckout}>
+        <Link 
+            href="/checkout" 
+            className="block text-center w-full p-4 text-lg bg-black text-white rounded-lg font-bold hover:bg-gray-800 transition-colors border-none cursor-pointer" 
+            onClick={handleCheckout}
+        >
             Proceed to Checkout
         </Link>
     );
@@ -77,7 +81,7 @@ export default function CartPage() {
   const [couponCode, setCouponCode] = useState('');
   const [isCouponLoading, setCouponLoading] = useState(false);
   
-  // ১. Removing স্টেট যোগ করা হয়েছে
+  // ১. Removing স্টেট যোগ করা হয়েছে
   const [removingKey, setRemovingKey] = useState<string | null>(null);
 
   // --- সার্ভার থেকে কার্টের তথ্য আনার ফাংশন ---
@@ -160,7 +164,7 @@ export default function CartPage() {
     }
   };
 
-  // ২. রিমুভ হ্যান্ডলার যোগ করা হয়েছে
+  // ২. রিমুভ হ্যান্ডলার যোগ করা হয়েছে
   const handleRemoveItem = async (key: string) => {
     setRemovingKey(key);
     await removeFromCart(key);
@@ -178,27 +182,51 @@ export default function CartPage() {
   return (
     <>
       <Breadcrumbs pageTitle="Shopping Cart" />
-      <div className={styles.container}>
+      {/* Container */}
+      <div className="max-w-[1300px] mx-auto px-4 pb-12 font-sans box-border">
         {cartItems.length === 0 && !isCartLoading ? (
-          <div className={styles.emptyCartContainer}>
-            <h1 className={styles.title}>Your Cart is Empty</h1>
-            <Link href="/products" className={styles.continueShopping}>
+          /* Empty Cart Container */
+          <div className="text-center py-12 px-4">
+            <h1 className="text-3xl font-bold text-gray-900 mb-8">Your Cart is Empty</h1>
+            <Link 
+                href="/products" 
+                className="inline-block mt-6 px-8 py-3 bg-black text-white rounded-md font-semibold hover:bg-gray-800 transition-colors"
+            >
               Continue Shopping
             </Link>
           </div>
         ) : (
           <>
-            <h1 className={styles.title}>Your Shopping Cart</h1>
-            {isLoading && <div className={styles.loadingOverlay}>Updating Cart...</div>}
-            <div className={`${styles.cartLayout} ${isLoading ? styles.disabled : ''}`}>
-              <div className={styles.cartItems}>
+            <h1 className="text-center mb-8 text-3xl font-bold text-gray-900">Your Shopping Cart</h1>
+            {isLoading && (
+                <div className="fixed inset-0 bg-white/80 flex justify-center items-center text-2xl z-[1000] font-bold">
+                    Updating Cart...
+                </div>
+            )}
+            
+            {/* Cart Layout Grid */}
+            <div className={`grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-8 items-start ${isLoading ? 'opacity-60 pointer-events-none' : ''}`}>
+              
+              {/* Cart Items List */}
+              <div className="flex flex-col gap-4">
                 {cartItems.map(item => (
-                  <div key={item.key} className={styles.cartItem}>
-                    {item.image ? ( <Image src={item.image} alt={item.name} className={styles.itemImage} width={100} height={100}/> ) : ( <div className={styles.placeholderImage} /> )}
-                    <div className={styles.itemInfo}>
-                      <h2 className={styles.itemName}>{item.name}</h2>
+                  <div key={item.key} className="flex gap-4 md:gap-6 p-4 md:p-6 border border-gray-200 rounded-lg bg-white items-start">
+                    {item.image ? ( 
+                        <Image 
+                            src={item.image} 
+                            alt={item.name} 
+                            className="w-[80px] h-[80px] md:w-[100px] md:h-[100px] object-cover rounded-md border border-gray-100 shrink-0" 
+                            width={100} 
+                            height={100}
+                        /> 
+                    ) : ( 
+                        <div className="w-[80px] h-[80px] md:w-[100px] md:h-[100px] bg-gray-100 rounded-md shrink-0" /> 
+                    )}
+                    
+                    <div className="flex-grow flex flex-col gap-2">
+                      <h2 className="text-base md:text-lg font-semibold m-0 text-gray-900 leading-snug">{item.name}</h2>
                       
-                      {/* ৩. অ্যাট্রিবিউট (Color/Size) দেখানোর কোড যোগ করা হয়েছে */}
+                      {/* ৩. অ্যাট্রিবিউট (Color/Size) দেখানোর কোড যোগ করা হয়েছে */}
                       {item.attributes && item.attributes.length > 0 && (
                         <div style={{ marginTop: '5px', fontSize: '14px', color: '#555' }}>
                           {item.attributes.map((attr: any, index: number) => (
@@ -209,18 +237,30 @@ export default function CartPage() {
                         </div>
                       )}
 
-                      <div className={styles.itemMeta}>
-                          <p className={styles.itemPrice} dangerouslySetInnerHTML={{ __html: item.price }}></p>
-                          <div className={styles.quantityControl}>
-                            <button onClick={() => updateQuantity(item.key, item.quantity - 1)} disabled={isLoading || item.quantity <= 1}>-</button>
-                            <span>{item.quantity}</span>
-                            <button onClick={() => updateQuantity(item.key, item.quantity + 1)} disabled={isLoading}>+</button>
+                      <div className="flex flex-col items-start gap-3 mt-2">
+                          <p className="m-0 font-bold text-lg text-gray-900" dangerouslySetInnerHTML={{ __html: item.price }}></p>
+                          <div className="flex items-center border border-gray-300 rounded overflow-hidden">
+                            <button 
+                                onClick={() => updateQuantity(item.key, item.quantity - 1)} 
+                                disabled={isLoading || item.quantity <= 1}
+                                className="px-3 py-1.5 bg-gray-50 hover:bg-gray-200 disabled:opacity-50 font-bold text-base transition-colors"
+                            >
+                                -
+                            </button>
+                            <span className="px-3 font-semibold text-base">{item.quantity}</span>
+                            <button 
+                                onClick={() => updateQuantity(item.key, item.quantity + 1)} 
+                                disabled={isLoading}
+                                className="px-3 py-1.5 bg-gray-50 hover:bg-gray-200 disabled:opacity-50 font-bold text-base transition-colors"
+                            >
+                                +
+                            </button>
                           </div>
-                          <div className={styles.itemActions}>
-                           {/* ৪. রিমুভ বাটনে লোডিং টেক্সট এবং হ্যান্ডলার যোগ করা হয়েছে */}
+                          <div className="flex items-center">
+                           {/* ৪. রিমুভ বাটনে লোডিং টেক্সট এবং হ্যান্ডলার যোগ করা হয়েছে */}
                             <button 
                               onClick={() => handleRemoveItem(item.key)} 
-                              className={styles.removeButton} 
+                              className="bg-transparent border-none text-red-600 p-0 text-sm cursor-pointer underline mt-0.5 hover:text-red-700 hover:no-underline transition-colors disabled:opacity-50" 
                               disabled={isLoading || removingKey === item.key}
                               style={{ opacity: removingKey === item.key ? 0.7 : 1 }}
                             >
@@ -232,32 +272,53 @@ export default function CartPage() {
                   </div>
                 ))}
               </div>
-              <div className={styles.cartSummary}>
-                <h2>Order Summary</h2>
-                <div className={styles.summaryRow}>
+
+              {/* Cart Summary (Right Sidebar) */}
+              <div className="border border-gray-200 p-6 rounded-lg bg-gray-50 sticky top-[100px]">
+                <h2 className="mt-0 mb-6 text-2xl font-bold border-b border-gray-200 pb-4">Order Summary</h2>
+                <div className="flex justify-between mb-4 text-base text-gray-700">
                   <span>Subtotal</span>
                   <span dangerouslySetInnerHTML={{ __html: cartDetails?.subtotal || '$0.00' }}></span>
                 </div>
-                <div className={styles.couponContainer}>
-                  <div className={styles.couponForm}>
-                      <input type="text" value={couponCode} onChange={(e) => setCouponCode(e.target.value)} placeholder="Coupon code" className={styles.couponInput} disabled={isLoading}/>
-                      <button onClick={handleApplyCoupon} className={styles.couponButton} disabled={isLoading || !couponCode.trim()}>
+                
+                {/* Coupon Section */}
+                <div className="mb-6 border-b border-gray-200 pb-6">
+                  <div className="flex gap-2">
+                      <input 
+                        type="text" 
+                        value={couponCode} 
+                        onChange={(e) => setCouponCode(e.target.value)} 
+                        placeholder="Coupon code" 
+                        className="flex-grow p-2.5 border border-gray-300 rounded text-sm" 
+                        disabled={isLoading}
+                      />
+                      <button 
+                        onClick={handleApplyCoupon} 
+                        className="px-4 py-2.5 bg-gray-700 text-white rounded font-semibold text-sm hover:bg-gray-900 disabled:bg-gray-400 transition-colors" 
+                        disabled={isLoading || !couponCode.trim()}
+                      >
                           {isCouponLoading ? 'Applying...' : 'Apply'}
                       </button>
                   </div>
                 </div>
+
                 {cartDetails?.appliedCoupons?.map((coupon) => (
-                  <div key={coupon.code} className={`${styles.summaryRow} ${styles.couponRow}`}>
+                  <div key={coupon.code} className="flex justify-between mb-4 text-sm text-green-600">
                     <span>Coupon: {coupon.code}</span>
-                    <div className={styles.couponValue}>
+                    <div className="flex items-center">
                       <span dangerouslySetInnerHTML={{ __html: `-${cartDetails.discountTotal || '$0.00'}` }} />
-                      <button onClick={() => handleRemoveCoupon(coupon.code)} className={styles.removeButtonSmall} disabled={isLoading}>
+                      <button 
+                        onClick={() => handleRemoveCoupon(coupon.code)} 
+                        className="bg-transparent border-none text-red-600 ml-1.5 text-xs underline cursor-pointer hover:no-underline disabled:opacity-50" 
+                        disabled={isLoading}
+                      >
                         [Remove]
                       </button>
                     </div>
                   </div>
                 ))}
-                <div className={`${styles.summaryRow} ${styles.grandTotal}`}>
+                
+                <div className="flex justify-between text-xl font-extrabold text-gray-900 border-t-2 border-gray-200 pt-4 mt-4 mb-6">
                   <strong>Total</strong>
                   <strong dangerouslySetInnerHTML={{ __html: cartDetails?.total || '$0.00' }}></strong>
                 </div>

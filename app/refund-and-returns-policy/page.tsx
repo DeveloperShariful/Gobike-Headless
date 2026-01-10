@@ -1,6 +1,6 @@
 // app/refund-and-returns-policy/page.tsx
 import Script from 'next/script';
-import styles from './Returns.module.css';
+// import styles from './Returns.module.css'; // CSS Module সরানো হয়েছে
 import Breadcrumbs from '../../components/Breadcrumbs';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -14,11 +14,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Return and Refund Policy | GoBike Australia',
     description: 'Learn about our 30-day return policy and process for refunds and exchanges at GoBike Australia.',
-    url: 'https://gobike.au/refund-and-returns-policy', // <-- সঠিক URL
+    url: 'https://gobike.au/refund-and-returns-policy',
     siteName: 'GoBike Australia',
     images: [
       {
-        url: 'https://gobikes.au/wp-content/uploads/2025/11/gobike-au-1-year-warranty-kids-ebikes.jpg', // একটি ডিফল্ট শেয়ারিং ইমেজ
+        url: 'https://gobikes.au/wp-content/uploads/2025/11/gobike-au-1-year-warranty-kids-ebikes.jpg', 
         width: 1200,
         height: 857,
         alt: 'GoBike Australia Return and Refund Policy',
@@ -62,7 +62,7 @@ const organizationSchema = {
   "@type": "Organization",
   "name": "GoBike.au",
   "url": "https:gobike.au",
-  "logo": "URL_TO_YOUR_LOGO.png", // অনুগ্রহ করে আপনার লোগোর সঠিক URL দিন
+  "logo": "URL_TO_YOUR_LOGO.png",
   "contactPoint": {
     "@type": "ContactPoint",
     "telephone": "+61-426-067-277",
@@ -72,16 +72,9 @@ const organizationSchema = {
   }
 };
 
-
 export default function RefundAndReturnsPolicyPage() {
   return (
     <>
-      {/* 
-        Next.js 13+ App Router-এ <head> ট্যাগ সরাসরি ব্যবহার করা যায় না।
-        এর পরিবর্তে, আমরা metadata অবজেক্ট এক্সপোর্ট করতে পারি অথবা Script কম্পোনেন্ট ব্যবহার করতে পারি।
-        ফন্টগুলো layout.tsx-এ যোগ করা ভালো। আপাতত, এটি কাজ করবে।
-        SEO Schema যোগ করার জন্য Script কম্পোনেন্ট ব্যবহার করা হচ্ছে।
-      */}
       <Script id="faq-schema" type="application/ld+json">
         {JSON.stringify(faqSchema)}
       </Script>
@@ -89,75 +82,93 @@ export default function RefundAndReturnsPolicyPage() {
         {JSON.stringify(organizationSchema)}
       </Script>
       <div>
-            <Breadcrumbs />
-      <div className={styles.gobikePolicyPage}>
-        <div className={styles.policyContainer}>
+        <Breadcrumbs />
+        
+        {/* .gobikePolicyPage replaced */}
+        <div className="font-sans text-[#333] leading-[1.7] bg-white">
+          {/* .policyContainer replaced */}
+          <div className="max-w-[900px] mx-auto px-[15px]">
 
-            <div className={styles.policyHeader}>
-                <h1>Hassle-Free Refund & Return Policy</h1>
-                <p>We want you to feel completely confident shopping with us. Our straightforward policy ensures you get the best service and protection for your purchase.</p>
+            {/* .policyHeader replaced */}
+            <div className="text-center mb-10">
+              <h1 className="text-[32px] font-bold text-[#1a1a1a] mb-[15px]">Hassle-Free Refund & Return Policy</h1>
+              <p className="text-center text-[18px] text-[#555] max-w-[700px] mx-auto mb-[50px]">
+                We want you to feel completely confident shopping with us. Our straightforward policy ensures you get the best service and protection for your purchase.
+              </p>
             </div>
 
-            <div className={styles.policySection}>
-                <h2>Return Eligibility: What Can You Return?</h2>
-                <p>We accept returns of <strong>unused and undamaged</strong> products, including ebike conversion kits, within <strong>14 calendar days</strong> of delivery. To be eligible:</p>
-                <ul>
-                    <li>The product must be in brand-new condition, with no signs of installation or use.</li>
-                    <li>The original packaging must be intact with all accessories, manuals, and parts included.</li>
-                    <li>Electrical components like batteries must remain unopened and unused for safety reasons.</li>
-                </ul>
-                <div className={styles.highlightBox}>
-                    <p><strong>Please Note:</strong> The cost of return shipping is borne by the customer, unless the item was delivered faulty. We highly recommend using a tracked postal service.</p>
-                </div>
+            {/* .policySection replaced */}
+            <div className="mb-10">
+              <h2 className="text-[24px] font-semibold text-[#1a1a1a] mb-5 pb-[10px] border-b-2 border-[#f0f0f0]">Return Eligibility: What Can You Return?</h2>
+              <p className="text-base mb-[15px]">We accept returns of <strong className="font-semibold text-[#1a1a1a]">unused and undamaged</strong> products, including ebike conversion kits, within <strong className="font-semibold text-[#1a1a1a]">14 calendar days</strong> of delivery. To be eligible:</p>
+              
+              {/* Custom List Styling for Checkmarks */}
+              <ul className="list-none pl-0 mb-[15px]">
+                <li className="relative pl-[30px] mb-[10px] text-base before:content-['✓'] before:text-[#28a745] before:font-bold before:absolute before:left-0 before:top-[1px]">The product must be in brand-new condition, with no signs of installation or use.</li>
+                <li className="relative pl-[30px] mb-[10px] text-base before:content-['✓'] before:text-[#28a745] before:font-bold before:absolute before:left-0 before:top-[1px]">The original packaging must be intact with all accessories, manuals, and parts included.</li>
+                <li className="relative pl-[30px] mb-[10px] text-base before:content-['✓'] before:text-[#28a745] before:font-bold before:absolute before:left-0 before:top-[1px]">Electrical components like batteries must remain unopened and unused for safety reasons.</li>
+              </ul>
+              
+              {/* .highlightBox replaced */}
+              <div className="bg-[#f8f9fa] border-l-4 border-[#007bff] p-5 rounded-r-lg my-5">
+                <p className="text-base mb-0"><strong className="font-semibold text-[#1a1a1a]">Please Note:</strong> The cost of return shipping is borne by the customer, unless the item was delivered faulty. We highly recommend using a tracked postal service.</p>
+              </div>
             </div>
 
-            <div className={styles.policySection}>
-                <h2>Refund Process: How It Works</h2>
-                <p>Once we receive and inspect your return, an approved refund will be processed to your original payment method within <strong>5 to 7 business days</strong>. You will receive an email confirmation.</p>
-                <div className={`${styles.highlightBox} ${styles.warningBox}`}>
-                    <p>If a product shows signs of use, damage, or is missing components, we reserve the right to apply a restocking fee of up to 20% or, in some cases, reject the return.</p>
-                </div>
+            <div className="mb-10">
+              <h2 className="text-[24px] font-semibold text-[#1a1a1a] mb-5 pb-[10px] border-b-2 border-[#f0f0f0]">Refund Process: How It Works</h2>
+              <p className="text-base mb-[15px]">Once we receive and inspect your return, an approved refund will be processed to your original payment method within <strong className="font-semibold text-[#1a1a1a]">5 to 7 business days</strong>. You will receive an email confirmation.</p>
+              
+              {/* .highlightBox .warningBox replaced */}
+              <div className="bg-[#fff8f8] border-l-4 border-[#dc3545] p-5 rounded-r-lg my-5">
+                <p className="text-base mb-0">If a product shows signs of use, damage, or is missing components, we reserve the right to apply a restocking fee of up to 20% or, in some cases, reject the return.</p>
+              </div>
             </div>
 
-            <div className={styles.policySection}>
-                <h2>Faulty, Damaged, or Incorrect Items</h2>
-                <p>If your <strong>ebike conversion kit</strong> or any item arrives damaged or defective, please <strong>contact us within 48 hours</strong> of delivery. We will offer a replacement at no extra cost or a full refund, including return shipping.</p>
+            <div className="mb-10">
+              <h2 className="text-[24px] font-semibold text-[#1a1a1a] mb-5 pb-[10px] border-b-2 border-[#f0f0f0]">Faulty, Damaged, or Incorrect Items</h2>
+              <p className="text-base mb-[15px]">If your <strong className="font-semibold text-[#1a1a1a]">ebike conversion kit</strong> or any item arrives damaged or defective, please <strong className="font-semibold text-[#1a1a1a]">contact us within 48 hours</strong> of delivery. We will offer a replacement at no extra cost or a full refund, including return shipping.</p>
             </div>
 
-            <div className={styles.policySection}>
-                <h2>How to Initiate a Return</h2>
-                <ol>
-                    <li><strong>Contact us via email at <a href="mailto:gobike@gobike.au">gobike@gobike.au</a></strong>.</li>
-                    <li>Provide your <strong>order number</strong> and the reason for your return.</li>
-                    <li><strong>Attach photos</strong> if the item is damaged or faulty (this speeds up the process).</li>
-                    <li>Our team will reply within 1 business day with return instructions.</li>
-                </ol>
+            <div className="mb-10">
+              <h2 className="text-[24px] font-semibold text-[#1a1a1a] mb-5 pb-[10px] border-b-2 border-[#f0f0f0]">How to Initiate a Return</h2>
+              <ol className="list-decimal pl-[20px] text-base mb-[15px]">
+                <li className="mb-[10px]"><strong className="font-semibold text-[#1a1a1a]">Contact us via email at <a href="mailto:gobike@gobike.au" className="text-[#007bff] font-semibold underline">gobike@gobike.au</a></strong>.</li>
+                <li className="mb-[10px]">Provide your <strong className="font-semibold text-[#1a1a1a]">order number</strong> and the reason for your return.</li>
+                <li className="mb-[10px]"><strong className="font-semibold text-[#1a1a1a]">Attach photos</strong> if the item is damaged or faulty (this speeds up the process).</li>
+                <li className="mb-[10px]">Our team will reply within 1 business day with return instructions.</li>
+              </ol>
             </div>
 
-            <div className={`${styles.policySection} ${styles.finalSummary}`}>
-                <h2>Summary of Our Policy</h2>
-                <ul>
-                    <li><strong>14-day return window</strong> for new and unused items.</li>
-                    <li>Full refunds processed within 5-7 business days after inspection.</li>
-                    <li>Faulty or damaged items are replaced or fully refunded at our cost.</li>
-                    <li>Simple exchange and upgrade options are available.</li>
-                    <li>Full compliance with <strong>Australian Consumer Law</strong>.</li>
-                </ul>
+            {/* .policySection .finalSummary replaced */}
+            <div className="mb-10 bg-[#f8f9fa] p-[30px] rounded-xl">
+              <h2 className="text-[24px] font-semibold text-[#1a1a1a] mb-5 pb-[10px] border-b-2 border-[#f0f0f0]">Summary of Our Policy</h2>
+              <ul className="list-none pl-0 mb-[15px]">
+                <li className="relative pl-[30px] mb-[10px] text-base before:content-['✓'] before:text-[#28a745] before:font-bold before:absolute before:left-0 before:top-[1px]"><strong className="font-semibold text-[#1a1a1a]">14-day return window</strong> for new and unused items.</li>
+                <li className="relative pl-[30px] mb-[10px] text-base before:content-['✓'] before:text-[#28a745] before:font-bold before:absolute before:left-0 before:top-[1px]">Full refunds processed within 5-7 business days after inspection.</li>
+                <li className="relative pl-[30px] mb-[10px] text-base before:content-['✓'] before:text-[#28a745] before:font-bold before:absolute before:left-0 before:top-[1px]">Faulty or damaged items are replaced or fully refunded at our cost.</li>
+                <li className="relative pl-[30px] mb-[10px] text-base before:content-['✓'] before:text-[#28a745] before:font-bold before:absolute before:left-0 before:top-[1px]">Simple exchange and upgrade options are available.</li>
+                <li className="relative pl-[30px] mb-[10px] text-base before:content-['✓'] before:text-[#28a745] before:font-bold before:absolute before:left-0 before:top-[1px]">Full compliance with <strong className="font-semibold text-[#1a1a1a]">Australian Consumer Law</strong>.</li>
+              </ul>
             </div>
             
-            <div className={styles.policySection}>
-                <h2>Need Help with Your Return?</h2>
-                <p>Your satisfaction is our top priority. If you have any questions, our local Aussie support team is here to help you every step of the way.</p>
-                <div className={styles.contactInfoBlock}>
-                    <p><strong>Business Name:</strong> GoBike.au<br />
-                    <strong>Email:</strong> <a href="mailto:support@gobike.au">support@gobike.au</a><br />
-                    <strong>Phone:</strong> +61 426 067 277<br />
-                    <strong>Website:</strong> <Link href="https://gobike.au">Gobike Australia </Link></p>
-                </div>
+            <div className="mb-10">
+              <h2 className="text-[24px] font-semibold text-[#1a1a1a] mb-5 pb-[10px] border-b-2 border-[#f0f0f0]">Need Help with Your Return?</h2>
+              <p className="text-base mb-[15px]">Your satisfaction is our top priority. If you have any questions, our local Aussie support team is here to help you every step of the way.</p>
+              
+              {/* .contactInfoBlock replaced */}
+              <div className="border border-[#e9e9e9] p-[30px] rounded-xl mt-[30px]">
+                <p className="text-base mb-0">
+                  <strong className="font-semibold text-[#1a1a1a]">Business Name:</strong> GoBike.au<br />
+                  <strong className="font-semibold text-[#1a1a1a]">Email:</strong> <a href="mailto:support@gobike.au" className="text-[#007bff] font-semibold underline">support@gobike.au</a><br />
+                  <strong className="font-semibold text-[#1a1a1a]">Phone:</strong> +61 426 067 277<br />
+                  <strong className="font-semibold text-[#1a1a1a]">Website:</strong> <Link href="https://gobike.au" className="text-[#007bff] font-semibold underline">Gobike Australia </Link>
+                </p>
+              </div>
             </div>
 
+          </div>
         </div>
-      </div>
       </div>
     </>
   );

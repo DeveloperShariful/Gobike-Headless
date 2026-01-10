@@ -1,9 +1,9 @@
 // ফাইল পাথ: app/product/components/ImageSlider/ImageSlider.tsx
 'use client';
 
-import { useState, useEffect, useCallback } from 'react'; // <-- useCallback এখানে import করা হয়েছে
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import styles from './ImageSlider.module.css';
+// import styles from './ImageSlider.module.css'; // CSS Module সরানো হয়েছে
 
 interface ImageSliderProps {
   images: {
@@ -16,7 +16,7 @@ interface ImageSliderProps {
 export default function ImageSlider({ images, title }: ImageSliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // === মূল পরিবর্তন: ফাংশনগুলোকে useCallback দিয়ে মুড়ে দেওয়া হয়েছে ===
+  // === মূল পরিবর্তন: ফাংশনগুলোকে useCallback দিয়ে মুড়ে দেওয়া হয়েছে ===
   const goToNext = useCallback(() => {
     setCurrentIndex(prevIndex => (prevIndex === images.length - 1 ? 0 : prevIndex + 1));
   }, [images.length]);
@@ -33,33 +33,51 @@ export default function ImageSlider({ images, title }: ImageSliderProps) {
     const timer = setTimeout(goToNext, 5000);
     return () => clearTimeout(timer);
 
-  }, [currentIndex, images.length, goToNext]); // <-- goToNext কে dependency হিসেবে যোগ করা হয়েছে
+  }, [currentIndex, images.length, goToNext]);
 
   if (!images || images.length === 0) {
     return <div>No images to display.</div>;
   }
 
   return (
-    <div className={styles.sliderComponent}>
+    // .sliderComponent replaced
+    <div className="w-full">
       {title && (
-          <div className={styles.header}>
-            <h2 className={styles.title}>{title}</h2>
+          // .header replaced
+          <div className="flex justify-between items-center mb-4">
+            {/* .title replaced */}
+            <h2 className="text-2xl font-bold text-slate-900">{title}</h2>
             {images.length > 1 && (
-                <div className={styles.navArrows}>
-                    <button onClick={goToPrevious} className={styles.arrow}>&#10094;</button>
-                    <button onClick={goToNext} className={styles.arrow}>&#10095;</button>
+                // .navArrows replaced
+                <div className="flex gap-2">
+                    <button 
+                        onClick={goToPrevious} 
+                        // .arrow replaced
+                        className="w-10 h-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-lg text-slate-600 cursor-pointer transition-all duration-200 ease-in-out hover:bg-slate-200 hover:text-slate-900"
+                    >
+                        &#10094;
+                    </button>
+                    <button 
+                        onClick={goToNext} 
+                        className="w-10 h-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-lg text-slate-600 cursor-pointer transition-all duration-200 ease-in-out hover:bg-slate-200 hover:text-slate-900"
+                    >
+                        &#10095;
+                    </button>
                 </div>
             )}
           </div>
       )}
 
-      <div className={styles.sliderContainer}>
+      {/* .sliderContainer replaced */}
+      <div className="relative w-full aspect-[4/3] overflow-hidden rounded-xl">
         <div 
-          className={styles.sliderTrack} 
+          // .sliderTrack replaced
+          className="flex h-full transition-transform duration-500 ease-in-out"
           style={{ transform: `translateX(-${currentIndex * 100}%)` }}
         >
           {images.map((image, index) => (
-            <div className={styles.slide} key={index}>
+            // .slide replaced
+            <div className="flex-none w-full h-full relative" key={index}>
               <Image 
                 src={image.src} 
                 alt={image.alt} 
@@ -74,10 +92,18 @@ export default function ImageSlider({ images, title }: ImageSliderProps) {
 
         {!title && images.length > 1 && (
             <>
-                <button onClick={goToPrevious} className={`${styles.navButton} ${styles.prevButton}`}>
+                {/* .navButton & .prevButton replaced */}
+                <button 
+                    onClick={goToPrevious} 
+                    className="absolute top-1/2 -translate-y-1/2 left-4 w-10 h-10 rounded-full bg-white/80 backdrop-blur-[4px] border border-black/5 text-[#333] flex items-center justify-center text-xl z-10 cursor-pointer transition-colors duration-200 ease-in-out hover:bg-white"
+                >
                     &#10094;
                 </button>
-                <button onClick={goToNext} className={`${styles.navButton} ${styles.nextButton}`}>
+                {/* .navButton & .nextButton replaced */}
+                <button 
+                    onClick={goToNext} 
+                    className="absolute top-1/2 -translate-y-1/2 right-4 w-10 h-10 rounded-full bg-white/80 backdrop-blur-[4px] border border-black/5 text-[#333] flex items-center justify-center text-xl z-10 cursor-pointer transition-colors duration-200 ease-in-out hover:bg-white"
+                >
                     &#10095;
                 </button>
             </>
@@ -85,9 +111,11 @@ export default function ImageSlider({ images, title }: ImageSliderProps) {
       </div>
 
       {images.length > 1 && (
-          <div className={styles.progressBarContainer}>
+          // .progressBarContainer replaced
+          <div className="w-full h-1 bg-slate-200 rounded-sm mt-6">
             <div 
-                className={styles.progressFill}
+                // .progressFill replaced
+                className="h-full bg-blue-500 rounded-sm transition-[width] duration-300 ease-in-out"
                 style={{ width: `${((currentIndex + 1) / images.length) * 100}%` }}
             ></div>
           </div>

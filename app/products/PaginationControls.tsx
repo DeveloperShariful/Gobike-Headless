@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import styles from './pagination.module.css'; // pagination.module.css ফাইলটি অপরিবর্তিত থাকবে
+// import styles from './pagination.module.css'; // CSS Module সরানো হয়েছে
 
 interface PageInfo {
   hasNextPage: boolean;
@@ -21,7 +21,6 @@ export default function PaginationControls({ pageInfo }: PaginationControlsProps
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // "Next" বাটনের জন্য URL তৈরি
   const createNextPageUrl = () => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete('before');
@@ -31,7 +30,6 @@ export default function PaginationControls({ pageInfo }: PaginationControlsProps
     return `${pathname}?${params.toString()}`;
   };
 
-  // "Previous" বাটনের জন্য URL তৈরি
   const createPrevPageUrl = () => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete('after');
@@ -42,23 +40,37 @@ export default function PaginationControls({ pageInfo }: PaginationControlsProps
   };
 
   return (
-    <div className={styles.paginationContainer}>
+    // .paginationContainer replaced
+    <div className="flex justify-center items-center gap-4 mt-10 mb-8">
       {pageInfo.hasPreviousPage ? (
-        <Link href={createPrevPageUrl()} className={styles.button}>
+        <Link 
+            href={createPrevPageUrl()} 
+            // .button replaced
+            className="px-6 py-3 border border-gray-200 bg-white rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+        >
           &larr; Previous
         </Link>
       ) : (
-        <button className={styles.button} disabled>
+        <button 
+            className="px-6 py-3 border border-gray-200 bg-white rounded-lg text-gray-400 font-medium cursor-not-allowed opacity-60" 
+            disabled
+        >
           &larr; Previous
         </button>
       )}
 
       {pageInfo.hasNextPage ? (
-        <Link href={createNextPageUrl()} className={styles.button}>
+        <Link 
+            href={createNextPageUrl()} 
+            className="px-6 py-3 border border-gray-200 bg-white rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+        >
           Next &rarr;
         </Link>
       ) : (
-        <button className={styles.button} disabled>
+        <button 
+            className="px-6 py-3 border border-gray-200 bg-white rounded-lg text-gray-400 font-medium cursor-not-allowed opacity-60" 
+            disabled
+        >
           Next &rarr;
         </button>
       )}

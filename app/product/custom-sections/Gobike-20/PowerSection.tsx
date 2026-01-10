@@ -1,20 +1,15 @@
 // ফাইল পাথ: app/product/custom-sections/Gobike-20/PowerSection.tsx
 import TextWithImage from '../../components/TextWithImage/TextWithImage';
-import styles from '../GobikeSections.module.css';
-
-// সেকশনগুলোর মধ্যে স্পেস দেওয়ার জন্য একটি wrapper div
-const wrapperStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '4rem',
-} as const;
+// import styles from '../GobikeSections.module.css'; // CSS Module সরানো হয়েছে
 
 export default function PowerSection() {
   return (
-    <section className={`${styles.sectionContainer} ${styles.coloredBackground}`}>
-      <div style={wrapperStyle}>
+    // .sectionContainer & .coloredBackground replaced
+    <section className="w-full py-12 px-[5%] md:px-[1%] box-border bg-[#f7fafc]">
+      {/* wrapperStyle replaced */}
+      <div className="flex flex-col gap-16">
       
-        {/* === সেকশন ১: পাওয়ার এবং পারফরম্যান্স === */}
+        {/* === সেকশন ১: পাওয়ার এবং পারফরম্যান্স === */}
         <TextWithImage
           imageUrl="https://gobikes.au/wp-content/uploads/2025/10/gobike-20-hydraulic-disc-brakes-closeup.webp"
           imageAlt="A young rider leans into a turn on a pump track with the GoBike 20 e-bike."

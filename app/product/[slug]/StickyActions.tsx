@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import { useCart } from '../../../context/CartContext';
-import styles from './StickyActions.module.css';
+// import styles from './StickyActions.module.css'; // CSS Module সরানো হয়েছে
 
 interface ProductForCart {
   id: string;
@@ -50,27 +50,35 @@ export default function StickyActions({ product, isValid }: StickyActionsProps) 
   const buttonText = isAdding ? 'Adding...' : (isValid ? 'Add to Cart' : 'Select color and size');
 
   return (
-    <div className={styles.actionsWrapper}>
-      <div className={styles.quantitySelector}>
+    // .actionsWrapper replaced
+    <div className="flex items-center gap-2 w-full md:w-auto justify-between md:justify-start">
+      
+      {/* .quantitySelector replaced */}
+      <div className="flex items-center border border-[#e0e0e0] rounded-md overflow-hidden h-[40px] md:h-[42px]">
         <button 
           onClick={() => handleQuantityChange(-1)} 
           disabled={isCartLoading || isAdding || quantity <= 1 || !isValid}
+          className="bg-[#f9f9f9] border-none text-base font-medium h-full flex items-center justify-center px-3 md:px-[14px] cursor-pointer hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           -
         </button>
-        <span>{quantity}</span>
+        <span className="bg-white min-w-[30px] h-full flex items-center justify-center text-base font-medium">
+            {quantity}
+        </span>
         <button 
           onClick={() => handleQuantityChange(1)} 
           disabled={isCartLoading || isAdding || !isValid}
+          className="bg-[#f9f9f9] border-none text-base font-medium h-full flex items-center justify-center px-3 md:px-[14px] cursor-pointer hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           +
         </button>
       </div>
       
+      {/* .addToCartButton replaced */}
       <button 
-        className={styles.addToCartButton}
         onClick={handleAddToCart}
         disabled={isCartLoading || isAdding || !isValid}
+        className={`bg-black text-white border-none rounded-md h-[40px] md:h-[42px] px-4 md:px-6 text-sm md:text-[15px] font-semibold whitespace-nowrap transition-colors duration-200 flex-grow md:flex-grow-0 hover:bg-[#333] disabled:bg-[#888] disabled:cursor-not-allowed`}
         style={{ 
             opacity: isValid ? 1 : 0.6, 
             cursor: isValid ? 'pointer' : 'not-allowed' 

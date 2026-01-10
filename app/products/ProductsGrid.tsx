@@ -1,10 +1,9 @@
 // app/products/ProductsGrid.tsx
-'use client'; // <-- এই লাইনটি অপরিহার্য
+'use client'; 
 
 import ProductCard from './ProductCard';
-import styles from './products.module.css';
+// import styles from './products.module.css'; // CSS Module সরানো হয়েছে
 
-// সার্ভার কম্পוננט থেকে আসা প্রোডাক্ট ডেটার ধরন
 interface Product {
   id: string;
   databaseId: number;
@@ -19,18 +18,18 @@ interface Product {
   reviewCount?: number;
 }
 
-// ProductsGrid কম্পוננטের props-এর ধরন
 interface ProductsGridProps {
     products: Product[];
 }
 
 export default function ProductsGrid({ products }: ProductsGridProps) {
     if (!products || products.length === 0) {
-        return <p>No products found for this category.</p>;
+        return <p className="text-center py-10 text-gray-500 text-xl">No products found for this category.</p>;
     }
 
     return (
-        <div className={styles.grid}>
+        // Bikes/Spare Parts পেজের মতো গ্রিড লেআউট
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
             {products.map((product) => (
                 <ProductCard key={product.id} product={product} />
             ))}

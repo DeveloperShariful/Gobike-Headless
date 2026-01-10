@@ -1,8 +1,10 @@
+// components/Breadcrumbs.tsx
+
 'use client';
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import styles from './Breadcrumbs.module.css';
+// import styles from './Breadcrumbs.module.css'; // CSS Module সরানো হয়েছে
 
 interface BreadcrumbsProps {
   pageTitle?: string;
@@ -19,19 +21,22 @@ export default function Breadcrumbs({ pageTitle }: BreadcrumbsProps) {
   const pathSegments = pathname.split('/').filter(segment => segment);
 
   return (
-    <nav aria-label="Breadcrumb" className={styles.breadcrumbNav}>
-      <ol className={styles.breadcrumbList}>
-        <li className={styles.breadcrumbItem}>
-          <Link href="/" className={styles.breadcrumbLink}>Home</Link>
+    <nav aria-label="Breadcrumb" className="max-w-[1600px] mx-auto mt-2 mb-4 px-1.5 font-sans">
+      <ol className="flex items-center list-none p-0 m-0 text-[0.9rem] lg:text-[1.2rem] text-black overflow-hidden text-ellipsis whitespace-nowrap">
+        <li className="flex items-center">
+          <Link 
+            href="/" 
+            className="text-black no-underline font-semibold transition-colors duration-200 hover:underline hover:font-semibold whitespace-nowrap"
+          >
+            Home
+          </Link>
         </li>
         
         {pathSegments.map((segment, index) => {
           const isLast = index === pathSegments.length - 1;
           let href = '/' + pathSegments.slice(0, index + 1).join('/');
 
-          // ★★★ সমাধান: 'product' সেগমেন্টের জন্য লিঙ্ক পরিবর্তন করা হয়েছে ★★★
-          // যদি URL-এর অংশ 'product' হয়, তাহলে লিঙ্কটি '/products' করে দাও।
-          // আপনার প্রোডাক্ট পেজের লিঙ্ক যদি অন্য কিছু হয় (যেমন /shop), তাহলে সেটি এখানে দিন।
+          // ★★★ সমাধান: 'product' সেগমেন্টের জন্য লিঙ্ক পরিবর্তন লজিক অপরিবর্তিত রাখা হয়েছে ★★★
           if (segment === 'product') {
             href = '/products'; 
           }
@@ -43,12 +48,17 @@ export default function Breadcrumbs({ pageTitle }: BreadcrumbsProps) {
           }
 
           return (
-            <li key={segment} className={styles.breadcrumbItem}>
-              <span className={styles.separator}>/</span>
+            <li key={segment} className="flex items-center">
+              <span className="mx-[0.2rem] text-[#555555]">/</span>
               {isLast ? (
-                <span className={styles.currentPage}>{title}</span>
+                <span className="font-medium text-[#1a1a1a] text-[0.75rem] md:text-[1rem] whitespace-nowrap">
+                    {title}
+                </span>
               ) : (
-                <Link href={href} className={styles.breadcrumbLink}>
+                <Link 
+                    href={href} 
+                    className="text-black no-underline font-semibold transition-colors duration-200 hover:underline hover:font-semibold whitespace-nowrap"
+                >
                   {title}
                 </Link>
               )}

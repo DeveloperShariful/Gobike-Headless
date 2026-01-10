@@ -1,52 +1,56 @@
+// app/product/[slug]/ReviewForm.tsx
+
 'use client';
 
 import { useState, FormEvent, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import styles from './ReviewForm.module.css'; // নিশ্চিত করুন CSS গুলো এখানে আছে
+// import styles from './ReviewForm.module.css'; // CSS Module সরানো হয়েছে
 import { FaStar } from 'react-icons/fa';
 import Image from 'next/image';
 
 // --- Interfaces ---
 interface ReviewEdge {
-    node: {
-        id: string;
-        author: { node: { name: string; avatar?: { url: string } }; };
-        content: string;
-        date: string;
-    };
-    rating: number;
+  node: {
+    id: string;
+    author: { node: { name: string; avatar?: { url: string } }; };
+    content: string;
+    date: string;
+  };
+  rating: number;
 }
 
 interface ReviewFormProps {
   productId: number;
   averageRating: number | null | undefined;
   reviewCount: number | null | undefined;
-  reviews: ReviewEdge[]; // নতুন প্রপ: রিভিউ লিস্ট
+  reviews: ReviewEdge[];
 }
 
-// --- Helper Components (Moved from ProductClient) ---
+// --- Helper Components (Converted to Tailwind) ---
 const StarRatingDisplay = ({ rating }: { rating: number }) => {
-    const [starRating, setStarRating] = useState({ full: 0, empty: 5 });
-    useEffect(() => {
-        const totalStars = 5;
-        const fullStars = Math.round(rating || 0);
-        const emptyStars = totalStars - fullStars;
-        setStarRating({ full: fullStars, empty: emptyStars });
-    }, [rating]);
+  const [starRating, setStarRating] = useState({ full: 0, empty: 5 });
+  useEffect(() => {
+    const totalStars = 5;
+    const fullStars = Math.round(rating || 0);
+    const emptyStars = totalStars - fullStars;
+    setStarRating({ full: fullStars, empty: emptyStars });
+  }, [rating]);
 
-    return (
-        <div className={styles.starDisplay}>
-            {[...Array(starRating.full)].map((_, i) => <FaStar key={`full-${i}`} color="#ffc107" />)}
-            {[...Array(starRating.empty)].map((_, i) => <FaStar key={`empty-${i}`} color="#e4e5e9" />)}
-        </div>
-    );
+  return (
+    // .starDisplay replaced
+    <div className="flex gap-1 text-[1.5rem] my-2 text-amber-500">
+      {[...Array(starRating.full)].map((_, i) => <FaStar key={`full-${i}`} color="#ffc107" />)}
+      {[...Array(starRating.empty)].map((_, i) => <FaStar key={`empty-${i}`} color="#e4e5e9" />)}
+    </div>
+  );
 };
 
 const FormattedDate = ({ dateString }: { dateString: string }) => {
-    const [formattedDate, setFormattedDate] = useState<string | null>(null);
-    useEffect(() => { setFormattedDate(new Date(dateString).toLocaleDateString()); }, [dateString]);
-    if (!formattedDate) return <span className={styles.reviewDate}></span>;
-    return <span className={styles.reviewDate}>{formattedDate}</span>;
+  const [formattedDate, setFormattedDate] = useState<string | null>(null);
+  useEffect(() => { setFormattedDate(new Date(dateString).toLocaleDateString()); }, [dateString]);
+  if (!formattedDate) return <span className="text-[0.85rem] text-gray-400 mt-0.5"></span>;
+  // .reviewDate replaced
+  return <span className="text-[0.85rem] text-gray-400 mt-0.5">{formattedDate}</span>;
 };
 
 export default function ReviewForm({ productId, averageRating, reviewCount, reviews }: ReviewFormProps) {
@@ -112,81 +116,158 @@ export default function ReviewForm({ productId, averageRating, reviewCount, revi
   };
 
   return (
-    <div className={styles.reviewWidgetContainer}>
+    // .reviewWidgetContainer & .reviewWidget replaced
+    <div className="w-full box-border">
+        
         {/* --- Review Summary & Form Toggle --- */}
-        <div className={styles.reviewWidget}>
-            <div className={styles.reviewsSummary}>
-                <div className={styles.summaryAverage}>
-                    <div className={styles.averageRatingValue}>{currentRating.toFixed(1)}</div>
-                    <StarRatingDisplay rating={currentRating} />
-                    <div className={styles.basedOnReviews}>Based on {currentReviewCount} reviews</div>
-                    <button className={styles.addReviewButton} onClick={() => setShowForm(!showForm)}>
-                        {showForm ? 'Cancel Review' : 'Add a review'}
-                    </button>
-                </div>
-                <div className={styles.summaryBreakdown}>
-                     {/* Breakdown Bars (Static for UI as per requirement) */}
-                    <div className={styles.ratingBarRow}><span>5 star</span><div className={styles.ratingBar}><div style={{width: '100%'}}></div></div><span>100%</span></div>
-                    <div className={styles.ratingBarRow}><span>4 star</span><div className={styles.ratingBar}><div style={{width: '0%'}}></div></div><span>0%</span></div>
-                    <div className={styles.ratingBarRow}><span>3 star</span><div className={styles.ratingBar}><div style={{width: '0%'}}></div></div><span>0%</span></div>
-                    <div className={styles.ratingBarRow}><span>2 star</span><div className={styles.ratingBar}><div style={{width: '0%'}}></div></div><span>0%</span></div>
-                    <div className={styles.ratingBarRow}><span>1 star</span><div className={styles.ratingBar}><div style={{width: '0%'}}></div></div><span>0%</span></div>
-                </div>
+        {/* .reviewsSummary replaced */}
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-8 p-6 md:p-10 bg-[#f9fafb] border border-[#e5e7eb] rounded-xl mb-12 items-center">
+            {/* .summaryAverage replaced */}
+            <div className="flex flex-col items-center justify-center text-center md:border-r md:border-[#e5e7eb] md:pr-8">
+                {/* .averageRatingValue replaced */}
+                <div className="text-[3rem] font-extrabold text-gray-900 leading-none">{currentRating.toFixed(1)}</div>
+                <StarRatingDisplay rating={currentRating} />
+                {/* .basedOnReviews replaced */}
+                <div className="text-sm text-gray-500 mb-5">Based on {currentReviewCount} reviews</div>
+                {/* .addReviewButton replaced */}
+                <button 
+                    className="w-full sm:w-auto py-3 px-6 bg-white border border-[#d1d5db] rounded-md font-semibold text-gray-700 cursor-pointer transition-all duration-200 text-sm hover:bg-[#f3f4f6] hover:border-[#9ca3af]" 
+                    onClick={() => setShowForm(!showForm)}
+                >
+                    {showForm ? 'Cancel Review' : 'Add a review'}
+                </button>
             </div>
             
-            {/* --- Review Submission Form --- */}
-            {showForm && (
-                <form onSubmit={handleSubmit} className={styles.reviewForm}>
-                    <h4>Write a Review</h4>
-                    <p>Your email address will not be published. Required fields are marked *</p>
-                    <div className={styles.ratingInput}>
-                        <label>Your rating *</label>
-                        <div className={styles.stars}>
-                            {[...Array(5)].map((_, index) => {
-                            const ratingValue = index + 1;
-                            return (
-                                <label key={index}>
-                                <input type="radio" name="rating" value={ratingValue} onClick={() => setRating(ratingValue)} />
-                                <FaStar 
-                                    className={styles.star} 
-                                    color={ratingValue <= (hover || rating) ? "#ffc107" : "#e4e5e9"} 
-                                    onMouseEnter={() => setHover(ratingValue)}
-                                    onMouseLeave={() => setHover(0)}
-                                />
-                                </label>
-                            );
-                            })}
-                        </div>
+            {/* .summaryBreakdown replaced */}
+            <div className="w-full flex flex-col gap-3">
+                {/* .ratingBarRow replaced */}
+                <div className="flex items-center gap-3 text-[0.85rem] text-gray-600">
+                    <span className="min-w-[45px] font-medium">5 star</span>
+                    {/* .ratingBar replaced */}
+                    <div className="flex-grow h-2 bg-[#e5e7eb] rounded overflow-hidden">
+                        <div className="h-full bg-amber-500 w-full"></div>
                     </div>
-                    <div className={styles.formGroup}>
-                        <label htmlFor='comment'>Your review *</label>
-                        <textarea id='comment' value={comment} onChange={e => setComment(e.target.value)} required />
+                    <span className="min-w-[35px] text-right">100%</span>
+                </div>
+                <div className="flex items-center gap-3 text-[0.85rem] text-gray-600">
+                    <span className="min-w-[45px] font-medium">4 star</span>
+                    <div className="flex-grow h-2 bg-[#e5e7eb] rounded overflow-hidden">
+                        <div className="h-full bg-amber-500 w-0"></div>
                     </div>
-                    <div className={styles.formRow}>
-                        <div className={styles.formGroup}>
-                            <label htmlFor='author'>Your Name *</label>
-                            <input id='author' type="text" value={author} onChange={e => setAuthor(e.target.value)} required />
-                        </div>
-                        <div className={styles.formGroup}>
-                            <label htmlFor='email'>Your Email *</label>
-                            <input id='email' type="email" value={email} onChange={e => setEmail(e.target.value)} required />
-                        </div>
+                    <span className="min-w-[35px] text-right">0%</span>
+                </div>
+                <div className="flex items-center gap-3 text-[0.85rem] text-gray-600">
+                    <span className="min-w-[45px] font-medium">3 star</span>
+                    <div className="flex-grow h-2 bg-[#e5e7eb] rounded overflow-hidden">
+                        <div className="h-full bg-amber-500 w-0"></div>
                     </div>
-                    <button type="submit" className={styles.submitButton} disabled={isSubmitting}>
-                        {isSubmitting ? 'Submitting...' : 'Submit Review'}
-                    </button>
-                </form>
-            )}
+                    <span className="min-w-[35px] text-right">0%</span>
+                </div>
+                <div className="flex items-center gap-3 text-[0.85rem] text-gray-600">
+                    <span className="min-w-[45px] font-medium">2 star</span>
+                    <div className="flex-grow h-2 bg-[#e5e7eb] rounded overflow-hidden">
+                        <div className="h-full bg-amber-500 w-0"></div>
+                    </div>
+                    <span className="min-w-[35px] text-right">0%</span>
+                </div>
+                <div className="flex items-center gap-3 text-[0.85rem] text-gray-600">
+                    <span className="min-w-[45px] font-medium">1 star</span>
+                    <div className="flex-grow h-2 bg-[#e5e7eb] rounded overflow-hidden">
+                        <div className="h-full bg-amber-500 w-0"></div>
+                    </div>
+                    <span className="min-w-[35px] text-right">0%</span>
+                </div>
+            </div>
         </div>
+        
+        {/* --- Review Submission Form --- */}
+        {showForm && (
+            // .reviewForm replaced
+            <form onSubmit={handleSubmit} className="mt-6 p-6 md:p-8 border border-[#e5e7eb] rounded-lg bg-white">
+                <h4 className="text-xl font-bold m-0 mb-2 text-[#111]">Write a Review</h4>
+                <p className="text-gray-500 m-0 mb-6 text-sm">Your email address will not be published. Required fields are marked *</p>
+                
+                {/* .ratingInput replaced */}
+                <div className="mb-6">
+                    <label className="block mb-2 font-semibold text-gray-700">Your rating *</label>
+                    {/* .stars replaced */}
+                    <div className="flex gap-2 text-[1.8rem]">
+                        {[...Array(5)].map((_, index) => {
+                        const ratingValue = index + 1;
+                        return (
+                            <label key={index} className="cursor-pointer">
+                            <input type="radio" name="rating" value={ratingValue} onClick={() => setRating(ratingValue)} className="hidden" />
+                            <FaStar 
+                                className={`transition-colors duration-200 hover:text-amber-300 ${ratingValue <= (hover || rating) ? 'text-amber-400' : 'text-[#d1d5db]'}`} 
+                                onMouseEnter={() => setHover(ratingValue)}
+                                onMouseLeave={() => setHover(0)}
+                            />
+                            </label>
+                        );
+                        })}
+                    </div>
+                </div>
+
+                {/* .formGroup replaced */}
+                <div className="mb-5">
+                    <label htmlFor='comment' className="block mb-2 font-semibold text-sm text-gray-700">Your review *</label>
+                    <textarea 
+                        id='comment' 
+                        value={comment} 
+                        onChange={e => setComment(e.target.value)} 
+                        required 
+                        className="w-full p-3 border border-[#d1d5db] rounded-md text-[0.95rem] font-sans box-border min-h-[100px] resize-y"
+                    />
+                </div>
+
+                {/* .formRow replaced */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="mb-5">
+                        <label htmlFor='author' className="block mb-2 font-semibold text-sm text-gray-700">Your Name *</label>
+                        <input 
+                            id='author' 
+                            type="text" 
+                            value={author} 
+                            onChange={e => setAuthor(e.target.value)} 
+                            required 
+                            className="w-full p-3 border border-[#d1d5db] rounded-md text-[0.95rem] font-sans box-border"
+                        />
+                    </div>
+                    <div className="mb-5">
+                        <label htmlFor='email' className="block mb-2 font-semibold text-sm text-gray-700">Your Email *</label>
+                        <input 
+                            id='email' 
+                            type="email" 
+                            value={email} 
+                            onChange={e => setEmail(e.target.value)} 
+                            required 
+                            className="w-full p-3 border border-[#d1d5db] rounded-md text-[0.95rem] font-sans box-border"
+                        />
+                    </div>
+                </div>
+
+                {/* .submitButton replaced */}
+                <button 
+                    type="submit" 
+                    className="bg-gray-900 text-white border-none py-3 px-8 text-base font-semibold rounded-md cursor-pointer w-full sm:w-auto transition-colors duration-200 hover:bg-black disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    disabled={isSubmitting}
+                >
+                    {isSubmitting ? 'Submitting...' : 'Submit Review'}
+                </button>
+            </form>
+        )}
 
         {/* --- Customer Images --- */}
         {customerImages.length > 0 && (
-            <div className={styles.customerImagesSection}>
-                <h3>Customer Images</h3>
-                <div className={styles.customerImagesGrid}>
+            // .customerImagesSection replaced
+            <div className="mb-10">
+                <h3 className="text-xl font-bold mb-4 text-[#111]">Customer Images</h3>
+                {/* .customerImagesGrid replaced */}
+                <div className="flex gap-2.5 overflow-x-auto pb-1.5 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
                     {customerImages.map((imageUrl, index) => (
                         imageUrl && (
-                            <div key={index} className={styles.customerImageWrapper}>
+                            // .customerImageWrapper replaced
+                            <div key={index} className="relative w-[80px] h-[80px] flex-shrink-0 rounded-lg overflow-hidden border border-[#e5e7eb]">
                                 <Image src={imageUrl} alt={`Customer image ${index + 1}`} fill style={{objectFit: 'cover'}} sizes="100px" />
                             </div>
                         )
@@ -196,11 +277,19 @@ export default function ReviewForm({ productId, averageRating, reviewCount, revi
         )}
 
         {/* --- Reviews List --- */}
-        <div className={styles.reviewsListContainer}>
-            <div className={styles.reviewsListHeader}>
-                <input type="search" placeholder="Search customer reviews" className={styles.reviewSearchInput} />
+        {/* .reviewsListContainer replaced */}
+        <div className="mt-8 border-t border-[#e5e7eb] pt-8">
+            {/* .reviewsListHeader replaced */}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
+                {/* .reviewSearchInput replaced */}
+                <input 
+                    type="search" 
+                    placeholder="Search customer reviews" 
+                    className="p-2.5 px-4 border border-[#d1d5db] rounded-md w-full md:w-[300px] text-[0.9rem]" 
+                />
                 <span>{`1-${Math.min(visibleReviews, reviews.length)} of ${reviews.length} reviews`}</span>
-                <select className={styles.reviewSortDropdown}>
+                {/* .reviewSortDropdown replaced */}
+                <select className="p-2.5 pr-8 pl-4 border border-[#d1d5db] rounded-md text-[0.9rem] bg-white cursor-pointer">
                     <option>Most Recent</option>
                     <option>Highest Rating</option>
                     <option>Lowest Rating</option>
@@ -209,31 +298,44 @@ export default function ReviewForm({ productId, averageRating, reviewCount, revi
 
             {reviews.length > 0 ? (
                 reviews.slice(0, visibleReviews).map((edge: ReviewEdge) => (
-                    <div key={edge.node.id} className={styles.reviewItem}>
-                        <div className={styles.reviewAuthor}>
-                            <div className={styles.authorAvatar}>{edge.node.author.node.name.substring(0, 2).toUpperCase()}</div>
+                    // .reviewItem replaced
+                    <div key={edge.node.id} className="flex gap-4 sm:gap-6 py-6 border-b border-[#f3f4f6] items-start last:border-b-0">
+                        {/* .reviewAuthor replaced */}
+                        <div className="flex-shrink-0 w-[50px]">
+                            {/* .authorAvatar replaced */}
+                            <div className="w-12 h-12 rounded-full bg-[#e5e7eb] text-gray-700 flex items-center justify-center font-bold text-[1.1rem] relative after:content-['✓'] after:absolute after:-bottom-0.5 after:-right-0.5 after:bg-emerald-500 after:text-white after:w-[18px] after:h-[18px] after:rounded-full after:border-2 after:border-white after:flex after:items-center after:justify-center after:text-[10px] after:font-bold">
+                                {edge.node.author.node.name.substring(0, 2).toUpperCase()}
+                            </div>
                         </div>
-                        <div className={styles.reviewDetails}>
-                            <div className={styles.reviewHeader}>
-                                <strong>{edge.node.author.node.name}</strong>
+                        
+                        {/* .reviewDetails replaced */}
+                        <div className="flex-grow w-full">
+                            {/* .reviewHeader replaced */}
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-1">
+                                <strong className="text-base text-gray-900 font-bold">{edge.node.author.node.name}</strong>
                                 <FormattedDate dateString={edge.node.date} />
                             </div>
                             {typeof edge.rating === 'number' && edge.rating > 0 && 
-                                <div className={styles.reviewRating}>
+                                // .reviewRating replaced
+                                <div className="flex gap-0.5 text-base text-amber-500 mb-2">
                                     <StarRatingDisplay rating={edge.rating} />
                                 </div>
                             }
-                            <div className={styles.verifiedLink}>✓ Verified review</div>
-                            <div className={styles.reviewContent} dangerouslySetInnerHTML={{ __html: edge.node.content }} />
+                            {/* .verifiedLink replaced */}
+                            <div className="text-[0.8rem] text-emerald-500 font-semibold inline-block mb-3">✓ Verified review</div>
+                            {/* .reviewContent replaced */}
+                            <div className="text-[0.95rem] leading-[1.6] text-gray-600" dangerouslySetInnerHTML={{ __html: edge.node.content }} />
                         </div>
                     </div>
                 ))
             ) : ( <p>There are no reviews yet.</p> )}
             
             {hasMoreReviews && (
-                <div className={styles.showMoreContainer}>
+                // .showMoreContainer replaced
+                <div className="text-center mt-8 pt-4">
+                    {/* .showMoreButton replaced */}
                     <button 
-                        className={styles.showMoreButton} 
+                        className="bg-transparent border border-[#d1d5db] py-3 px-8 rounded-md cursor-pointer font-semibold text-gray-700 transition-all duration-200 hover:bg-[#f3f4f6] hover:border-[#9ca3af]" 
                         onClick={() => setVisibleReviews(reviews.length)}
                     >
                         Show All {reviews.length} Reviews

@@ -1,6 +1,6 @@
 // ফাইল পাথ: app/product/custom-sections/Gobike-12/KeyFeaturesSection.tsx
 import FeatureSlider from '../../components/FeatureSlider/FeatureSlider';
-import styles from '../GobikeSections.module.css';
+// import styles from '../GobikeSections.module.css'; // CSS Module সরানো হয়েছে
 
 const keyFeatures = [
   {
@@ -31,8 +31,8 @@ const keyFeatures = [
 
 export default function KeyFeaturesSection() {
   return (
-    // আমরা শুধু sectionContainer ক্লাসটি রাখছি স্পেস দেওয়ার জন্য
-    <section className={styles.sectionContainer}> 
+    // .sectionContainer replaced
+    <section className="w-full py-12 px-[5%] md:px-[1%] box-border"> 
       <FeatureSlider title="More Key Features" features={keyFeatures} />
     </section>
   );

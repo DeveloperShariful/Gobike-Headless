@@ -32,8 +32,9 @@ const keyFeatures = [
 
 export default function KeyFeaturesSection() {
   return (
-    <section className={styles.sectionContainer}> 
-      <FeatureSlider title="Pro Features" features={keyFeatures} />
+    // .sectionContainer replaced
+    <section className="w-full py-12 px-[5%] md:px-[1%] box-border"> 
+      <FeatureSlider title="More Key Features" features={keyFeatures} />
     </section>
   );
 }

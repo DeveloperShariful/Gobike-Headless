@@ -1,12 +1,10 @@
-//app/products/page.tsx
+// app/products/page.tsx
 
 import { gql } from '@apollo/client';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-// --- সমাধান: সঠিক ফাইল থেকে getClient import করা হচ্ছে ---
 import { getClient } from '../../lib/apollo-rsc-client';
-
-import styles from './products.module.css';
+// import styles from './products.module.css'; // CSS Module সরানো হয়েছে
 import ProductFilters from './ProductFilters';
 import PaginationControls from './PaginationControls';
 import ProductsGrid from './ProductsGrid';
@@ -60,7 +58,6 @@ export async function generateMetadata({ searchParams }: {
   let canonicalUrl = '/products';
 
   if (categorySlug) {
-    // এখানে ক্যাটাগরির আসল নাম ডেটাবেস থেকে আনা যেতে পারে, তবে আপাতত slug দিয়েই কাজ চালানো হচ্ছে
     const categoryName = categorySlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     title = `Shop ${categoryName} | GoBike Australia`;
     description = `Discover our collection of ${categoryName}. Top quality and performance guaranteed. Shop now at GoBike Australia.`;
@@ -73,23 +70,21 @@ export async function generateMetadata({ searchParams }: {
     alternates: {
       canonical: canonicalUrl,
     },
-    // --- সমাধান: সম্পূর্ণ Open Graph ট্যাগ যোগ করা হয়েছে ---
     openGraph: {
       title: title,
       description: description,
       url: canonicalUrl,
-      // --- নতুন সংযোজন ---
-      siteName: 'GoBike Australia', // আপনার সাইটের নাম
+      siteName: 'GoBike Australia',
       images: [
         {
-          url: 'https://gobikes.au/wp-content/uploads/2025/11/gobike-12-safety-features-for-toddlers.jpg', // একটি ডিফল্ট শেয়ারিং ইমেজ
+          url: 'https://gobikes.au/wp-content/uploads/2025/11/gobike-12-safety-features-for-toddlers.jpg',
           width: 1200,
           height: 857,
           alt: 'GoBike Australia Products',
         },
       ],
-      locale: 'en_AU', // আপনার লোকেশন
-      type: 'website', // এই পেজের ধরন
+      locale: 'en_AU',
+      type: 'website',
     },
   };
 }
@@ -103,7 +98,6 @@ async function getProductsAndCategories(
     before: string | null
 ) {
   try {
-    // --- সমাধান: getClient() এখন সঠিকভাবে কাজ করবে ---
     const { data } = await getClient().query<QueryData>({
       query: gql`
         query GetProductsCursor($category: String, $first: Int, $after: String, $last: Int, $before: String) {
@@ -126,10 +120,9 @@ async function getProductsAndCategories(
         }
       `,
       variables: { category, first, after, last, before },
-      context: { fetchOptions: { next: { revalidate: 50000 } } }, // 1 hour cache
+      context: { fetchOptions: { next: { revalidate: 50000 } } },
     });
     if (!data) {
-        // যদি data না থাকে, তাহলে একটি খালি ফলাফল রিটার্ন করুন
         console.error("No data returned from GraphQL query.");
         return {
             products: [],
@@ -170,7 +163,6 @@ export default async function ProductsPage({ searchParams }: {
 
   const currentCategoryName = categories.find((c: Category) => c.slug === category)?.name || "All Products";
 
-    // --- নতুন সংযোজন: Schema Markup / Structured Data ---
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -200,36 +192,56 @@ export default async function ProductsPage({ searchParams }: {
 
   return (
     <div>
-      {/* --- নতুন সংযোজন: JSON-LD স্ক্রিপ্টটি পেজে যোগ করা হয়েছে --- */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
       <Breadcrumbs pageTitle={currentCategoryName} />
-      <div className={styles.pageWrapper}>
-        <header className={styles.header}>
-          <h1>{currentCategoryName}</h1>
-          <p>Explore our curated selection of high-quality products. Find exactly what you are looking for.</p>
+      
+      {/* .pageWrapper replaced */}
+      <div className="max-w-[1300px] mx-auto px-1.5 font-sans mb-12">
+        {/* .header replaced */}
+        <header className="text-center mb-12 bg-gray-50 rounded-lg p-8 md:p-12">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">{currentCategoryName}</h1>
+          <p className="text-gray-600 max-w-2xl mx-auto text-lg">Explore our curated selection of high-quality products. Find exactly what you are looking for.</p>
         </header>
         
         <ProductFilters categories={categories} />
         
-        <main className={styles.mainContent}>
+        {/* .mainContent replaced */}
+        <main className="mb-16">
           {products.length > 0 ? (
             <ProductsGrid products={products} />
           ) : (
-            <p className={styles.noProductsFound}>No products found in this category.</p>
+            <p className="text-center text-gray-500 text-xl py-10">No products found in this category.</p>
           )}
         </main>
         
-        <div className={styles.paginationWrapper}>
+        <div className="mt-10 flex justify-center">
             <PaginationControls pageInfo={pageInfo} basePath="/products" />
         </div>
-        <div className={styles.internalLinks}>
-            <Link href="/contact" className={styles.internalLink}>Contact Our Team</Link>
-            <Link href="/bikes" className={styles.internalLink}>Shop All Bikes</Link>
-            <Link href="/about" className={styles.internalLink}>About Us</Link>
+
+        {/* .internalLinks replaced */}
+        <div className="flex justify-center gap-4 flex-wrap mt-12 pb-8 border-t border-gray-100 pt-8">
+            <Link 
+                href="/contact" 
+                className="inline-block px-6 py-3 bg-gray-50 text-gray-800 border border-gray-200 rounded-full font-medium transition-all duration-200 hover:bg-black hover:text-white hover:border-black"
+            >
+                Contact Our Team
+            </Link>
+            <Link 
+                href="/bikes" 
+                className="inline-block px-6 py-3 bg-gray-50 text-gray-800 border border-gray-200 rounded-full font-medium transition-all duration-200 hover:bg-black hover:text-white hover:border-black"
+            >
+                Shop All Bikes
+            </Link>
+            <Link 
+                href="/about" 
+                className="inline-block px-6 py-3 bg-gray-50 text-gray-800 border border-gray-200 rounded-full font-medium transition-all duration-200 hover:bg-black hover:text-white hover:border-black"
+            >
+                About Us
+            </Link>
           </div>
       </div>
     </div>

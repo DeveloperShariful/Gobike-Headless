@@ -31,8 +31,8 @@ const keyFeatures = [
 
 export default function KeyFeaturesSection() {
   return (
-    // We're just keeping the sectionContainer class for spacing
-    <section className={styles.sectionContainer}> 
+    // .sectionContainer replaced
+    <section className="w-full py-12 px-[5%] md:px-[1%] box-border"> 
       <FeatureSlider title="More Key Features" features={keyFeatures} />
     </section>
   );

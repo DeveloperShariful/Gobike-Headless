@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation'; 
-import styles from './products.module.css';
+// import styles from './products.module.css'; // CSS Module সরানো হয়েছে
 import { useCart } from '../../context/CartContext';
 
 // --- Interface Update ---
@@ -36,13 +36,15 @@ const StarRating = ({ rating, count }: { rating: number, count: number }) => {
   const emptyStars = totalStars - fullStars - (halfStar ? 1 : 0);
 
   return (
-    <div className={styles.starRating}>
+    // .starRating replaced
+    <div className="text-black-500 text-base mb-4 flex items-center justify-center gap-0.5">
       {[...Array(fullStars)].map((_, i) => <span key={`full-${i}`}>★</span>)}
       {halfStar && <span key="half">⭐</span>}
       {[...Array(emptyStars)].map((_, i) => <span key={`empty-${i}`}>☆</span>)}
       
       {count > 0 && (
-        <span className={styles.ratingValue}>
+        // .ratingValue replaced
+        <span className="text-gray-500 text-xs ml-2 font-normal">
           ({rating.toFixed(1)}) ({count} customer review{count > 1 ? 's' : ''})
         </span>
       )}
@@ -100,47 +102,69 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <div className={styles.productCard}>
-        <Link href={`/product/${product.slug}`} className={styles.productLinkWrapper}>
-            <div className={styles.productImageContainer}>
+    // .productCard replaced (Bikes/Spare Parts পেজের কার্ডের মতো ডিজাইন)
+    <div className="bg-white border border-gray-100 rounded-xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group h-full">
+        <Link href={`/product/${product.slug}`} className="flex flex-col flex-grow no-underline text-inherit">
+            {/* .productImageContainer replaced */}
+            <div className="relative w-full aspect-square bg-gray-50 p-1 overflow-hidden">
                 {product.onSale && discountPercent > 0 && (
-                    <div className={styles.discountBadge}>-{discountPercent}%</div>
+                    // .discountBadge replaced
+                    <div className="absolute top-3 left-3 bg-red-600 text-white px-2 py-1 rounded-md text-xs font-bold z-10 shadow-sm">
+                        -{discountPercent}%
+                    </div>
                 )}
                 {product.image?.sourceUrl ? ( 
-                  <Image src={product.image.sourceUrl} width={1000} height={1000} alt={product.name} className={styles.productImage} /> 
+                  // .productImage replaced
+                  <Image 
+                    src={product.image.sourceUrl} 
+                    width={1000} 
+                    height={1000} 
+                    alt={product.name} 
+                    className="w-full h-full object-contain transition-transform duration-500 ease-in-out group-hover:scale-110" 
+                  /> 
                 ) : ( 
-                  <div className={styles.placeholderImage} /> 
+                  <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">No Image</div> 
                 )}
             </div>
-            <div className={styles.productInfo}>
-                 <h3 className={styles.productName}>{product.name}</h3>
+            {/* .productInfo replaced */}
+            <div className="p-5 text-center flex flex-col flex-grow">
+                 {/* .productName replaced */}
+                 <h3 className="text-lg font-bold text-gray-900 mb-2 leading-tight min-h-[3rem] line-clamp-2">
+                    {product.name}
+                 </h3>
 
                 {typeof product.averageRating === 'number' ? (
                     <StarRating rating={product.averageRating} count={product.reviewCount || 0} />
                 ) : (
-                    <div className={styles.noRating}></div>
+                    <div className="h-6 mb-4"></div> // Placeholder for spacing consistency
                 )}
 
-                <div className={styles.priceContainer}>
+                {/* .priceContainer replaced */}
+                <div className="flex justify-center items-baseline gap-2 mb-4 h-9">
                     {product.onSale && product.salePrice ? (
                         <>
-                            <span className={styles.regularPriceStriked} dangerouslySetInnerHTML={{ __html: product.regularPrice || '' }} />
-                            <span className={styles.salePrice} dangerouslySetInnerHTML={{ __html: product.salePrice }} />
+                            {/* .regularPriceStriked replaced */}
+                            <span className="text-sm font-semibold text-gray-400 line-through" dangerouslySetInnerHTML={{ __html: product.regularPrice || '' }} />
+                            {/* .salePrice replaced */}
+                            <span className="text-xl font-extrabold text-red-600" dangerouslySetInnerHTML={{ __html: product.salePrice }} />
                         </>
                     ) : (
-                        <div className={styles.productPrice} dangerouslySetInnerHTML={{ __html: product.price || 'Price not available' }} />
+                        // .productPrice replaced
+                        <div className="text-xl font-extrabold text-gray-900" dangerouslySetInnerHTML={{ __html: product.price || 'Price not available' }} />
                     )}
                 </div>
             </div>
         </Link>
-        <button 
-          className={styles.addToCartBtn} 
-          onClick={handleButtonClick}
-          disabled={isAdding} 
-        >
-          {isAdding ? 'Adding...' : (isVariableProduct ? 'Select Options' : 'Add to Cart')}
-        </button>
-        {/* ------------------------- */}
+        {/* .addToCartBtn replaced */}
+        <div className="px-1 pb-5">
+            <button 
+                className="w-full py-2 px-3 text-base font-bold text-white bg-gray-900 border-2 border-gray-900 rounded-full cursor-pointer transition-all duration-300 hover:bg-white hover:text-gray-900 disabled:bg-gray-300 disabled:border-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 disabled:hover:bg-gray-300" 
+                onClick={handleButtonClick}
+                disabled={isAdding} 
+            >
+                {isAdding ? 'Adding...' : (isVariableProduct ? 'Select Options' : 'Add to Cart')}
+            </button>
+        </div>
     </div>
   );
 }
