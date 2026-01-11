@@ -6,7 +6,8 @@ import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 
 // Stripe ইনিশিয়ালাইজ করুন
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-09-30.clover',
+  apiVersion: "2025-01-27.acacia" as any, 
+  typescript: true,
 });
 
 // WooCommerce API ইনিশিয়ালাইজ করুন
