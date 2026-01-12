@@ -41,8 +41,8 @@ export async function POST(request: Request) {
     }
 
     const orderUpdateData = {
-      status: 'processing', // অর্ডার স্ট্যাটাস 'প্রসেসিং'-এ পরিবর্তন করুন
-      transaction_id: paymentIntent.id, // Stripe ট্রানজেকশন আইডি যোগ করুন
+      status: 'processing', 
+      transaction_id: paymentIntent.id, 
       set_paid: true,
     };
 

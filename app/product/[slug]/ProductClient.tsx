@@ -219,7 +219,6 @@ export default function ProductClient({ product }: { product: Product }) {
       <div className="grid grid-cols-1 md:grid-cols-[520px_1fr] gap-12 items-start">
         
         {/* Gallery Container */}
-        {/* --- ফিক্স: মোবাইলে static (relative) এবং ডেস্কটপে sticky --- */}
         <div className="flex flex-col gap-4 relative md:sticky md:top-[100px]">
           {mainImage && (
             <Image 
@@ -262,13 +261,13 @@ export default function ProductClient({ product }: { product: Product }) {
           </div>
 
           <div className="flex items-center gap-2 mb-6">
-            <Image src="https://gobikes.au/wp-content/uploads/2025/08/hot-deal.svg" width={50} height={50} alt="Hot Deal" className="h-[60px] w-auto ml-2 md:h-[50px]" />
+            <Image src="https://gobikes.au/wp-content/uploads/2025/08/hot-deal.svg" width={50} height={50} alt="Hot Deal" className="h-8 w-auto md:h-10" />
             {product.onSale && product.salePrice ? (
-                <div className="flex items-baseline gap-3 md:gap-2 relative">
-                    <span className="text-[1.8rem] md:text-[1.2rem] font-extrabold text-[#1a202c] line-through" dangerouslySetInnerHTML={{ __html: product.regularPrice || '' }} />
-                    <span className="text-[2rem] md:text-[1.5rem] font-extrabold text-[#ff3613]" dangerouslySetInnerHTML={{ __html: product.salePrice }} />
+                <div className="flex items-baseline gap-3 md:gap-1 relative">
+                    <span className="text-lg md:text-xl font-bold text-black-400 line-through" dangerouslySetInnerHTML={{ __html: product.regularPrice || '' }} />
+                    <span className="text-2xl md:text-3xl font-extrabold text-[#ff3613]" dangerouslySetInnerHTML={{ __html: product.salePrice }} />
                     {discountPercent > 0 && (
-                        <span className="bg-[#ff0202] text-white px-2.5 py-1 rounded-md text-[2rem] md:text-[1rem] font-bold absolute right-[34rem] top-[12rem] rotate-[10deg] hidden md:block">
+                        <span className="bg-[#ff0202] text-white px-2 py-0.5 rounded text-sm md:text-base font-bold transform -rotate-2 shadow-sm whitespace-nowrap">
                             -{discountPercent}%
                         </span>
                     )}
