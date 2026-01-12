@@ -325,8 +325,12 @@ export default function ProductClient({ product }: { product: Product }) {
                                     key={option}
                                     type="button"
                                     onClick={() => handleAttributeSelect(attr.name, option)}
-                                    className={`py-2.5 px-5 text-sm font-medium text-[#333] bg-white border rounded cursor-pointer transition-all duration-200 min-w-[50px] text-center uppercase hover:border-[#333] ${isActive ? 'bg-black text-white border-black font-semibold shadow-sm -translate-y-px' : 'border-[#e1e1e1]'}`}
-                                >
+                                    className={`py-2.5 px-5 text-sm font-medium border rounded cursor-pointer transition-all duration-200 min-w-[50px] text-center uppercase ${
+                                     isActive 
+                                    ? 'bg-black text-white border-black font-semibold shadow-sm -translate-y-px' 
+                                    : 'bg-white text-[#333] border-[#e1e1e1] hover:border-[#333]'
+                                    }`}
+                                  >
                                     {option}
                                 </button>
                             );
