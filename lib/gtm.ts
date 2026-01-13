@@ -1,21 +1,20 @@
 // lib/gtm.ts
-// এটি নিশ্চিত করে যে window অবজেক্টের উপর dataLayer থাকলেও TypeScript কোনো এরর দেবে না
+
 type WindowWithDataLayer = Window & {
   dataLayer: Record<string, unknown>[];
 };
 
-// window অবজেক্টটিকে নতুন টাইপ দিয়ে ঘোষণা করা হচ্ছে
+
 declare const window: WindowWithDataLayer;
 
 
-// --- ই-কমার্স আইটেমের জন্য একটি সাধারণ টাইপ ---
 interface GTMProduct {
     item_name: string;
     item_id: number | string;
     price: number;
     quantity: number;
-    item_category?: string; // ঐচ্ছিক
-    item_brand?: string;    // ঐচ্ছিক
+    item_category?: string; 
+    item_brand?: string;    
 }
 
 
@@ -30,7 +29,7 @@ interface GTMProduct {
 export const gtmPageView = (url: string) => {
   if (typeof window.dataLayer !== "undefined") {
     window.dataLayer.push({
-      event: 'page_view', // Google Analytics 4-এর জন্য 'page_view' ব্যবহার করা ভালো
+      event: 'page_view', 
       page_path: url,
     });
   } else {
@@ -166,9 +165,6 @@ export const gtmBeginCheckout = (items: GTMProduct[]) => {
         });
     }
 };
-// lib/gtm.ts
-
-// ... আপনার বিদ্যমান কোড এবং interface ...
 
 /**
  * যখন কোনো ব্যবহারকারী সফলভাবে একটি কেনাকাটা সম্পন্ন করেন।

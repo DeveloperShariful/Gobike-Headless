@@ -29,15 +29,15 @@ body {
   overflow: hidden;
 }
 #nprogress .bar {
-  background: #74ff92 !important; /* আপনার ব্র্যান্ডের রঙ দিন */
+  background: #74ff92 !important; 
   height: 3px !important;
 }
 
 #nprogress .peg {
-  box-shadow: 0 0 10px #000, 0 0 5px #000 !important; /* আপনার ব্র্যান্ডের রঙ দিন */
+  box-shadow: 0 0 10px #000, 0 0 5px #000 !important; 
 }
 
 #nprogress .spinner-icon {
-  border-top-color: #000000 !important; /* আপনার ব্র্যান্ডের রঙ দিন */
-  border-left-color: #000 !important; /* আপনার ব্র্যান্ডের রঙ দিন */
+  border-top-color: #000000 !important; 
+  border-left-color: #000 !important; 
 }

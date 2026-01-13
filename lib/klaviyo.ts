@@ -1,5 +1,5 @@
 // lib/klaviyo.ts
-// --- টাইপ ডেফিনিশন ---
+
 type KlaviyoItem = {
     ProductID: string | number;
     SKU?: string;
@@ -16,8 +16,6 @@ type WindowWithKlaviyo = Window & {
   _learnq: unknown[];
 };
 declare const window: WindowWithKlaviyo;
-
-// --- Helper ফাংশন ---
 
 /**
  * Klaviyo-এর জন্য একজন ব্যবহারকারীকে শনাক্ত করে।
@@ -55,7 +53,7 @@ export const klaviyoTrackAddedToCart = (cart: {
         'AddedItemProductID': cart.added_item.ProductID,
         'AddedItemQuantity': cart.added_item.Quantity,
         'ItemNames': cart.items.map(i => i.ProductName),
-        'CheckoutURL': '/cart', // অথবা আপনার চেকআউট URL
+        'CheckoutURL': '/cart',
         'Items': cart.items,
         'cart_total': cart.total_price
     };
@@ -72,9 +70,7 @@ export const klaviyoTrackAddedToCart = (cart: {
         }
     }]);
 }
-// lib/klaviyo.ts
 
-// ... আপনার বিদ্যমান কোড এবং interface ...
 
 /**
  * Placed Order ইভেন্ট ট্র্যাক করে।
@@ -89,7 +85,7 @@ export const klaviyoTrackPlacedOrder = (order: {
   window._learnq = window._learnq || [];
 
   const eventData = {
-    '$event_id': order.order_id, // ডুপ্লিকেট অর্ডার এড়ানোর জন্য
+    '$event_id': order.order_id, 
     '$value': order.value,
     'ItemNames': order.item_names,
     'CheckoutURL': order.checkout_url,
@@ -98,12 +94,11 @@ export const klaviyoTrackPlacedOrder = (order: {
 
   window._learnq.push(['track', 'Placed Order', eventData]);
 
-  // প্রতিটি কেনা প্রোডাক্টের জন্য আলাদা 'Ordered Product' ইভেন্ট পাঠানো
   order.items.forEach(item => {
     const itemEventData = {
-      '$event_id': `${order.order_id}-${item.ProductID}`, // ডুপ্লিকেট এড়ানোর জন্য
+      '$event_id': `${order.order_id}-${item.ProductID}`, 
       '$value': item.RowTotal,
-      ...item // KlaviyoItem-এর সমস্ত প্রপার্টি যোগ করা হচ্ছে
+      ...item 
     };
     window._learnq.push(['track', 'Ordered Product', itemEventData]);
   });

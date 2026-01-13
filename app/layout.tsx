@@ -10,8 +10,6 @@ import { ClientProviders } from "./providers";
 import { Suspense } from 'react';
 import SourceTracker from '@/components/SourceTracker';
 
-
-// --- ফন্ট কনফিগারেশন ---
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -22,7 +20,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// --- SEO: মেটাডেটা অবজেক্ট ---
 export const metadata: Metadata = {
   metadataBase: new URL('https://gobike.au'),
   
@@ -78,12 +75,10 @@ export const metadata: Metadata = {
   },
 };
 
-// --- SEO: ভিউপোর্ট অবজেক্ট ---
 export const viewport: Viewport = {
   themeColor: '#ffffff',
 };
 
-// --- মূল লেআউট কম্পোনেন্ট ---
 export default function RootLayout({
   children,
 }: Readonly<{

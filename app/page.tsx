@@ -34,7 +34,7 @@ export const metadata: Metadata = {
       {
         url: siteConfig.ogImage,
         width: 1200,
-        height: 857, // --- সমাধান ২: ছবির আসল উচ্চতা দেওয়া হয়েছে ---
+        height: 857, 
         alt: 'A child happily riding a GoBike electric bike in an Australian park.',
       },
     ],
@@ -54,7 +54,7 @@ export default function Home() {
         '@type': 'Organization',
         'name': siteConfig.siteName,
         'url': siteConfig.url,
-        'logo': siteConfig.logo, // --- সমাধান ১: এখানে শুধু siteConfig.logo হবে ---
+        'logo': siteConfig.logo,
         'contactPoint': { '@type': 'ContactPoint', 'telephone': siteConfig.phone, 'contactType': 'Customer Service' },
         'sameAs': [ siteConfig.facebook, siteConfig.instagram, siteConfig.youtube, ]
       },

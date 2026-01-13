@@ -4,7 +4,6 @@
 import Breadcrumbs from '../../components/Breadcrumbs';
 import { useCart } from '../../context/CartContext';
 import Link from 'next/link';
-// import styles from './CartPage.module.css'; // CSS Module সরানো হয়েছে
 import CartCrossSell from './CartCrossSell';
 import { gtmViewCart, gtmBeginCheckout } from '../../lib/gtm';
 import { useEffect, useState, useCallback } from 'react';
@@ -13,7 +12,6 @@ import { gql } from '@apollo/client';
 import client from '../../lib/apolloClient';
 import toast from 'react-hot-toast';
 
-// --- TypeScript Interfaces (অপরিবর্তিত) ---
 interface AppliedCoupon {
   code: string;
 }
@@ -25,7 +23,6 @@ interface CartDetails {
   appliedCoupons: AppliedCoupon[] | null;
 }
 
-// --- GraphQL কোড (অপরিবর্তিত) ---
 const GET_CART_DETAILS = gql`
   query GetCartDetails {
     cart {
@@ -51,7 +48,6 @@ const REMOVE_COUPON_MUTATION = gql`
   }
 `;
 
-// --- Checkout বাটন কম্পোনেন্ট ---
 function CheckoutButton() {
     const { cartItems } = useCart();
     const handleCheckout = () => {
@@ -74,17 +70,13 @@ function CheckoutButton() {
     );
 }
 
-// --- মূল কার্ট পেজ কম্পোনেন্ট ---
 export default function CartPage() {
   const { cartItems, updateQuantity, removeFromCart, loading: isCartLoading } = useCart();
   const [cartDetails, setCartDetails] = useState<CartDetails | null>(null);
   const [couponCode, setCouponCode] = useState('');
   const [isCouponLoading, setCouponLoading] = useState(false);
   
-  // ১. Removing স্টেট যোগ করা হয়েছে
   const [removingKey, setRemovingKey] = useState<string | null>(null);
-
-  // --- সার্ভার থেকে কার্টের তথ্য আনার ফাংশন ---
   const fetchCartDetails = useCallback(async () => {
     try {
       const { data } = await client.query<{ cart: CartDetails }>({
@@ -164,14 +156,12 @@ export default function CartPage() {
     }
   };
 
-  // ২. রিমুভ হ্যান্ডলার যোগ করা হয়েছে
   const handleRemoveItem = async (key: string) => {
     setRemovingKey(key);
     await removeFromCart(key);
     setRemovingKey(null);
   };
 
-  // অ্যাট্রিবিউট নাম সুন্দর করার ফাংশন
   const formatLabel = (name: string) => {
     const clean = name.replace(/^pa_/, '').replace(/_/g, ' ');
     return clean.charAt(0).toUpperCase() + clean.slice(1);
@@ -226,7 +216,6 @@ export default function CartPage() {
                     <div className="flex-grow flex flex-col gap-2">
                       <h2 className="text-base md:text-lg font-semibold m-0 text-gray-900 leading-snug">{item.name}</h2>
                       
-                      {/* ৩. অ্যাট্রিবিউট (Color/Size) দেখানোর কোড যোগ করা হয়েছে */}
                       {item.attributes && item.attributes.length > 0 && (
                         <div style={{ marginTop: '5px', fontSize: '14px', color: '#555' }}>
                           {item.attributes.map((attr: any, index: number) => (
@@ -257,7 +246,6 @@ export default function CartPage() {
                             </button>
                           </div>
                           <div className="flex items-center">
-                           {/* ৪. রিমুভ বাটনে লোডিং টেক্সট এবং হ্যান্ডলার যোগ করা হয়েছে */}
                             <button 
                               onClick={() => handleRemoveItem(item.key)} 
                               className="bg-transparent border-none text-red-600 p-0 text-sm cursor-pointer underline mt-0.5 hover:text-red-700 hover:no-underline transition-colors disabled:opacity-50" 
