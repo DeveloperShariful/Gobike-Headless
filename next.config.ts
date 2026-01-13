@@ -12,7 +12,8 @@ const nextConfig = {
       'framer-motion',
       'lodash',
       'date-fns',
-      '@headlessui/react'
+      '@headlessui/react',
+      'lucide-react'
     ],
   },
   

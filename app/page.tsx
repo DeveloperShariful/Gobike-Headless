@@ -1,7 +1,11 @@
 //app/page.tsx
 import type { Metadata } from 'next';
 import HomePageClient from './HomePageClient';
-import DynamicBlogSection from './blog/DynamicBlogSection';
+import dynamic from 'next/dynamic';
+
+const DynamicBlogSection = dynamic(() => import('./blog/DynamicBlogSection'), {
+  ssr: true, 
+});
 
 const siteConfig = {
   url: 'https://gobike.au',

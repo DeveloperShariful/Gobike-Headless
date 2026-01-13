@@ -1,10 +1,49 @@
-// app/page.tsx
+// app/HomePageClient.tsx
 "use client";
 import Image from 'next/image';
 import FeaturedBikes from '../components/FeaturedBikes';
 import Link from 'next/link';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, ReactNode } from 'react';
 import HomePageReviews from '../components/HomePageReviews';
+
+// ====================================================================
+// Performance Optimization: Lazy Load Wrapper
+// ====================================================================
+/**
+ * এই কম্পোনেন্টটি নিচের সেকশনগুলোকে তখনই রেন্ডার করবে
+ * যখন ইউজার স্ক্রল করে তার কাছাকাছি আসবে।
+ * এটি ইনিশিয়াল লোড টাইম (TBT) কমাতে সাহায্য করে।
+ */
+const LazyLoadSection = ({ children }: { children: ReactNode }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect(); 
+        }
+      },
+      {
+        rootMargin: "300px",
+      }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={sectionRef} style={{ minHeight: '100px' }}>
+      {isVisible ? children : null}
+    </div>
+  );
+};
 
 // ====================================================================
 // Shared Components / Icons
@@ -17,7 +56,7 @@ const ShippingIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="32" he
 const SupportIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6"/><path d="M22 11h-4"/></svg>;
 
 const TickMark = () => <span className="text-red-600 font-bold text-xl">✓</span>;
-const CrossMark = () => <span className="text-black font-bold text-xl">✗</span>;
+const CrossMark = () => <span className="text-black font-bold text-xl">✕</span>;
 
 // ====================================================================
 // HeroSlider Component
@@ -413,7 +452,7 @@ const CommunitySection = () => {
           <div className="text-center">
             <h2 className="text-[32px] font-extrabold text-black mb-5 tracking-tight leading-[1.2]">More Than a Bike - It is The GoBike Family</h2>
             <p className="text-[17px] text-[#333] leading-[1.8] mb-6 max-w-[700px] mx-auto text-left">At GoBike, our passion is creating unforgettable riding experiences. We did not just set out to sell another kids ebike, we aimed to design the <strong>best electric bike for kids</strong> in Australia, ensuring a fun-filled adventure for them and a stress-free experience for parents.</p>
-            <p className="text-[17px] text-[#333] leading-[1.8] mb-6 max-w-[700px] mx-auto text-left">Every <strong>electric balance bike</strong> we create is a blend of fun, reliability, and safety. By choosing GoBike, you’re not just getting a top-quality <strong>kids electric motorbike</strong>; you’re joining a community that values adventure and family bonding.</p>
+            <p className="text-[17px] text-[#333] leading-[1.8] mb-6 max-w-[700px] mx-auto text-left">Every <strong>electric balance bike</strong> we create is a blend of fun, reliability, and safety. By choosing GoBike, youâ€™re not just getting a top-quality <strong>kids electric motorbike</strong>; youâ€™re joining a community that values adventure and family bonding.</p>
             <p className="text-[18px] text-black font-semibold mb-8">Create lasting memories and join the adventure today!</p>
             <Link href="/bikes" className="inline-block bg-black text-white py-3.5 px-9 rounded-full font-bold text-base border-2 border-transparent transition-all duration-300 hover:bg-white hover:text-black hover:border-black">Join The Community</Link>
           </div>
@@ -564,34 +603,55 @@ const FaqSection = () => {
 export default function HomePageClient() {
   return (
     <>
+      {/* Hero & TrustBadges লোড হবে তাৎক্ষণিকভাবে (LCP এর জন্য) */}
       <HeroSlider />
       <TrustBadges />
       
-      <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
-      <ProductCollection />
+      {/* বাকি সব সেকশন Lazy Load হবে - যখন ইউজার স্ক্রল করে নিচে যাবে */}
       
-      <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
-      <OurStory />
+      <LazyLoadSection>
+        <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
+        <ProductCollection />
+      </LazyLoadSection>
       
-      <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
-      <SmarterChoice />
+      <LazyLoadSection>
+        <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
+        <OurStory />
+      </LazyLoadSection>
       
-      <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
-      <FeaturedBikes />
+      <LazyLoadSection>
+        <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
+        <SmarterChoice />
+      </LazyLoadSection>
       
-      <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
-      <DifferenceSection />
+      <LazyLoadSection>
+        <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
+        <FeaturedBikes />
+      </LazyLoadSection>
+      
+      <LazyLoadSection>
+        <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
+        <DifferenceSection />
+      </LazyLoadSection>
 
-      <CommunitySection />
+      <LazyLoadSection>
+        <CommunitySection />
+      </LazyLoadSection>
       
-      <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
-      <HomePageReviews />
+      <LazyLoadSection>
+        <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
+        <HomePageReviews />
+      </LazyLoadSection>
 
-      <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
-      <VideoReviews />
+      <LazyLoadSection>
+        <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
+        <VideoReviews />
+      </LazyLoadSection>
 
-      <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
-      <FaqSection />
+      <LazyLoadSection>
+        <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
+        <FaqSection />
+      </LazyLoadSection>
       
       <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
     </>
