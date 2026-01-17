@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { gql } from '@apollo/client';
 import client from '../../lib/apolloClient';
 import toast from 'react-hot-toast';
+import Cookies from 'js-cookie'; // ★★★ 1. Added: Affiliate ID রিড করার জন্য ইম্পোর্ট
 // CSS Module import removed: import styles from './CheckoutClient.module.css';
 import OrderNotes from './components/OrderNotes';
 import ShippingForm from './components/ShippingForm';
@@ -302,6 +303,9 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
     const isStandaloneRedirect = selectedPaymentMethod === 'stripe_klarna' || selectedPaymentMethod === 'stripe_afterpay_clearpay';
     const isEmbeddedRedirect = paymentData?.is_embedded_redirect === true;
 
+    // ★★★ 2. Added: কুকি থেকে এফিলিয়েট আইডি নেওয়া ★★★
+    const affiliateId = Cookies.get('solid_affiliate_id');
+
     if (paymentData?.redirect_needed && (isStandaloneRedirect || isEmbeddedRedirect)) {
         try {
             if (!cartData) {
@@ -355,6 +359,14 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
               }],
               coupon_lines: cartData.appliedCoupons?.map(coupon => ({ code: coupon.code })) || [],
               customer_note: orderNotes,
+              
+              // ★★★ 3. Added: REST API অর্ডারের সাথে এফিলিয়েট আইডি মেটা ডেটা হিসেবে পাঠানো ★★★
+              meta_data: affiliateId ? [
+                {
+                  key: 'solid_affiliate_id',
+                  value: affiliateId
+                }
+              ] : []
             };
 
             const response = await fetch('/api/create-order', {
@@ -411,6 +423,14 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
           customerNote: orderNotes,
           transactionId: paymentData?.transaction_id || '',
           isPaid: !!paymentData?.transaction_id,
+
+          // ★★★ 4. Added: GraphQL অর্ডারের সাথে এফিলিয়েট আইডি মেটা ডেটা হিসেবে পাঠানো ★★★
+          metaData: affiliateId ? [
+            {
+              key: 'solid_affiliate_id',
+              value: affiliateId
+            }
+          ] : []
         };
     
         const { data } = await client.mutate<CheckoutMutationResult>({
