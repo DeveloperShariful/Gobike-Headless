@@ -305,6 +305,16 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
 
     // ★★★ 2. Added: কুকি থেকে এফিলিয়েট আইডি নেওয়া ★★★
     const affiliateId = Cookies.get('solid_affiliate_id');
+    const visitId = Cookies.get('solid_affiliate_visit_id');
+
+    // মেটা ডেটা অ্যারে প্রস্তুত করা
+    const affiliateMetaData = [];
+    if (affiliateId) {
+        affiliateMetaData.push({ key: 'solid_affiliate_id', value: affiliateId });
+    }
+    if (visitId) {
+        affiliateMetaData.push({ key: 'solid_affiliate_visit_id', value: visitId });
+    }
 
     if (paymentData?.redirect_needed && (isStandaloneRedirect || isEmbeddedRedirect)) {
         try {
@@ -361,12 +371,7 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
               customer_note: orderNotes,
               
               // ★★★ 3. Added: REST API অর্ডারের সাথে এফিলিয়েট আইডি মেটা ডেটা হিসেবে পাঠানো ★★★
-              meta_data: affiliateId ? [
-                {
-                  key: 'solid_affiliate_id',
-                  value: affiliateId
-                }
-              ] : []
+              meta_data: affiliateMetaData
             };
 
             const response = await fetch('/api/create-order', {
@@ -425,12 +430,7 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
           isPaid: !!paymentData?.transaction_id,
 
           // ★★★ 4. Added: GraphQL অর্ডারের সাথে এফিলিয়েট আইডি মেটা ডেটা হিসেবে পাঠানো ★★★
-          metaData: affiliateId ? [
-            {
-              key: 'solid_affiliate_id',
-              value: affiliateId
-            }
-          ] : []
+          metaData: affiliateMetaData
         };
     
         const { data } = await client.mutate<CheckoutMutationResult>({

@@ -2,25 +2,61 @@
 
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import Cookies from 'js-cookie';
 
 const SourceTracker = () => {
   const searchParams = useSearchParams();
   const pathname = usePathname();
+  // ডাবল API কল রোধ করার জন্য একটি Ref ব্যবহার করা হলো
+  const visitTracked = useRef(false);
 
   useEffect(() => {
     // ---------------------------------------------------------
-    // ১. Solid Affiliate Tracking Logic (নতুন যুক্ত করা হয়েছে)
+    // ১. Solid Affiliate Real Visit Tracking (New API Logic)
     // ---------------------------------------------------------
-    // ইউআরএল এ 'sld' প্যারামিটার আছে কিনা চেক করা হচ্ছে
     const affiliateId = searchParams.get('sld');
     
-    if (affiliateId) {
-      // যদি থাকে, কুকিতে সেভ করা হচ্ছে (৩০ দিনের জন্য)
-      // এই আইডি পরবর্তীতে চেকআউট পেজে ব্যবহার করা হবে
-      Cookies.set('solid_affiliate_id', affiliateId, { expires: 30, path: '/' });
+    // যদি এফিলিয়েট আইডি থাকে এবং এই সেশনে এখনো ট্র্যাক না হয়ে থাকে
+    if (affiliateId && !visitTracked.current) {
+        
+        const trackVisit = async () => {
+            try {
+                // আমরা ব্যাকএন্ডে একটি কাস্টম এন্ডপয়েন্টে ডেটা পাঠাচ্ছি
+                // নোট: এই এন্ডপয়েন্টটি আমরা পরের ধাপে ব্যাকএন্ডে তৈরি করব
+                const apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_URL}/wp-json/gobike/v1/track-visit`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        affiliate_id: affiliateId,
+                        url: window.location.href, // ভিজিটর কোন পেজে ল্যান্ড করেছে
+                        referrer: document.referrer || '' // ভিজিটর কোথা থেকে এসেছে (Facebook/Google etc.)
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.visit_id) {
+                    // সফল হলে কুকিতে Visit ID এবং Affiliate ID সেভ করা
+                    Cookies.set('solid_affiliate_visit_id', data.visit_id.toString(), { expires: 30, path: '/' });
+                    Cookies.set('solid_affiliate_id', affiliateId, { expires: 30, path: '/' });
+                    
+                    // ফ্ল্যাগ সেট করা যাতে বারবার কল না হয়
+                    visitTracked.current = true;
+                }
+            } catch (error) {
+                console.error('Affiliate visit tracking failed:', error);
+                // ফেইল করলেও অন্তত আইডিটা সেভ রাখা (ব্যাকআপ হিসেবে)
+                Cookies.set('solid_affiliate_id', affiliateId, { expires: 30, path: '/' });
+            }
+        };
+
+        trackVisit();
     }
 
     // ---------------------------------------------------------
@@ -57,7 +93,6 @@ const SourceTracker = () => {
       }
     }
     
-    // Cookies.set() ব্যবহার করে কুকি সেট করা হচ্ছে
     Cookies.set('visitor_source', source, { expires: 30, path: '/' });
 
   }, [searchParams]);
