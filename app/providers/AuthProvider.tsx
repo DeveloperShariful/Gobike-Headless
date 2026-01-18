@@ -30,15 +30,43 @@ export function AuthProvider({
   children: ReactNode; 
   initialUser: User 
 }) {
+  // initialUser ব্যবহার করা হচ্ছে যাতে layout.tsx ঠিক থাকে
   const [user, setUser] = useState<User>(initialUser);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  /* --- Sync Initial User --- */
+  /* --- ১. Initial User Sync (Server Side Data) --- */
   useEffect(() => {
-    setUser(initialUser);
+    // যদি সার্ভার থেকে ডাটা আসে, সেটাই সেট হবে
+    if (initialUser) {
+      setUser(initialUser);
+    }
   }, [initialUser]);
+
+  /* --- ২. Session Rehydration (Client Side Check) --- */
+  // এই অংশটিই আপনার "রিফ্রেশ করলে লগআউট" সমস্যা সমাধান করবে
+  useEffect(() => {
+    const checkSession = async () => {
+      // যদি ইউজার ইতিমধ্যে না থাকে, আমরা API কল করে চেক করব কুকি আছে কি না
+      if (!user) {
+        try {
+          const res = await fetch('/api/auth/me');
+          if (res.ok) {
+            const data = await res.json();
+            if (data.loggedIn && data.user) {
+              // কুকি থেকে ইউজার পাওয়া গেছে! রিস্টোর করা হচ্ছে...
+              setUser(data.user);
+            }
+          }
+        } catch (error) {
+          console.error('Session check failed', error);
+        }
+      }
+    };
+
+    checkSession();
+  }, []); // এটি অ্যাপ লোড হলে একবার রান হবে
 
   /* --- Login Function --- */
   const login = (userData: User) => {
