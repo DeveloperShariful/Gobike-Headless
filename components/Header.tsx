@@ -1,4 +1,5 @@
 // components/Header.tsx
+// components/Header.tsx
 'use client';
 
 import { useState } from 'react';
@@ -10,7 +11,8 @@ import SearchOverlay from './SearchOverlay';
 import MiniCart from './MiniCart';
 import Image from 'next/image';
 
-import { IoSearch, IoPersonOutline, IoMenu, IoClose } from "react-icons/io5";
+// IoPersonOutline রিমুভ করা হয়েছে কারণ এখন আর আইকন লাগবে না
+import { IoSearch, IoMenu, IoClose } from "react-icons/io5";
 
 export default function Header() {
   const { cartItems, isMiniCartOpen, openMiniCart, closeMiniCart } = useCart();
@@ -89,12 +91,14 @@ export default function Header() {
               <span className="text-sm font-medium">Search</span>
             </button>
             
+            {/* Desktop Account Link - Icon Removed, Text Added */}
             <Link 
                 href={user ? "/account" : "/login"} 
-                className="hidden lg:flex bg-transparent border-none cursor-pointer p-2 text-[#333] items-center hover:text-black transition-colors"
+                className="hidden lg:flex bg-transparent border-none cursor-pointer p-2 text-[#333] items-center hover:text-black transition-colors font-medium text-sm whitespace-nowrap"
                 aria-label={user ? "My Account" : "Login"}
             >
-              <IoPersonOutline size={24} />
+              {/* IoPersonOutline Removed */}
+              <span>{user ? "My Account" : "Login / Register"}</span>
             </Link>
             
             <button 
@@ -148,13 +152,14 @@ export default function Header() {
             </nav>
           
           <div className="border-t border-[#f0f0f0] pt-4 mt-6">
+            {/* Mobile Account Link - Icon Removed */}
             <Link 
                 href={user ? "/account" : "/login"}
                 className={`text-[1.2rem] font-medium text-[#333] no-underline flex items-center gap-3 bg-transparent border-b border-[#ececec] w-full text-left cursor-pointer p-0 hover:text-black hover:font-bold ${pathname === '/account' || pathname === '/login' ? 'text-black font-bold' : ''}`} 
                 onClick={closeAllOverlays} 
                 aria-label={user ? "My Account" : "Login"}
             >
-                <IoPersonOutline />
+                {/* IoPersonOutline Removed */}
                 <span>{user ? "My Account" : "Login / Register"}</span>
             </Link>
           </div>
