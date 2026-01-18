@@ -1,15 +1,12 @@
 // app/(auth)/reset-password/page.tsx
 import ResetPasswordForm from './ResetPasswordForm';
 import { revalidatePath } from 'next/cache';
-import styles from './reset-password.module.css'; // ★ CSS ইম্পোর্ট
 
-// --- টাইপ ডিফাইন করা --- (অপরিবর্তিত)
 type ActionState = {
   error?: string;
   success?: boolean;
 };
 
-// --- GraphQL Mutation --- (অপরিবর্তিত)
 const RESET_USER_PASSWORD_MUTATION = `
 mutation ResetUserPassword($key: String!, $login: String!, $password: String!) {
   resetUserPassword(
@@ -26,7 +23,6 @@ mutation ResetUserPassword($key: String!, $login: String!, $password: String!) {
 }
 `;
 
-// --- হেল্পার ফাংশন --- (অপরিবর্তিত)
 async function fetchPublicGraphQL(query: string, variables: Record<string, unknown>) {
   const endpoint = process.env.WORDPRESS_GRAPHQL_ENDPOINT;
   if (!endpoint) throw new Error('GraphQL endpoint is not set.');
@@ -53,7 +49,6 @@ async function fetchPublicGraphQL(query: string, variables: Record<string, unkno
   }
 }
 
-// --- Server Action --- (অপরিবর্তিত)
 async function resetPasswordAction(
   prevState: ActionState,
   formData: FormData
@@ -90,7 +85,6 @@ async function resetPasswordAction(
   }
 }
 
-// --- মূল পেজ কম্পোনেন্ট ---
 export default function ResetPasswordPage({
   searchParams,
 }: {
@@ -100,15 +94,14 @@ export default function ResetPasswordPage({
 
   if (!key || !login) {
     return (
-      // ★ ইনভ্যালিড লিংকের জন্য কন্টেইনার
-      <div className={styles.container}>
-        <h2 className={styles.title}>Invalid Link</h2>
-        <p className={styles.errorMessage} style={{ textAlign: 'left' }}>
+      <div className="max-w-[420px] mx-auto my-16 p-10 bg-white border border-[#e0e0e0] rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.05)]">
+        <h2 className="text-center text-[2rem] font-bold text-[#333] mb-8">Invalid Link</h2>
+        <p className="text-[#721c24] bg-[#f8d7da] border border-[#f5c6cb] py-3 px-5 rounded-[5px] mb-5 text-left text-[0.95rem]">
           This password reset link is incomplete or invalid.
         </p>
-        <div className={styles.links}>
+        <div className="mt-6 text-center text-[0.95rem] text-[#555]">
           <p>
-            Please <a href="/forgot-password">request a new reset link</a>.
+            Please <a href="/forgot-password" className="text-[#007bff] font-semibold no-underline hover:underline">request a new reset link</a>.
           </p>
         </div>
       </div>
@@ -116,9 +109,8 @@ export default function ResetPasswordPage({
   }
 
   return (
-    // ★ কন্টেইনারে CSS যোগ করা হয়েছে
-    <div className={styles.container}>
-      <h2 className={styles.title}>Set New Password</h2>
+    <div className="max-w-[420px] mx-auto my-16 p-10 bg-white border border-[#e0e0e0] rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.05)]">
+      <h2 className="text-center text-[2rem] font-bold text-[#333] mb-8">Set New Password</h2>
       <ResetPasswordForm
         resetPasswordAction={resetPasswordAction}
         resetKey={key}

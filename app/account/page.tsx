@@ -1,13 +1,13 @@
 // app/account/page.tsx
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
-import Link from 'next/link'; // ★ Link ইম্পোর্ট করুন
-import styles from './dashboard.module.css'; // ★ লোকাল CSS ইম্পোর্ট
 
-// --- GraphQL Query (অপরিবর্তিত) ---
-const GET_VIEWER_QUERY = `
-query GetViewer {
-  viewer {
+import { cookies } from 'next/headers';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { AUTH_COOKIE_NAME } from '@/lib/constants';
+
+const GET_VIEWER_BY_KEY_QUERY = `
+query GetViewerByKey($key: String) {
+  viewerByKey(secretKey: $key) {
     id
     firstName
     lastName
@@ -16,79 +16,74 @@ query GetViewer {
 }
 `;
 
-// --- getViewerData ফাংশন (অপরিবর্তিত) ---
-async function getViewerData(authToken: string) {
+async function getViewerData(secretKey: string) {
   const endpoint = process.env.WORDPRESS_GRAPHQL_ENDPOINT;
-  if (!endpoint) throw new Error('WORDPRESS_GRAPHQL_ENDPOINT is not set');
+  if (!endpoint) return null;
 
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}` 
       },
-      body: JSON.stringify({
-        query: GET_VIEWER_QUERY,
+      body: JSON.stringify({ 
+        query: GET_VIEWER_BY_KEY_QUERY,
+        variables: { 
+            key: secretKey 
+        }
       }),
       cache: 'no-store',
     });
 
     const data = await response.json();
+    
     if (data.errors) {
-      console.error("GraphQL Errors:", data.errors);
       return null;
     }
-    return data.data.viewer;
+
+    if (!data?.data?.viewerByKey) {
+      return null;
+    }
+
+    return data.data.viewerByKey;
+
   } catch (error) {
-    console.error("Fetch Error:", error);
     return null;
   }
 }
 
-// --- মূল পেজ কম্পোনেন্ট (আপডেট করা হয়েছে) ---
 export default async function AccountDashboardPage() {
   const cookieStore = await cookies();
-  const authToken = cookieStore.get('auth-token')?.value;
-
-  if (!authToken) {
+  const secretKey = cookieStore.get(AUTH_COOKIE_NAME)?.value;
+  
+  if (!secretKey) {
     redirect('/login');
   }
 
-  const user = await getViewerData(authToken);
+  const user = await getViewerData(secretKey);
 
   if (!user) {
-    console.error("Could not fetch viewer, redirecting to login.");
-    redirect('/login'); 
+    redirect('/api/auth/logout?redirect=/login');
   }
 
   return (
     <div>
-      {/* <h2>Dashboard</h2> - এটি layout.module.css দিয়ে স্টাইল করা হয়েছে */}
+      <p className="text-[1.2rem] text-[#333]">
+        Hello, <strong className="font-semibold">{user.firstName || user.email}</strong>!
+      </p>
       
-      {/* ★ নতুন স্টাইল যোগ করা হয়েছে */}
-      <p className={styles.welcomeMessage}>
-        Hello, <strong>{user.firstName || user.email}</strong>!
-      </p>
-      <p className={styles.introText}>
-        From your account dashboard you can view your recent orders, 
-        manage your shipping and billing addresses, 
-        and edit your password and account details.
-      </p>
-
-      {/* ★ নতুন কুইক লিংক বক্স যোগ করা হয়েছে */}
-      <div className={styles.quickLinksGrid}>
-        <Link href="/account/orders" className={styles.quickLink}>
-          <h4>My Orders</h4>
-          <p>View your order history</p>
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 mt-10">
+        <Link href="/account/orders" className="block p-6 border border-[#e0e0e0] rounded-lg no-underline text-inherit bg-[#fafafa] hover:border-[#007bff]">
+          <h4 className="m-0 mb-2 text-[1.25rem] text-[#007bff]">My Orders</h4>
+          <p className="m-0 text-[1rem] text-[#666]">View your order history</p>
         </Link>
-        <Link href="/account/addresses" className={styles.quickLink}>
-          <h4>My Addresses</h4>
-          <p>Edit billing & shipping info</p>
+        <Link href="/account/addresses" className="block p-6 border border-[#e0e0e0] rounded-lg no-underline text-inherit bg-[#fafafa] hover:border-[#007bff]">
+          <h4 className="m-0 mb-2 text-[1.25rem] text-[#007bff]">My Addresses</h4>
+          <p className="m-0 text-[1rem] text-[#666]">Edit billing & shipping info</p>
         </Link>
-        <Link href="/account/details" className={styles.quickLink}>
-          <h4>Account Details</h4>
-          <p>Change your name or password</p>
+        <Link href="/account/details" className="block p-6 border border-[#e0e0e0] rounded-lg no-underline text-inherit bg-[#fafafa] hover:border-[#007bff]">
+          <h4 className="m-0 mb-2 text-[1.25rem] text-[#007bff]">Account Details</h4>
+          <p className="m-0 text-[1rem] text-[#666]">Change your name or password</p>
         </Link>
       </div>
     </div>

@@ -1,15 +1,12 @@
 // app/(auth)/register/page.tsx
 import RegisterForm from './RegisterForm';
 import { revalidatePath } from 'next/cache';
-import styles from './register.module.css'; 
 
-// --- টাইপ ডিফাইন করা ---
 type ActionState = {
   error?: string;
   success?: boolean;
 };
 
-// ★★★ GraphQL Mutation আপডেট করা হয়েছে ★★★
 const REGISTER_CUSTOMER_MUTATION = `
 mutation RegisterCustomer(
   $email: String!, 
@@ -33,7 +30,6 @@ mutation RegisterCustomer(
 }
 `;
 
-// --- হেল্পার ফাংশন: GraphQL-এ রিকোয়েস্ট পাঠানো (অপরিবর্তিত) ---
 async function fetchPublicGraphQL(query: string, variables: Record<string, unknown>) {
   const endpoint = process.env.WORDPRESS_GRAPHQL_ENDPOINT;
   if (!endpoint) throw new Error('GraphQL endpoint is not set.');
@@ -60,32 +56,27 @@ async function fetchPublicGraphQL(query: string, variables: Record<string, unkno
   }
 }
 
-// --- ★★★ Server Action: Register User (আপডেট করা হয়েছে) ★★★ ---
 async function registerUser(
   prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
   'use server';
 
-  // নতুন ফিল্ডগুলো পড়া
   const firstName = formData.get('firstName') as string;
   const lastName = formData.get('lastName') as string;
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
   const confirmPassword = formData.get('confirmPassword') as string;
 
-  // সার্ভার-সাইড ভ্যালিডেশন
   if (!firstName || !lastName || !email || !password) {
     return { error: 'Please fill out all required fields.' };
   }
 
-  // ★ পাসওয়ার্ড ম্যাচিং চেক
   if (password !== confirmPassword) {
     return { error: 'Passwords do not match. Please try again.' };
   }
 
   try {
-    // ★ মিউটেশনে নতুন ভেরিয়েবল পাস করা
     await fetchPublicGraphQL(REGISTER_CUSTOMER_MUTATION, {
       email: email,
       password: password,
@@ -104,17 +95,16 @@ async function registerUser(
   }
 }
 
-// --- মূল পেজ কম্পোনেন্ট (অপরিবর্তিত) ---
 export default function RegisterPage() {
   return (
-    <div className={styles.registerContainer}> 
-      <h2 className={styles.title}>Register</h2>
+    <div className="max-w-[480px] mx-auto my-16 p-12 bg-white rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] border border-[#f0f0f0]"> 
+      <h2 className="text-center text-4xl font-bold text-[#1a202c] mb-10">Register</h2>
       <RegisterForm registerAction={registerUser} />
-      <div className={styles.links}>
+      <div className="mt-8 text-center text-[0.95rem] text-[#4a5568]">
         <p>
-          Already have an account? <a href="/login">Login here</a>
+          Already have an account? <a href="/login" className="text-[#3182ce] font-semibold no-underline hover:underline">Login here</a>
         </p>
       </div>
     </div>
-  );
+ );
 }

@@ -2,25 +2,12 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import AccountDetailsForm from './AccountDetailsForm'; // ক্লায়েন্ট ফর্ম ইম্পোর্ট
+import AccountDetailsForm from './AccountDetailsForm';
+import { AUTH_COOKIE_NAME } from '@/lib/constants';
 
-// --- টাইপ ডিফাইন করা ---
-type User = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-};
-
-type ActionState = {
-  error?: string;
-  success?: boolean;
-};
-
-// --- GraphQL কোয়েরি এবং মিউটেশন ---
-const GET_VIEWER_DETAILS_QUERY = `
-query GetViewerDetails {
-  viewer {
+const GET_VIEWER_KEY_QUERY = `
+query GetViewerByKey($key: String) {
+  viewerByKey(secretKey: $key) {
     id
     firstName
     lastName
@@ -29,154 +16,116 @@ query GetViewerDetails {
 }
 `;
 
-const UPDATE_CUSTOMER_DETAILS_MUTATION = `
-mutation UpdateCustomerDetails($firstName: String!, $lastName: String!, $email: String!) {
-  updateCustomer(
-    input: {
-      firstName: $firstName
-      lastName: $lastName
-      email: $email
-    }
-  ) {
-    customer { id }
+const UPDATE_DETAILS_MUTATION = `
+mutation UpdateDetails($key: String!, $firstName: String!, $lastName: String!, $email: String!) {
+  updateCustomerByKey(input: {
+    secretKey: $key,
+    firstName: $firstName,
+    lastName: $lastName,
+    email: $email
+  }) {
+    success
   }
 }
 `;
 
 const CHANGE_PASSWORD_MUTATION = `
-mutation ChangePassword($currentPassword: String!, $newPassword: String!) {
-  changePassword(
-    input: {
-      currentPassword: $currentPassword
-      newPassword: $newPassword
-    }
-  ) {
-    clientMutationId
+mutation ChangePassword($key: String!, $newPassword: String!) {
+  changePasswordByKey(input: {
+    secretKey: $key,
+    newPassword: $newPassword
+  }) {
+    success
   }
 }
 `;
 
-// --- হেল্পার ফাংশন: GraphQL-এ রিকোয়েস্ট পাঠানো ---
-// ★★★ সমাধান: 'any' এর বদলে 'unknown' ব্যবহার ★★★
-async function fetchGraphQL(authToken: string, query: string, variables: Record<string, unknown> = {}) {
+async function getViewer(secretKey: string) {
+    const endpoint = process.env.WORDPRESS_GRAPHQL_ENDPOINT;
+    if (!endpoint) return null;
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: GET_VIEWER_KEY_QUERY, variables: { key: secretKey } }),
+            cache: 'no-store',
+        });
+        const data = await response.json();
+        return data?.data?.viewerByKey || null;
+    } catch(e) { return null; }
+}
+
+async function updateDetails(prevState: any, formData: FormData) {
+  'use server';
+  const secretKey = (await cookies()).get(AUTH_COOKIE_NAME)?.value;
+  if (!secretKey) return { error: 'Not authenticated.' };
+
   const endpoint = process.env.WORDPRESS_GRAPHQL_ENDPOINT;
-  if (!endpoint) throw new Error('GraphQL endpoint is not set.');
+  if(!endpoint) return { error: 'Server error' };
 
   try {
     const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`,
-      },
-      body: JSON.stringify({ query, variables }),
-      cache: 'no-store',
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            query: UPDATE_DETAILS_MUTATION,
+            variables: {
+                key: secretKey,
+                firstName: formData.get('firstName'),
+                lastName: formData.get('lastName'),
+                email: formData.get('email')
+            }
+        })
     });
-
     const data = await response.json();
-    if (data.errors) {
-      console.error("GraphQL Errors:", data.errors);
-      const errorMessage = data.errors[0]?.message || 'An error occurred.';
-      throw new Error(errorMessage);
-    }
-    return data.data;
-
-  } catch (error) {
-    console.error("Fetch Error:", error);
-    throw error;
-  }
-}
-
-// --- ★★★ Server Action ১: Update Details ★★★ ---
-async function updateDetails(
-  prevState: ActionState,
-  formData: FormData
-): Promise<ActionState> {
-  'use server';
-
-  const authToken = (await cookies()).get('auth-token')?.value;
-  if (!authToken) return { error: 'Not authenticated.' };
-
-  try {
-    await fetchGraphQL(authToken, UPDATE_CUSTOMER_DETAILS_MUTATION, {
-      firstName: formData.get('firstName') as string,
-      lastName: formData.get('lastName') as string,
-      email: formData.get('email') as string,
-    });
-
+    if(data.errors) return { error: 'Update failed' };
+    
     revalidatePath('/account/details');
     return { success: true };
-
-  } catch (error) {
-    // ★★★ সমাধান: 'error' কে সঠিকভাবে টাইপ চেক করা ★★★
-    if (error instanceof Error) {
-      return { error: error.message };
-    }
-    return { error: 'An unknown error occurred during update.' };
-  }
+  } catch(e) { return { error: 'Error' }; }
 }
 
-// --- ★★★ Server Action ২: Change Password ★★★ ---
-async function changePassword(
-  prevState: ActionState,
-  formData: FormData
-): Promise<ActionState> {
+async function changePassword(prevState: any, formData: FormData) {
   'use server';
+  const secretKey = (await cookies()).get(AUTH_COOKIE_NAME)?.value;
+  if (!secretKey) return { error: 'Not authenticated.' };
+  
+  const newPass = formData.get('newPassword') as string;
+  const confirmPass = formData.get('confirmPassword') as string;
 
-  const authToken = (await cookies()).get('auth-token')?.value;
-  if (!authToken) return { error: 'Not authenticated.' };
+  if(newPass !== confirmPass) return { error: 'Passwords do not match' };
 
-  const newPassword = formData.get('newPassword') as string;
-  const confirmPassword = formData.get('confirmPassword') as string;
-
-  if (newPassword !== confirmPassword) {
-    return { error: 'New passwords do not match.' };
-  }
+  const endpoint = process.env.WORDPRESS_GRAPHQL_ENDPOINT;
+  if(!endpoint) return { error: 'Server error' };
 
   try {
-    await fetchGraphQL(authToken, CHANGE_PASSWORD_MUTATION, {
-      currentPassword: formData.get('currentPassword') as string,
-      newPassword: newPassword,
+    const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            query: CHANGE_PASSWORD_MUTATION,
+            variables: { key: secretKey, newPassword: newPass }
+        })
     });
+    const data = await response.json();
+    if(data.errors) return { error: 'Failed to change password' };
     
     return { success: true };
-
-  } catch (error) {
-    // ★★★ সমাধান: 'error' কে সঠিকভাবে টাইপ চেক করা ★★★
-    if (error instanceof Error) {
-      return { error: error.message };
-    }
-    return { error: 'An unknown error occurred during password change.' };
-  }
+  } catch(e) { return { error: 'Error' }; }
 }
 
-// --- মূল পেজ কম্পোনেন্ট ---
 export default async function AccountDetailsPage() {
   const cookieStore = await cookies();
-  const authToken = cookieStore.get('auth-token')?.value;
+  const secretKey = cookieStore.get(AUTH_COOKIE_NAME)?.value;
+  if (!secretKey) redirect('/login');
 
-  if (!authToken) {
-    redirect('/login');
-  }
-
-  let user: User;
-  try {
-    const data = await fetchGraphQL(authToken, GET_VIEWER_DETAILS_QUERY);
-    user = data.viewer;
-  } catch (error) {
-    // ★★★ সমাধান: 'error' ভেরিয়েবলটি ব্যবহার করা (logging) ★★★
-    console.error("Failed to fetch viewer details:", error);
-    redirect('/login'); // টোকেন এক্সপায়ার হলে লগইনে পাঠাও
-  }
+  const user = await getViewer(secretKey);
+  if (!user) redirect('/api/auth/logout?redirect=/login');
 
   return (
     <div>
-      <h2>Account Details</h2>
-      <AccountDetailsForm
-        user={user}
-        updateDetailsAction={updateDetails}
-        changePasswordAction={changePassword}
-      />
+      <h2 className="text-2xl font-bold mb-6">Account Details</h2>
+      <AccountDetailsForm user={user} updateDetailsAction={updateDetails} changePasswordAction={changePassword} />
     </div>
   );
 }

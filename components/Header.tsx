@@ -5,6 +5,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '@/app/providers/AuthProvider';
 import SearchOverlay from './SearchOverlay';
 import MiniCart from './MiniCart';
 import Image from 'next/image';
@@ -13,6 +14,7 @@ import { IoSearch, IoPersonOutline, IoMenu, IoClose } from "react-icons/io5";
 
 export default function Header() {
   const { cartItems, isMiniCartOpen, openMiniCart, closeMiniCart } = useCart();
+  const { user } = useAuth();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
@@ -28,11 +30,8 @@ export default function Header() {
     <>
       <header className="bg-white border-b border-[#eaeaea] py-1.5 sticky top-[55px] z-50 transition-[top] duration-300 ease-in-out md:top-[48px]">
         
-        {/* --- এখানে পরিবর্তন: flex এর বদলে grid ব্যবহার করা হয়েছে যাতে মেনু একদম মাঝখানে থাকে --- */}
         <div className="max-w-[1400px] mx-auto px-6 flex lg:grid lg:grid-cols-3 items-center justify-between relative">
           
-          {/* --- বাম অংশ (Logo & Hamburger) --- */}
-          {/* flex-1 রাখা হয়েছে যাতে মোবাইলেও স্পেস ঠিক থাকে, Desktop এ justify-self-start */}
           <div className="flex flex-1 lg:flex-none items-center justify-start">
             <button 
                 onClick={() => setIsMenuOpen(true)} 
@@ -55,9 +54,6 @@ export default function Header() {
             </div>
           </div>
 
-          {/* --- মধ্যম অংশ (Mobile Logo & Desktop Nav) --- */}
-          
-          {/* মোবাইল লোগো (Absolute Centered) */}
           <div className="block lg:hidden absolute left-1/2 -translate-x-1/2">
             <Link href="/" className="flex items-center no-underline">
                <Image 
@@ -71,8 +67,6 @@ export default function Header() {
             </Link>
           </div>
           
-          {/* ডেস্কটপ নেভিগেশন (Grid Center) */}
-          {/* justify-self-center ব্যবহার করা হয়েছে */}
           <nav className="hidden lg:flex gap-6 xl:gap-8 items-center justify-self-center">
             {['/', '/bikes', '/spare-parts', '/apparel', '/about', '/contact', '/faq', '/blog'].map((path) => (
                 <Link 
@@ -85,8 +79,6 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* --- ডান অংশ (Icons) --- */}
-          {/* justify-self-end ব্যবহার করা হয়েছে */}
           <div className="flex flex-1 lg:flex-none items-center justify-end gap-2 justify-self-end">
             <button 
                 className="hidden lg:flex items-center gap-2 bg-transparent border-b border-[#d8d8d8] cursor-pointer px-2 pb-0.5 text-[#333] hover:border-black transition-colors" 
@@ -98,9 +90,9 @@ export default function Header() {
             </button>
             
             <Link 
-                href="/account" 
+                href={user ? "/account" : "/login"} 
                 className="hidden lg:flex bg-transparent border-none cursor-pointer p-2 text-[#333] items-center hover:text-black transition-colors"
-                aria-label="My account link"
+                aria-label={user ? "My Account" : "Login"}
             >
               <IoPersonOutline size={24} />
             </Link>
@@ -121,7 +113,6 @@ export default function Header() {
         </div>
       </header>
 
-      {/* --- মোবাইল মেনু প্যানেল (অপরিবর্তিত) --- */}
       <div 
         className={`fixed top-0 left-0 w-[350px] h-[95vh] bg-white z-[1001] transition-transform duration-300 ease-in-out flex flex-col p-6 shadow-[5px_0_15px_rgba(0,0,0,0.1)] ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
@@ -158,13 +149,13 @@ export default function Header() {
           
           <div className="border-t border-[#f0f0f0] pt-4 mt-6">
             <Link 
-                href="/account" 
-                className={`text-[1.2rem] font-medium text-[#333] no-underline flex items-center gap-3 bg-transparent border-b border-[#ececec] w-full text-left cursor-pointer p-0 hover:text-black hover:font-bold ${pathname === '/account' ? 'text-black font-bold' : ''}`} 
+                href={user ? "/account" : "/login"}
+                className={`text-[1.2rem] font-medium text-[#333] no-underline flex items-center gap-3 bg-transparent border-b border-[#ececec] w-full text-left cursor-pointer p-0 hover:text-black hover:font-bold ${pathname === '/account' || pathname === '/login' ? 'text-black font-bold' : ''}`} 
                 onClick={closeAllOverlays} 
-                aria-label="My account"
+                aria-label={user ? "My Account" : "Login"}
             >
                 <IoPersonOutline />
-                <span>My Account</span>
+                <span>{user ? "My Account" : "Login / Register"}</span>
             </Link>
           </div>
       </div>

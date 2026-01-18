@@ -1,7 +1,6 @@
 // app/(auth)/forgot-password/page.tsx
 import ForgotPasswordForm from './ForgotPasswordForm';
 import { revalidatePath } from 'next/cache';
-import styles from './forgot-password.module.css'; // ★ CSS ইম্পোর্ট
 
 // --- টাইপ ডিফাইন করা --- (অপরিবর্তিত)
 type ActionState = {
@@ -85,13 +84,21 @@ async function sendResetLinkAction(
 // --- মূল পেজ কম্পোনেন্ট ---
 export default function ForgotPasswordPage() {
   return (
-    // ★ কন্টেইনারে CSS যোগ করা হয়েছে
-    <div className={styles.container}>
-      <h2 className={styles.title}>Forgot Password?</h2>
+    // ★ কন্টেইনারে Tailwind CSS যোগ করা হয়েছে
+    <div className="max-w-[420px] mx-auto my-16 p-10 bg-white border border-[#e0e0e0] rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.05)]">
+      <h2 className="text-center text-[2rem] font-bold text-[#333] mb-4">
+        Forgot Password?
+      </h2>
+      
       <ForgotPasswordForm sendResetLinkAction={sendResetLinkAction} />
-      <div className={styles.links}> {/* ★ লিংক সেকশনে CSS যোগ করা হয়েছে */}
+      
+      {/* ★ লিংক সেকশনে Tailwind CSS যোগ করা হয়েছে */}
+      <div className="mt-6 text-center text-[0.95rem] text-[#555]">
         <p>
-          Remembered your password? <a href="/login">Login here</a>
+          Remembered your password?{' '}
+          <a href="/login" className="text-[#007bff] font-semibold no-underline hover:underline">
+            Login here
+          </a>
         </p>
       </div>
     </div>

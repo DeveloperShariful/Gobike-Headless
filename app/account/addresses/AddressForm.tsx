@@ -1,226 +1,151 @@
 // app/account/addresses/AddressForm.tsx
-'use client'; 
+'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
-import styles from './addresses.module.css'; // ★ লোকাল CSS ইম্পোর্ট
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 
-// Address টাইপ (অপরিবর্তিত)
 type Address = {
-  firstName: string; lastName: string; company: string | null; address1: string;
-  address2: string | null; city: string; state: string | null;
-  postcode: string; country: string; email?: string; phone?: string;
+  firstName?: string;
+  lastName?: string;
+  company?: string | null;
+  address1?: string;
+  address2?: string | null;
+  city?: string;
+  state?: string | null;
+  postcode?: string;
+  country?: string;
+  email?: string;
+  phone?: string;
 };
 
-// সার্ভার অ্যাকশন স্টেট-এর টাইপ (অপরিবর্তিত)
+type AddressesProps = {
+  billing?: Address | null;  // null হতে পারে
+  shipping?: Address | null; // null হতে পারে
+};
+
 type UpdateActionState = {
   error?: string;
   success?: boolean;
 };
 
-// সাবমিট বাটন
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <button type="submit" className={styles.saveButton} disabled={pending}>
-      {pending ? 'Saving...' : 'Save Addresses'}
+    <button 
+      type="submit" 
+      disabled={pending}
+      className="inline-block px-6 py-3 bg-[#007bff] text-white font-semibold rounded-md hover:bg-[#0056b3] transition-colors disabled:bg-[#ccc] disabled:cursor-not-allowed mt-4"
+    >
+      {pending ? 'Saving Addresses...' : 'Save Addresses'}
     </button>
   );
 }
 
-// --- মূল ফর্ম কম্পোনেন্ট ---
 export default function AddressForm({
   addresses,
   updateAction,
 }: {
-  addresses: { billing: Address; shipping: Address };
-  updateAction: (
-    prevState: UpdateActionState,
-    formData: FormData
-  ) => Promise<UpdateActionState>;
+  addresses: AddressesProps;
+  updateAction: (prevState: any, formData: FormData) => Promise<UpdateActionState>;
 }) {
   const initialState: UpdateActionState = {};
-  const [state, formAction] = useFormState(updateAction, initialState);
+  const [state, formAction] = useActionState(updateAction, initialState);
+
+  // ★★★ ফিক্স: ডাটা না থাকলে খালি অবজেক্ট ধরে নেওয়া হবে, যাতে অ্যাপ ক্র্যাশ না করে ★★★
+  const billing = addresses?.billing || {};
+  const shipping = addresses?.shipping || {};
 
   return (
     <form action={formAction}>
-      {/* ★ ফর্ম গ্রিড লেআউট */}
-      <div className={styles.formGrid}>
-        
-        {/* ★ সাকসেস বা এরর মেসেজ গ্রিডের ভেতরে */}
-        {state.success && (
-          <p className={styles.successMessage}>Addresses saved successfully!</p>
-        )}
-        {state.error && <p className={styles.errorMessage}>{state.error}</p>}
+      {state.success && (
+        <div className="mb-4 p-4 bg-[#d4edda] text-[#155724] border border-[#c3e6cb] rounded">
+          Addresses updated successfully!
+        </div>
+      )}
+      {state.error && (
+        <div className="mb-4 p-4 bg-[#f8d7da] text-[#721c24] border border-[#f5c6cb] rounded">
+          {state.error}
+        </div>
+      )}
 
-        {/* --- বিলিং কলাম --- */}
-        <div className={styles.addressColumn}>
-          <h3>Billing Address</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Billing Address Section */}
+        <div className="bg-[#fafafa] p-6 rounded-lg border border-[#eee]">
+          <h3 className="text-xl font-bold mb-4 text-[#333] border-b pb-2">Billing Address</h3>
           
-          <div className={styles.formGroup}>
-            <label htmlFor="billing_firstName" className={styles.label}>First Name:</label>
-            <input
-              id="billing_firstName"
-              name="billing_firstName"
-              className={styles.formInput}
-              defaultValue={addresses.billing.firstName || ''}
-              required
-            />
-          </div>
-          
-          <div className={styles.formGroup}>
-            <label htmlFor="billing_lastName" className={styles.label}>Last Name:</label>
-            <input
-              id="billing_lastName"
-              name="billing_lastName"
-              className={styles.formInput}
-              defaultValue={addresses.billing.lastName || ''}
-              required
-            />
-          </div>
-          
-          <div className={styles.formGroup}>
-            <label htmlFor="billing_address1" className={styles.label}>Address 1:</label>
-            <input
-              id="billing_address1"
-              name="billing_address1"
-              className={styles.formInput}
-              defaultValue={addresses.billing.address1 || ''}
-              required
-            />
-          </div>
-          
-          <div className={styles.formGroup}>
-            <label htmlFor="billing_city" className={styles.label}>City:</label>
-            <input
-              id="billing_city"
-              name="billing_city"
-              className={styles.formInput}
-              defaultValue={addresses.billing.city || ''}
-              required
-            />
-          </div>
-          
-          <div className={styles.formGroup}>
-            <label htmlFor="billing_postcode" className={styles.label}>Postcode:</label>
-            <input
-              id="billing_postcode"
-              name="billing_postcode"
-              className={styles.formInput}
-              defaultValue={addresses.billing.postcode || ''}
-              required
-            />
-          </div>
-          
-          <div className={styles.formGroup}>
-            <label htmlFor="billing_country" className={styles.label}>Country Code (e.g., AU):</label>
-            <input
-              id="billing_country"
-              name="billing_country"
-              className={styles.formInput}
-              defaultValue={addresses.billing.country || ''}
-              required
-            />
-          </div>
-          
-          <div className={styles.formGroup}>
-            <label htmlFor="billing_email" className={styles.label}>Email:</label>
-            <input
-              id="billing_email"
-              name="billing_email"
-              type="email"
-              className={styles.formInput}
-              defaultValue={addresses.billing.email || ''}
-              required
-            />
-          </div>
-          
-          <div className={styles.formGroup}>
-            <label htmlFor="billing_phone" className={styles.label}>Phone:</label>
-            <input
-              id="billing_phone"
-              name="billing_phone"
-              type="tel"
-              className={styles.formInput}
-              defaultValue={addresses.billing.phone || ''}
-              required
-            />
+          <div className="grid grid-cols-1 gap-4">
+            <div>
+              <label className="block text-sm font-semibold mb-1">First Name</label>
+              {/* ডাটা রিড করার সময় সেফটি চেক (|| '') দেওয়া হলো */}
+              <input name="billing_firstName" defaultValue={billing.firstName || ''} required className="w-full p-2 border rounded" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Last Name</label>
+              <input name="billing_lastName" defaultValue={billing.lastName || ''} required className="w-full p-2 border rounded" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Email</label>
+              <input name="billing_email" type="email" defaultValue={billing.email || ''} required className="w-full p-2 border rounded" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Phone</label>
+              <input name="billing_phone" type="tel" defaultValue={billing.phone || ''} className="w-full p-2 border rounded" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Street Address</label>
+              <input name="billing_address1" defaultValue={billing.address1 || ''} required className="w-full p-2 border rounded mb-2" placeholder="House number and street name" />
+              <input name="billing_address2" defaultValue={billing.address2 || ''} className="w-full p-2 border rounded" placeholder="Apartment, suite, unit, etc. (optional)" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">City</label>
+              <input name="billing_city" defaultValue={billing.city || ''} required className="w-full p-2 border rounded" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Postcode / ZIP</label>
+              <input name="billing_postcode" defaultValue={billing.postcode || ''} required className="w-full p-2 border rounded" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Country</label>
+              <input name="billing_country" defaultValue={billing.country || ''} required className="w-full p-2 border rounded" />
+            </div>
           </div>
         </div>
 
-        {/* --- শিপিং কলাম --- */}
-        <div className={styles.addressColumn}>
-          <h3>Shipping Address</h3>
-
-          <div className={styles.formGroup}>
-            <label htmlFor="shipping_firstName" className={styles.label}>First Name:</label>
-            <input
-              id="shipping_firstName"
-              name="shipping_firstName"
-              className={styles.formInput}
-              defaultValue={addresses.shipping.firstName || ''}
-              required
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label htmlFor="shipping_lastName" className={styles.label}>Last Name:</label>
-            <input
-              id="shipping_lastName"
-              name="shipping_lastName"
-              className={styles.formInput}
-              defaultValue={addresses.shipping.lastName || ''}
-              required
-            />
-          </div>
+        {/* Shipping Address Section */}
+        <div className="bg-[#fafafa] p-6 rounded-lg border border-[#eee]">
+          <h3 className="text-xl font-bold mb-4 text-[#333] border-b pb-2">Shipping Address</h3>
           
-          <div className={styles.formGroup}>
-            <label htmlFor="shipping_address1" className={styles.label}>Address 1:</label>
-            <input
-              id="shipping_address1"
-              name="shipping_address1"
-              className={styles.formInput}
-              defaultValue={addresses.shipping.address1 || ''}
-              required
-            />
-          </div>
-          
-          <div className={styles.formGroup}>
-            <label htmlFor="shipping_city" className={styles.label}>City:</label>
-            <input
-              id="shipping_city"
-              name="shipping_city"
-              className={styles.formInput}
-              defaultValue={addresses.shipping.city || ''}
-              required
-            />
-          </div>
-          
-          <div className={styles.formGroup}>
-            <label htmlFor="shipping_postcode" className={styles.label}>Postcode:</label>
-            <input
-              id="shipping_postcode"
-              name="shipping_postcode"
-              className={styles.formInput}
-              defaultValue={addresses.shipping.postcode || ''}
-              required
-            />
-          </div>
-          
-          <div className={styles.formGroup}>
-            <label htmlFor="shipping_country" className={styles.label}>Country Code (e.g., AU):</label>
-            <input
-              id="shipping_country"
-              name="shipping_country"
-              className={styles.formInput}
-              defaultValue={addresses.shipping.country || ''}
-              required
-            />
+          <div className="grid grid-cols-1 gap-4">
+            <div>
+              <label className="block text-sm font-semibold mb-1">First Name</label>
+              <input name="shipping_firstName" defaultValue={shipping.firstName || ''} required className="w-full p-2 border rounded" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Last Name</label>
+              <input name="shipping_lastName" defaultValue={shipping.lastName || ''} required className="w-full p-2 border rounded" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Street Address</label>
+              <input name="shipping_address1" defaultValue={shipping.address1 || ''} required className="w-full p-2 border rounded mb-2" placeholder="House number and street name" />
+              <input name="shipping_address2" defaultValue={shipping.address2 || ''} className="w-full p-2 border rounded" placeholder="Apartment, suite, unit, etc. (optional)" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">City</label>
+              <input name="shipping_city" defaultValue={shipping.city || ''} required className="w-full p-2 border rounded" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Postcode / ZIP</label>
+              <input name="shipping_postcode" defaultValue={shipping.postcode || ''} required className="w-full p-2 border rounded" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Country</label>
+              <input name="shipping_country" defaultValue={shipping.country || ''} required className="w-full p-2 border rounded" />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* --- সাবমিট বাটন (গ্রিডের বাইরে) --- */}
-      <div className={styles.submitRow}>
+      <div className="mt-6">
         <SubmitButton />
       </div>
     </form>

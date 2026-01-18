@@ -1,12 +1,11 @@
 // app/(auth)/login/page.tsx
+
 'use client'; 
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import styles from './login.module.css'; // ★ শুধু লোকাল CSS ইম্পোর্ট করা হয়েছে
+import { useAuth } from '@/app/providers/AuthProvider';
 
-// SVG আইকন (ফাইলের ভেতরেই)
 const EyeOpenIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
     <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z" />
@@ -25,13 +24,11 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const router = useRouter();
+  
+  const { login, isLoading } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError(null);
 
     try {
@@ -45,30 +42,27 @@ export default function LoginPage() {
 
       if (!response.ok) {
         setError(data.error || 'Login failed. Please try again.');
-        setIsLoading(false);
       } else {
-        router.push('/account'); 
+        login(data.user);
       }
     } catch (err) {
-      console.error("Login failed:", err);
       setError('An unexpected error occurred. Please try again.');
-      setIsLoading(false);
     }
   };
 
   return (
-    <div className={styles.loginContainer}>
-      <h2 className={styles.title}>Login</h2>
+    <div className="max-w-[420px] mx-auto my-16 p-10 bg-white border border-[#e0e0e0] rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.05)]">
+      <h2 className="text-center text-[2rem] font-bold text-[#333] mb-8">Login</h2>
       <form onSubmit={handleSubmit}>
         
-        {error && <p className={styles.errorMessage}>{error}</p>} 
+        {error && <p className="text-[#721c24] bg-[#f8d7da] border border-[#f5c6cb] py-3 px-5 rounded-[5px] mb-5 text-center text-[0.95rem]">{error}</p>} 
         
-        <div className={styles.formGroup}>
-          <label htmlFor="email" className={styles.label}>Email:</label>
+        <div className="mb-5">
+          <label htmlFor="email" className="block mb-2 font-semibold text-[#333] text-[0.95rem]">Email:</label>
           <input
             type="email"
             id="email"
-            className={styles.formInput} 
+            className="block w-full py-[0.85rem] px-4 text-base border border-[#ccc] rounded-md transition-all duration-200 focus:border-[#007bff] focus:shadow-[0_0_0_3px_rgba(0,123,255,0.2)] focus:outline-none" 
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -76,13 +70,13 @@ export default function LoginPage() {
           />
         </div>
         
-        <div className={styles.formGroup}>
-          <label htmlFor="password" className={styles.label}>Password:</label>
-          <div className={styles.passwordWrapper}>
+        <div className="mb-5">
+          <label htmlFor="password" className="block mb-2 font-semibold text-[#333] text-[0.95rem]">Password:</label>
+          <div className="relative w-full">
             <input
               type={showPassword ? 'text' : 'password'}
               id="password"
-              className={styles.passwordInput} 
+              className="block w-full py-[0.85rem] px-4 pr-[40px] text-base border border-[#ccc] rounded-md transition-all duration-200 focus:border-[#007bff] focus:shadow-[0_0_0_3px_rgba(0,123,255,0.2)] focus:outline-none" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -90,7 +84,7 @@ export default function LoginPage() {
             />
             <button
               type="button"
-              className={styles.passwordToggleBtn}
+              className="absolute top-1/2 right-[10px] -translate-y-1/2 bg-transparent border-none cursor-pointer p-[5px] text-[#555] flex"
               onClick={() => setShowPassword(!showPassword)}
             >
               {showPassword ? <EyeClosedIcon /> : <EyeOpenIcon />}
@@ -98,17 +92,17 @@ export default function LoginPage() {
           </div>
         </div>
         
-        <button type="submit" className={styles.btn} disabled={isLoading}>
+        <button type="submit" className="inline-block w-full py-[0.9rem] px-6 text-[1.05rem] font-semibold border border-transparent rounded-md cursor-pointer text-center transition-all duration-200 bg-[#007bff] text-white hover:bg-[#0056b3] disabled:bg-[#ccc] disabled:cursor-not-allowed" disabled={isLoading}>
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
       </form>
       
-      <div className={styles.links}>
-        <p>
-          <Link href="/forgot-password">Forgot your password?</Link>
+      <div className="mt-6 text-center text-[0.95rem] text-[#555]">
+        <p className="my-3">
+          <Link href="/forgot-password" className="text-[#007bff] font-semibold no-underline hover:underline">Forgot your password?</Link>
         </p>
-        <p>
-          Don nott have an account? <Link href="/register">Sign up</Link>
+        <p className="my-3">
+          Don nott have an account? <Link href="/register" className="text-[#007bff] font-semibold no-underline hover:underline">Sign up</Link>
         </p>
       </div>
     </div>

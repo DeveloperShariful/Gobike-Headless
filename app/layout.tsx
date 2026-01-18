@@ -10,6 +10,11 @@ import { ClientProviders } from "./providers";
 import { Suspense } from 'react';
 import SourceTracker from '@/components/SourceTracker';
 
+// ★★★ নতুন ইম্পোর্ট (Auth এর জন্য) ★★★
+import { AuthProvider } from '@/app/providers/AuthProvider';
+import { cookies } from 'next/headers';
+import { AUTH_COOKIE_NAME } from '@/lib/constants';
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -79,29 +84,74 @@ export const viewport: Viewport = {
   themeColor: '#ffffff',
 };
 
-export default function RootLayout({
+// ★★★ ইউজার ডেটা ফেচ করার কুয়েরি এবং ফাংশন ★★★
+const GET_VIEWER_QUERY = `
+query GetViewer {
+  viewer {
+    id
+    firstName
+    lastName
+    email
+  }
+}
+`;
+
+async function getViewer(token: string | undefined) {
+  if (!token) return null;
+  
+  const endpoint = process.env.WORDPRESS_GRAPHQL_ENDPOINT;
+  if (!endpoint) return null;
+
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ query: GET_VIEWER_QUERY }),
+      cache: 'no-store', // সবসময় নতুন ডেটা ফেচ হবে
+    });
+
+    const data = await response.json();
+    return data?.data?.viewer || null;
+  } catch (error) {
+    return null;
+  }
+}
+
+// ★★★ RootLayout এখন async হতে হবে ★★★
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // ★★★ সার্ভার সাইডে কুকি এবং ইউজার চেক করা ★★★
+  const cookieStore = await cookies();
+  const token = cookieStore.get(AUTH_COOKIE_NAME)?.value;
+  const user = await getViewer(token);
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning={true}
       >
-        <Suspense>
-          <SourceTracker />
-        </Suspense>
-        <ClientProviders>
-          <TopBar />
-          <Header />
-          <main>
-            {children}
-          </main>
-          <Footer />
-        </ClientProviders>
-        
+        {/* ★★★ AuthProvider দিয়ে পুরো অ্যাপ র‍্যাপ করা হয়েছে ★★★ */}
+        <AuthProvider initialUser={user}>
+          <Suspense>
+            <SourceTracker />
+          </Suspense>
+          <ClientProviders>
+            <TopBar />
+            <Header />
+            <main>
+              {children}
+            </main>
+            <Footer />
+          </ClientProviders>
+
+        </AuthProvider>
         <DelayedScripts />
       </body>
     </html>

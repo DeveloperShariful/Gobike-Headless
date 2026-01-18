@@ -1,34 +1,14 @@
 // app/account/layout.tsx
+
 import { ReactNode } from 'react';
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
-import styles from './layout.module.css';
-import AccountSidebar from './AccountSidebar'; // ক্লায়েন্ট সাইডবার ইম্পোর্ট
+import AccountSidebar from './AccountSidebar';
 
-// ★★★ সমাধান: Server Action-কে অবশ্যই Server Component-এর ভেতরে রাখতে হবে ★★★
-async function logoutAction() {
-  'use server'; // এখানে এটি রাখা সঠিক
-  const cookieStore = await cookies();
-  cookieStore.delete('auth-token');
-  cookieStore.delete('refresh-token');
-  redirect('/login');
-}
-
-export default async function AccountLayout({ children }: { children: ReactNode }) {
-  const cookieStore = await cookies();
-  const authToken = cookieStore.get('auth-token');
-
-  if (!authToken) {
-    redirect('/login');
-  }
-
+export default function AccountLayout({ children }: { children: ReactNode }) {
   return (
-    <div className={styles.container}>
-      
-      {/* ★★★ সমাধান: logoutAction-কে prop হিসেবে পাস করা ★★★ */}
-      <AccountSidebar logoutAction={logoutAction} />
+    <div className="flex flex-col lg:flex-row max-w-[1200px] mx-auto my-4 lg:my-8 gap-6 lg:gap-8 px-0 lg:px-4 items-start">
+      <AccountSidebar />
 
-      <main className={styles.content}>
+      <main className="flex-1 p-6 lg:p-8 bg-white rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.05)] w-full">
         {children}
       </main>
     </div>

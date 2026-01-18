@@ -3,10 +3,8 @@
 
 import { useFormState, useFormStatus } from 'react-dom';
 import Link from 'next/link';
-import { useState } from 'react'; // ★ Show/Hide এর জন্য ইম্পোর্ট
-import styles from './reset-password.module.css'; // ★ লোকাল CSS ইম্পোর্ট
+import { useState } from 'react';
 
-// SVG আইকন (ফাইলের ভেতরেই)
 const EyeOpenIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
     <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z" />
@@ -20,23 +18,20 @@ const EyeClosedIcon = () => (
   </svg>
 );
 
-// সার্ভার অ্যাকশন স্টেট-এর টাইপ
 type ActionState = {
   error?: string;
   success?: boolean;
 };
 
-// সাবমিট বাটন
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <button type="submit" className={styles.btn} disabled={pending}>
+    <button type="submit" className="inline-block w-full py-[0.9rem] px-6 text-[1.05rem] font-semibold border border-transparent rounded-md cursor-pointer text-center transition-all duration-200 bg-[#007bff] text-white hover:bg-[#0056b3] disabled:bg-[#ccc] disabled:cursor-not-allowed" disabled={pending}>
       {pending ? 'Resetting...' : 'Set New Password'}
     </button>
   );
 }
 
-// --- মূল ফর্ম কম্পোনেন্ট ---
 export default function ResetPasswordForm({
   resetPasswordAction,
   resetKey,
@@ -52,16 +47,15 @@ export default function ResetPasswordForm({
   const initialState: ActionState = {};
   const [state, formAction] = useFormState(resetPasswordAction, initialState);
 
-  // ★ দুটি পাসওয়ার্ড ফিল্ডের জন্য দুটি আলাদা স্টেট
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   if (state.success) {
     return (
-      <div className={styles.successMessage}>
+      <div className="text-[#155724] bg-[#d4edda] border border-[#c3e6cb] p-4 rounded-[5px] text-center">
         <p>Password reset successfully!</p>
         <p>
-          <Link href="/login">You can now log in with your new password.</Link>
+          <Link href="/login" className="font-semibold text-[#155724]">You can now log in with your new password.</Link>
         </p>
       </div>
     );
@@ -69,21 +63,21 @@ export default function ResetPasswordForm({
 
   return (
     <form action={formAction}>
-      {state.error && <p className={styles.errorMessage}>{state.error}</p>}
+      {state.error && <p className="text-[#721c24] bg-[#f8d7da] border border-[#f5c6cb] py-3 px-5 rounded-[5px] mb-5 text-center text-[0.95rem]">{state.error}</p>}
 
-      <div className={styles.formGroup}>
-        <label htmlFor="newPassword" className={styles.label}>New Password:</label>
-        <div className={styles.passwordWrapper}>
+      <div className="mb-5">
+        <label htmlFor="newPassword" className="block mb-2 font-semibold text-[#333] text-[0.95rem]">New Password:</label>
+        <div className="relative w-full">
           <input
             id="newPassword"
             name="newPassword"
             type={showPassword ? 'text' : 'password'}
-            className={styles.passwordInput}
+            className="block w-full py-[0.85rem] px-4 pr-[40px] text-base border border-[#ccc] rounded-md transition-all duration-200 focus:border-[#007bff] focus:shadow-[0_0_0_3px_rgba(0,123,255,0.2)] focus:outline-none"
             required
           />
           <button
             type="button"
-            className={styles.passwordToggleBtn}
+            className="absolute top-1/2 right-[10px] -translate-y-1/2 bg-transparent border-none cursor-pointer p-[5px] text-[#555] flex"
             onClick={() => setShowPassword(!showPassword)}
           >
             {showPassword ? <EyeClosedIcon /> : <EyeOpenIcon />}
@@ -91,19 +85,19 @@ export default function ResetPasswordForm({
         </div>
       </div>
 
-      <div className={styles.formGroup}>
-        <label htmlFor="confirmPassword" className={styles.label}>Confirm New Password:</label>
-        <div className={styles.passwordWrapper}>
+      <div className="mb-5">
+        <label htmlFor="confirmPassword" className="block mb-2 font-semibold text-[#333] text-[0.95rem]">Confirm New Password:</label>
+        <div className="relative w-full">
           <input
             id="confirmPassword"
             name="confirmPassword"
             type={showConfirmPassword ? 'text' : 'password'}
-            className={styles.passwordInput}
+            className="block w-full py-[0.85rem] px-4 pr-[40px] text-base border border-[#ccc] rounded-md transition-all duration-200 focus:border-[#007bff] focus:shadow-[0_0_0_3px_rgba(0,123,255,0.2)] focus:outline-none"
             required
           />
           <button
             type="button"
-            className={styles.passwordToggleBtn}
+            className="absolute top-1/2 right-[10px] -translate-y-1/2 bg-transparent border-none cursor-pointer p-[5px] text-[#555] flex"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
           >
             {showConfirmPassword ? <EyeClosedIcon /> : <EyeOpenIcon />}

@@ -1,37 +1,16 @@
 // app/account/addresses/page.tsx
-
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import AddressForm from './AddressForm';
-import styles from './addresses.module.css';
+import { AUTH_COOKIE_NAME } from '@/lib/constants';
 
-type Address = {
-  firstName: string;
-  lastName: string;
-  company: string | null;
-  address1: string;
-  address2: string | null;
-  city: string;
-  state: string | null;
-  postcode: string;
-  country: string;
-  email?: string;
-  phone?: string;
-};
-
-type UpdateActionState = {
-  error?: string;
-  success?: boolean;
-};
-
-const GET_CUSTOMER_ADDRESSES_QUERY = `
-query GetCustomerAddresses {
-  customer {
+const GET_ADDRESSES_QUERY = `
+query GetAddressesByKey($key: String) {
+  customerAddressesByKey(secretKey: $key) {
     billing {
       firstName
       lastName
-      company
       address1
       address2
       city
@@ -44,7 +23,6 @@ query GetCustomerAddresses {
     shipping {
       firstName
       lastName
-      company
       address1
       address2
       city
@@ -56,129 +34,106 @@ query GetCustomerAddresses {
 }
 `;
 
-const UPDATE_CUSTOMER_ADDRESSES_MUTATION = `
-mutation UpdateCustomerAddresses($billing: CustomerAddressInput!, $shipping: CustomerAddressInput!) {
-  updateCustomer(input: {
+const UPDATE_ADDRESS_MUTATION = `
+mutation UpdateAddresses($key: String!, $billing: CustomerAddressInput!, $shipping: CustomerAddressInput!) {
+  updateCustomerByKey(input: {
+    secretKey: $key,
     billing: $billing,
     shipping: $shipping
   }) {
-    customer {
-      id
-    }
+    success
   }
 }
 `;
 
-async function getCustomerAddresses(authToken: string): Promise<{
-  billing: Address;
-  shipping: Address;
-} | null> {
+async function getAddresses(secretKey: string) {
   const endpoint = process.env.WORDPRESS_GRAPHQL_ENDPOINT;
-  if (!endpoint) throw new Error('GraphQL endpoint is not set.');
+  if (!endpoint) return null;
 
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`
-      },
-      body: JSON.stringify({ query: GET_CUSTOMER_ADDRESSES_QUERY }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+          query: GET_ADDRESSES_QUERY,
+          variables: { key: secretKey }
+      }),
       cache: 'no-store',
     });
     const data = await response.json();
-    if (data.errors) {
-      console.error("GraphQL Errors (Get):", data.errors);
-      return null;
-    }
-    return data.data.customer;
+    
+    if (data.errors || !data?.data?.customerAddressesByKey) return null;
+    return data.data.customerAddressesByKey;
+
   } catch (error) {
-    console.error("Fetch Error (Get):", error);
     return null;
   }
 }
 
-async function updateAddresses(
-  prevState: UpdateActionState,
-  formData: FormData
-): Promise<UpdateActionState> {
+async function updateAddresses(prevState: any, formData: FormData) {
   'use server';
-  const authToken = (await cookies()).get('auth-token')?.value;
-  if (!authToken) return { error: 'You are not authenticated.' };
+  const secretKey = (await cookies()).get(AUTH_COOKIE_NAME)?.value;
+  if (!secretKey) return { error: 'Not authenticated.' };
 
   const billingData = {
-    firstName: formData.get('billing_firstName') as string,
-    lastName: formData.get('billing_lastName') as string,
-    address1: formData.get('billing_address1') as string,
-    city: formData.get('billing_city') as string,
-    postcode: formData.get('billing_postcode') as string,
-    country: formData.get('billing_country') as string,
-    email: formData.get('billing_email') as string,
-    phone: formData.get('billing_phone') as string,
+    firstName: formData.get('billing_firstName'),
+    lastName: formData.get('billing_lastName'),
+    address1: formData.get('billing_address1'),
+    city: formData.get('billing_city'),
+    postcode: formData.get('billing_postcode'),
+    country: formData.get('billing_country'),
+    email: formData.get('billing_email'),
+    phone: formData.get('billing_phone'),
   };
 
   const shippingData = {
-    firstName: formData.get('shipping_firstName') as string,
-    lastName: formData.get('shipping_lastName') as string,
-    address1: formData.get('shipping_address1') as string,
-    city: formData.get('shipping_city') as string,
-    postcode: formData.get('shipping_postcode') as string,
-    country: formData.get('shipping_country') as string,
+    firstName: formData.get('shipping_firstName'),
+    lastName: formData.get('shipping_lastName'),
+    address1: formData.get('shipping_address1'),
+    city: formData.get('shipping_city'),
+    postcode: formData.get('shipping_postcode'),
+    country: formData.get('shipping_country'),
   };
 
   const endpoint = process.env.WORDPRESS_GRAPHQL_ENDPOINT;
-  if (!endpoint) throw new Error('GraphQL endpoint is not set.');
+  if (!endpoint) return { error: 'Server error' };
 
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        query: UPDATE_CUSTOMER_ADDRESSES_MUTATION,
-        variables: { billing: billingData, shipping: shippingData },
+        query: UPDATE_ADDRESS_MUTATION,
+        variables: { key: secretKey, billing: billingData, shipping: shippingData },
       }),
     });
     const data = await response.json();
-    if (data.errors) {
-      console.error("GraphQL Errors (Update):", data.errors);
-      return { error: 'Failed to update addresses.' };
-    }
+    
+    if (data.errors) return { error: 'Update failed' };
+    
     revalidatePath('/account/addresses');
     return { success: true };
   } catch (error) {
-    console.error("Fetch Error (Update):", error);
-    return { error: 'An unexpected error occurred.' };
+    return { error: 'Network error' };
   }
 }
 
 export default async function AccountAddressesPage() {
   const cookieStore = await cookies();
-  const authToken = cookieStore.get('auth-token')?.value;
+  const secretKey = cookieStore.get(AUTH_COOKIE_NAME)?.value;
 
-  if (!authToken) redirect('/login');
+  if (!secretKey) redirect('/login');
 
-  const addresses = await getCustomerAddresses(authToken);
+  const addresses = await getAddresses(secretKey);
 
   if (!addresses) {
-    return (
-      <div>
-        <p>Could not fetch addresses. Please try again later.</p>
-      </div>
-    );
+    redirect('/api/auth/logout?redirect=/login');
   }
 
   return (
     <div>
-      <p className={styles.introText}>
-        Edit your billing and shipping addresses.
-      </p>
-      <AddressForm
-        addresses={addresses}
-        updateAction={updateAddresses}
-      />
+      <p className="text-[1rem] text-[#555] mb-6">Edit your billing and shipping addresses.</p>
+      <AddressForm addresses={addresses} updateAction={updateAddresses} />
     </div>
   );
 }

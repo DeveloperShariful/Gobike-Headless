@@ -1,11 +1,17 @@
 // app/account/details/AccountDetailsForm.tsx
+
+
 'use client'; 
 
-import { useFormState, useFormStatus } from 'react-dom';
-import { useState } from 'react';
-import styles from './details.module.css'; // ★ লোকাল CSS ইম্পোর্ট
+// ★★★ পরিবর্তন ১: ইম্পোর্ট 'react-dom' থেকে 'react' এ moved এবং useFormState -> useActionState হয়েছে ★★★
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom'; // দ্রষ্টব্য: Next.js এর কিছু ভার্সনে useFormStatus এখনো react-dom এ থাকতে পারে, তবে React 19 এ এটি react এ। আপনার এররটি শুধু useFormState নিয়ে। যদি useFormStatus নিয়ে এরর দেয় তবে সেটা 'react' থেকে আনবেন। আপাতত useFormState ঠিক করছি।
 
-// SVG আইকন (ফাইলের ভেতরেই)
+// React 19 এর জন্য সঠিক ইম্পোর্ট (যদি পুরোপুরি React 19 সাপোর্ট থাকে):
+// import { useActionState, useFormStatus } from 'react'; 
+
+import { useState } from 'react';
+
 const EyeOpenIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
     <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z" />
@@ -19,30 +25,26 @@ const EyeClosedIcon = () => (
   </svg>
 );
 
-// সার্ভার অ্যাকশন স্টেট-এর টাইপ (অপরিবর্তিত)
 type ActionState = {
   error?: string;
   success?: boolean;
 };
 
-// ইউজার টাইপ (অপরিবর্তিত)
 type User = {
   firstName: string;
   lastName: string;
   email: string;
 };
 
-// সাবমিট বাটন
 function SubmitButton({ text }: { text: string }) {
   const { pending } = useFormStatus();
   return (
-    <button type="submit" className={styles.btn} disabled={pending}>
+    <button type="submit" className="inline-block w-full md:w-auto md:min-w-[150px] py-[0.85rem] md:py-[0.9rem] px-6 text-base font-semibold border border-transparent rounded-md cursor-pointer text-center transition-all duration-200 bg-[#007bff] text-white mt-2 hover:bg-[#0056b3] disabled:bg-[#ccc] disabled:cursor-not-allowed" disabled={pending}>
       {pending ? 'Saving...' : text}
     </button>
   );
 }
 
-// --- মূল ফর্ম কম্পোনেন্ট ---
 export default function AccountDetailsForm({
   user,
   updateDetailsAction,
@@ -53,55 +55,55 @@ export default function AccountDetailsForm({
   changePasswordAction: (prevState: ActionState, formData: FormData) => Promise<ActionState>;
 }) {
   const initialState: ActionState = {};
-  const [detailsState, detailsFormAction] = useFormState(updateDetailsAction, initialState);
-  const [passwordState, passwordFormAction] = useFormState(changePasswordAction, initialState);
 
-  // ★ তিনটি পাসওয়ার্ড ফিল্ডের জন্য স্টেট
+  // ★★★ পরিবর্তন ২: useFormState এর বদলে useActionState ব্যবহার করা হয়েছে ★★★
+  const [detailsState, detailsFormAction] = useActionState(updateDetailsAction, initialState);
+  const [passwordState, passwordFormAction] = useActionState(changePasswordAction, initialState);
+
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
   return (
     <div>
-      {/* --- ফর্ম ১: ডিটেইলস আপডেটের জন্য --- */}
-      <form action={detailsFormAction} className={styles.formSection}>
-        <h3>Update Details</h3>
+      <form action={detailsFormAction} className="mb-8 pb-6 border-b border-[#eee] last:mb-0 last:pb-0 last:border-b-0 md:mb-10 md:pb-8">
+        <h3 className="text-[1.3rem] md:text-[1.5rem] font-bold text-[#333] mt-0 mb-6">Update Details</h3>
         {detailsState.success && (
-          <p className={styles.successMessage}>Details saved successfully!</p>
+          <p className="text-[#155724] bg-[#d4edda] border border-[#c3e6cb] py-3 px-5 rounded-[5px] mb-5 text-left text-[0.95rem] max-w-[500px]">Details saved successfully!</p>
         )}
         {detailsState.error && (
-          <p className={styles.errorMessage}>{detailsState.error}</p>
+          <p className="text-[#721c24] bg-[#f8d7da] border border-[#f5c6cb] py-3 px-5 rounded-[5px] mb-5 text-left text-[0.95rem] max-w-[500px]">{detailsState.error}</p>
         )}
 
-        <div className={styles.formGroup}>
-          <label htmlFor="firstName" className={styles.label}>First Name:</label>
+        <div className="mb-5 max-w-[500px]">
+          <label htmlFor="firstName" className="block mb-2 font-semibold text-[#333] text-[0.95rem]">First Name:</label>
           <input 
             id="firstName"
             name="firstName" 
-            className={styles.formInput}
+            className="block w-full py-[0.8rem] md:py-[0.85rem] px-4 text-[0.95rem] md:text-[1rem] border border-[#ccc] rounded-md box-border transition-all duration-200 focus:border-[#007bff] focus:shadow-[0_0_0_3px_rgba(0,123,255,0.2)] focus:outline-none"
             defaultValue={user.firstName || ''} 
             required 
           />
         </div>
 
-        <div className={styles.formGroup}>
-          <label htmlFor="lastName" className={styles.label}>Last Name:</label>
+        <div className="mb-5 max-w-[500px]">
+          <label htmlFor="lastName" className="block mb-2 font-semibold text-[#333] text-[0.95rem]">Last Name:</label>
           <input 
             id="lastName"
             name="lastName" 
-            className={styles.formInput}
+            className="block w-full py-[0.8rem] md:py-[0.85rem] px-4 text-[0.95rem] md:text-[1rem] border border-[#ccc] rounded-md box-border transition-all duration-200 focus:border-[#007bff] focus:shadow-[0_0_0_3px_rgba(0,123,255,0.2)] focus:outline-none"
             defaultValue={user.lastName || ''} 
             required 
           />
         </div>
 
-        <div className={styles.formGroup}>
-          <label htmlFor="email" className={styles.label}>Email:</label>
+        <div className="mb-5 max-w-[500px]">
+          <label htmlFor="email" className="block mb-2 font-semibold text-[#333] text-[0.95rem]">Email:</label>
           <input
             id="email"
             name="email"
             type="email"
-            className={styles.formInput}
+            className="block w-full py-[0.8rem] md:py-[0.85rem] px-4 text-[0.95rem] md:text-[1rem] border border-[#ccc] rounded-md box-border transition-all duration-200 focus:border-[#007bff] focus:shadow-[0_0_0_3px_rgba(0,123,255,0.2)] focus:outline-none"
             defaultValue={user.email || ''}
             required
           />
@@ -109,29 +111,28 @@ export default function AccountDetailsForm({
         <SubmitButton text="Save Details" />
       </form>
 
-      {/* --- ফর্ম ২: পাসওয়ার্ড পরিবর্তনের জন্য --- */}
-      <form action={passwordFormAction} className={styles.formSection}>
-        <h3>Change Password</h3>
+      <form action={passwordFormAction} className="mb-8 pb-6 border-b border-[#eee] last:mb-0 last:pb-0 last:border-b-0 md:mb-10 md:pb-8">
+        <h3 className="text-[1.3rem] md:text-[1.5rem] font-bold text-[#333] mt-0 mb-6">Change Password</h3>
         {passwordState.success && (
-          <p className={styles.successMessage}>Password changed successfully!</p>
+          <p className="text-[#155724] bg-[#d4edda] border border-[#c3e6cb] py-3 px-5 rounded-[5px] mb-5 text-left text-[0.95rem] max-w-[500px]">Password changed successfully!</p>
         )}
         {passwordState.error && (
-          <p className={styles.errorMessage}>{passwordState.error}</p>
+          <p className="text-[#721c24] bg-[#f8d7da] border border-[#f5c6cb] py-3 px-5 rounded-[5px] mb-5 text-left text-[0.95rem] max-w-[500px]">{passwordState.error}</p>
         )}
 
-        <div className={styles.formGroup}>
-          <label htmlFor="currentPassword" className={styles.label}>Current Password:</label>
-          <div className={styles.passwordWrapper}>
+        <div className="mb-5 max-w-[500px]">
+          <label htmlFor="currentPassword" className="block mb-2 font-semibold text-[#333] text-[0.95rem]">Current Password:</label>
+          <div className="relative w-full">
             <input 
               id="currentPassword"
               name="currentPassword" 
               type={showCurrent ? 'text' : 'password'}
-              className={styles.passwordInput} 
+              className="block w-full py-[0.8rem] md:py-[0.85rem] px-4 pr-[40px] text-[0.95rem] md:text-[1rem] border border-[#ccc] rounded-md box-border transition-all duration-200 focus:border-[#007bff] focus:shadow-[0_0_0_3px_rgba(0,123,255,0.2)] focus:outline-none" 
               required 
             />
             <button
               type="button"
-              className={styles.passwordToggleBtn}
+              className="absolute top-1/2 right-[10px] -translate-y-1/2 bg-transparent border-none cursor-pointer p-[5px] text-[#555] flex items-center"
               onClick={() => setShowCurrent(!showCurrent)}
             >
               {showCurrent ? <EyeClosedIcon /> : <EyeOpenIcon />}
@@ -139,19 +140,19 @@ export default function AccountDetailsForm({
           </div>
         </div>
 
-        <div className={styles.formGroup}>
-          <label htmlFor="newPassword" className={styles.label}>New Password:</label>
-          <div className={styles.passwordWrapper}>
+        <div className="mb-5 max-w-[500px]">
+          <label htmlFor="newPassword" className="block mb-2 font-semibold text-[#333] text-[0.95rem]">New Password:</label>
+          <div className="relative w-full">
             <input 
               id="newPassword"
               name="newPassword" 
               type={showNew ? 'text' : 'password'}
-              className={styles.passwordInput} 
+              className="block w-full py-[0.8rem] md:py-[0.85rem] px-4 pr-[40px] text-[0.95rem] md:text-[1rem] border border-[#ccc] rounded-md box-border transition-all duration-200 focus:border-[#007bff] focus:shadow-[0_0_0_3px_rgba(0,123,255,0.2)] focus:outline-none" 
               required 
             />
             <button
               type="button"
-              className={styles.passwordToggleBtn}
+              className="absolute top-1/2 right-[10px] -translate-y-1/2 bg-transparent border-none cursor-pointer p-[5px] text-[#555] flex items-center"
               onClick={() => setShowNew(!showNew)}
             >
               {showNew ? <EyeClosedIcon /> : <EyeOpenIcon />}
@@ -159,19 +160,19 @@ export default function AccountDetailsForm({
           </div>
         </div>
 
-        <div className={styles.formGroup}>
-          <label htmlFor="confirmPassword" className={styles.label}>Confirm New Password:</label>
-          <div className={styles.passwordWrapper}>
+        <div className="mb-5 max-w-[500px]">
+          <label htmlFor="confirmPassword" className="block mb-2 font-semibold text-[#333] text-[0.95rem]">Confirm New Password:</label>
+          <div className="relative w-full">
             <input 
               id="confirmPassword"
               name="confirmPassword" 
               type={showConfirm ? 'text' : 'password'}
-              className={styles.passwordInput} 
+              className="block w-full py-[0.8rem] md:py-[0.85rem] px-4 pr-[40px] text-[0.95rem] md:text-[1rem] border border-[#ccc] rounded-md box-border transition-all duration-200 focus:border-[#007bff] focus:shadow-[0_0_0_3px_rgba(0,123,255,0.2)] focus:outline-none" 
               required 
             />
             <button
               type="button"
-              className={styles.passwordToggleBtn}
+              className="absolute top-1/2 right-[10px] -translate-y-1/2 bg-transparent border-none cursor-pointer p-[5px] text-[#555] flex items-center"
               onClick={() => setShowConfirm(!showConfirm)}
             >
               {showConfirm ? <EyeClosedIcon /> : <EyeOpenIcon />}
