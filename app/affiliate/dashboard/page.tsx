@@ -1,219 +1,129 @@
+//app/affiliate/dashboard/page.tsx
+
 import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
-import Link from 'next/link';
 import { AUTH_COOKIE_NAME } from '@/lib/constants';
-import LinkGenerator from './LinkGenerator';
-import AffiliateStats from './AffiliateStats';
-import AffiliateApplicationForm from './AffiliateApplicationForm'; // ★★★ নতুন ফর্ম ইমপোর্ট ★★★
+import { GET_AFFILIATE_DASHBOARD } from '@/lib/graphql/affiliateQueries';
+import DashboardCharts from './_components/DashboardCharts';
+import Link from 'next/link';
+import { IoCopyOutline, IoOpenOutline } from 'react-icons/io5';
 
-// ★★★ আমাদের তৈরি করা নতুন কুয়েরি ★★★
-const GET_AFFILIATE_DASHBOARD = `
-query GetAffiliateDashboard($key: String) {
-  affiliateDashboard(secretKey: $key) {
-    affiliateId
-    status
-    commissionRate
-    referralUrl
-    totalVisits
-    totalReferrals
-    totalEarnings
-    unpaidEarnings
-    referrals {
-      id
-      amount
-      commission
-      status
-      date
-      description
-    }
-    visits {
-      id
-      url
-      referrer
-      converted
-      date
-    }
-    payouts {
-        id
-        amount
-        date
-        status
-    }
-  }
-}
-`;
-
-async function getAffiliateData(secretKey: string) {
+// Data Fetching Function
+async function getDashboardData() {
+  const cookieStore = await cookies();
+  const secretKey = cookieStore.get(AUTH_COOKIE_NAME)?.value;
   const endpoint = process.env.WORDPRESS_GRAPHQL_ENDPOINT;
-  if (!endpoint) return null;
+
+  if (!secretKey || !endpoint) return null;
 
   try {
-    const response = await fetch(endpoint, {
+    const res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-          query: GET_AFFILIATE_DASHBOARD,
-          variables: { key: secretKey } 
+      body: JSON.stringify({
+        query: GET_AFFILIATE_DASHBOARD,
+        variables: { secretKey },
       }),
-      cache: 'no-store', // রিয়েল-টাইম ডাটার জন্য ক্যাশ বন্ধ
+      cache: 'no-store', // Always fresh data
     });
-    
-    const data = await response.json();
-    return data?.data?.affiliateDashboard || null;
+
+    const json = await res.json();
+    return json.data?.affiliateDashboard;
   } catch (error) {
+    console.error('Affiliate Dashboard Error:', error);
     return null;
   }
 }
 
-function getStatusBadge(status: string) {
-    const styles: any = {
-        paid: 'bg-green-100 text-green-800',
-        unpaid: 'bg-yellow-100 text-yellow-800',
-        rejected: 'bg-red-100 text-red-800',
-        active: 'bg-green-100 text-green-800',
-        pending: 'bg-orange-100 text-orange-800'
-    };
-    return (
-        <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${styles[status] || 'bg-gray-100 text-gray-800'}`}>
-            {status}
-        </span>
-    );
-}
-
 export default async function AffiliateDashboardPage() {
-  const cookieStore = await cookies();
-  const secretKey = cookieStore.get(AUTH_COOKIE_NAME)?.value;
+  const data = await getDashboardData();
 
-  if (!secretKey) redirect('/login');
-
-  const data = await getAffiliateData(secretKey);
-
-  // ★★★ যদি ইউজার লগইন করা থাকে কিন্তু অ্যাফিলিয়েট না হয় ★★★
   if (!data) {
-    return (
-      <div className="max-w-3xl mx-auto my-16 px-6">
-        <div className="text-center mb-10">
-            <h1 className="text-3xl font-bold mb-4 text-[#333]">Become an Affiliate</h1>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-                It looks like you are not registered as an affiliate yet. Join our program to earn commissions by referring customers to GoBike.
-            </p>
-        </div>
-
-        {/* ★★★ আপডেট: ফর্ম কম্পোনেন্ট বসানো হলো ★★★ */}
-        <AffiliateApplicationForm secretKey={secretKey} />
-
-        <div className="mt-10 text-center">
-            <Link href="/account" className="text-[#007bff] hover:underline font-medium">
-                &larr; Return to My Account
-            </Link>
-        </div>
-      </div>
-    );
+    return <div className="p-8 text-center text-red-500">Failed to load dashboard data.</div>;
   }
 
-  // ★★★ যদি অ্যাফিলিয়েট হয়, তাহলে ড্যাশবোর্ড দেখাবে (আগের কোড হুবহু রাখা হয়েছে) ★★★
   return (
-    <div className="max-w-[1200px] mx-auto my-8 px-4 md:px-8">
+    <div className="min-h-screen bg-white">
       
-      {/* Header Area */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      {/* 1. Header Info Bar (Top Section) */}
+      <div className="bg-white border-b border-gray-200 p-2 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-            <h1 className="text-2xl font-bold text-[#333] mb-1">Affiliate Dashboard</h1>
-            <p className="text-sm text-[#666]">
-                Status: {getStatusBadge(data.status)} &bull; Rate: <span className="font-bold text-black">{data.commissionRate}</span>
-            </p>
+           <h1 className="text-2xl font-bold text-gray-800 mb-4">Affiliate Portal</h1>
+           <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm">
+              <div className="flex flex-col">
+                  <span className="text-gray-500 text-xs uppercase tracking-wider font-semibold">Affiliate Status</span>
+                  <span className={`font-medium ${data.status === 'active' || data.status === 'approved' ? 'text-green-600' : 'text-yellow-600'}`}>
+                    {data.status ? data.status.charAt(0).toUpperCase() + data.status.slice(1) : 'Unknown'}
+                  </span>
+              </div>
+              <div className="flex flex-col">
+                  <span className="text-gray-500 text-xs uppercase tracking-wider font-semibold">Commission Rate</span>
+                  <span className="font-medium text-gray-800">{data.commissionRate}</span>
+              </div>
+           </div>
         </div>
-        <div className="flex gap-3">
-             <Link href="/account" className="px-4 py-2 border border-[#ddd] rounded text-sm font-semibold hover:bg-gray-50 transition">
-                Back to Account
-             </Link>
+
+        <div className="flex flex-col items-start md:items-end text-sm gap-2 bg-gray-50 p-3 rounded-lg border border-gray-100">
+            <div className="flex items-center gap-4 justify-between w-full">
+                <span className="text-gray-500 text-xs uppercase">Affiliate ID</span>
+                <span className="font-bold text-gray-800">{data.affiliateId}</span>
+            </div>
+            <div className="flex flex-col items-end">
+                <span className="text-gray-500 text-xs uppercase mb-1">Your Affiliate Link</span>
+                <a href={data.referralUrl} target="_blank" className="text-blue-600 hover:underline flex items-center gap-1 font-medium break-all">
+                    {data.referralUrl} <IoOpenOutline />
+                </a>
+            </div>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <AffiliateStats data={data} />
-
-      {/* Link Generator */}
-      <LinkGenerator affiliateId={data.affiliateId} referralUrl={data.referralUrl} />
-
-      {/* Recent Referrals & Visits Tables */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="p-3 md:p-1">
         
-        {/* Recent Sales/Referrals */}
-        <div className="bg-white border border-[#e0e0e0] rounded-lg overflow-hidden shadow-sm">
-            <div className="bg-[#f8f9fa] px-6 py-4 border-b border-[#e0e0e0]">
-                <h3 className="font-bold text-[#333] m-0 text-base">Recent Referrals</h3>
-            </div>
-            <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left">
-                    <thead className="bg-white border-b border-[#eee]">
-                        <tr>
-                            <th className="p-4 font-semibold text-[#555]">Date</th>
-                            <th className="p-4 font-semibold text-[#555]">Description</th>
-                            <th className="p-4 font-semibold text-[#555]">Amount</th>
-                            <th className="p-4 font-semibold text-[#555] text-right">Commission</th>
-                            <th className="p-4 font-semibold text-[#555] text-right">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {data.referrals.length === 0 ? (
-                             <tr><td colSpan={5} className="p-6 text-center text-gray-500">No referrals yet.</td></tr>
-                        ) : (
-                            data.referrals.map((ref: any) => (
-                                <tr key={ref.id} className="border-b border-[#f5f5f5] hover:bg-[#fafafa]">
-                                    <td className="p-4 text-[#333] whitespace-nowrap">{new Date(ref.date).toLocaleDateString()}</td>
-                                    <td className="p-4 text-[#666] max-w-[200px] truncate" title={ref.description}>{ref.description}</td>
-                                    <td className="p-4 font-medium text-[#333]">${ref.amount}</td>
-                                    <td className="p-4 font-bold text-green-600 text-right">${ref.commission}</td>
-                                    <td className="p-4 text-right">{getStatusBadge(ref.status)}</td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
-            </div>
+        {/* 2. Stats Title */}
+        <div className="mb-6">
+            <h2 className="text-xl font-bold text-gray-800">Dashboard</h2>
+            <p className="text-gray-500 text-sm">Overview of your affiliate performance.</p>
         </div>
 
-        {/* Recent Visits */}
-        <div className="bg-white border border-[#e0e0e0] rounded-lg overflow-hidden shadow-sm">
-             <div className="bg-[#f8f9fa] px-6 py-4 border-b border-[#e0e0e0]">
-                <h3 className="font-bold text-[#333] m-0 text-base">Recent Visits</h3>
+        {/* 3. Stats Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            
+            {/* Total Referrals */}
+            <div className="bg-white p-5 border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <p className="text-gray-500 text-xs font-semibold uppercase mb-2">Total Referrals</p>
+                <p className="text-3xl font-bold text-gray-800">{data.totalReferrals}</p>
             </div>
-            <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left">
-                    <thead className="bg-white border-b border-[#eee]">
-                        <tr>
-                            <th className="p-4 font-semibold text-[#555]">Date</th>
-                            <th className="p-4 font-semibold text-[#555]">Source</th>
-                            <th className="p-4 font-semibold text-[#555]">Landing Page</th>
-                            <th className="p-4 font-semibold text-[#555] text-right">Converted</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                         {data.visits.length === 0 ? (
-                             <tr><td colSpan={4} className="p-6 text-center text-gray-500">No visits tracked yet.</td></tr>
-                        ) : (
-                            data.visits.map((visit: any) => (
-                                <tr key={visit.id} className="border-b border-[#f5f5f5] hover:bg-[#fafafa]">
-                                    <td className="p-4 text-[#333] whitespace-nowrap">{new Date(visit.date).toLocaleDateString()}</td>
-                                    <td className="p-4 text-[#666]">{visit.referrer || 'Direct'}</td>
-                                    <td className="p-4 text-[#007bff] truncate max-w-[150px]">
-                                        <a href={visit.url} target="_blank" rel="noreferrer">View Page</a>
-                                    </td>
-                                    <td className="p-4 text-right">
-                                        {visit.converted ? (
-                                            <span className="text-green-600 font-bold">Yes (Sale)</span>
-                                        ) : (
-                                            <span className="text-gray-400">No</span>
-                                        )}
-                                    </td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+
+            {/* Total Visits */}
+            <div className="bg-white p-5 border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <p className="text-gray-500 text-xs font-semibold uppercase mb-2">Total Visits</p>
+                <p className="text-3xl font-bold text-gray-800">{data.totalVisits}</p>
             </div>
+
+            {/* Unpaid Earnings */}
+            <div className="bg-white p-5 border border-yellow-100 bg-yellow-50/50 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <p className="text-yellow-700 text-xs font-semibold uppercase mb-2">Unpaid Earnings</p>
+                <p className="text-3xl font-bold text-yellow-700">${data.unpaidEarnings}</p>
+            </div>
+
+            {/* Paid Earnings */}
+            <div className="bg-white p-5 border border-green-100 bg-green-50/50 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <p className="text-green-700 text-xs font-semibold uppercase mb-2">Paid Earnings</p>
+                <p className="text-3xl font-bold text-green-700">${data.paidEarnings}</p>
+            </div>
+            
+            {/* Store Credit (New Feature) */}
+            <div className="bg-white p-5 border border-blue-100 bg-blue-50/50 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <p className="text-blue-700 text-xs font-semibold uppercase mb-2">Store Credit</p>
+                <p className="text-3xl font-bold text-blue-700">${data.storeCredit}</p>
+            </div>
+
         </div>
+
+        {/* 4. Charts Section (Client Component) */}
+        <DashboardCharts 
+            visitsData={data.visitsChart} 
+            referralsData={data.referralsChart} 
+        />
 
       </div>
     </div>
