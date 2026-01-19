@@ -5,12 +5,13 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-/* --- Types --- */
+/* --- Types Updated --- */
 type User = {
   id: string;
   email: string;
   firstName?: string;
   lastName?: string;
+  affiliateStatus?: string | null; // ★★★ নতুন ফিল্ড ★★★
 } | null;
 
 type AuthContextType = {
@@ -30,32 +31,27 @@ export function AuthProvider({
   children: ReactNode; 
   initialUser: User 
 }) {
-  // initialUser ব্যবহার করা হচ্ছে যাতে layout.tsx ঠিক থাকে
   const [user, setUser] = useState<User>(initialUser);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  /* --- ১. Initial User Sync (Server Side Data) --- */
+  /* --- 1. Initial User Sync --- */
   useEffect(() => {
-    // যদি সার্ভার থেকে ডাটা আসে, সেটাই সেট হবে
     if (initialUser) {
       setUser(initialUser);
     }
   }, [initialUser]);
 
-  /* --- ২. Session Rehydration (Client Side Check) --- */
-  // এই অংশটিই আপনার "রিফ্রেশ করলে লগআউট" সমস্যা সমাধান করবে
+  /* --- 2. Session Rehydration --- */
   useEffect(() => {
     const checkSession = async () => {
-      // যদি ইউজার ইতিমধ্যে না থাকে, আমরা API কল করে চেক করব কুকি আছে কি না
       if (!user) {
         try {
           const res = await fetch('/api/auth/me');
           if (res.ok) {
             const data = await res.json();
             if (data.loggedIn && data.user) {
-              // কুকি থেকে ইউজার পাওয়া গেছে! রিস্টোর করা হচ্ছে...
               setUser(data.user);
             }
           }
@@ -66,7 +62,7 @@ export function AuthProvider({
     };
 
     checkSession();
-  }, []); // এটি অ্যাপ লোড হলে একবার রান হবে
+  }, []); 
 
   /* --- Login Function --- */
   const login = (userData: User) => {

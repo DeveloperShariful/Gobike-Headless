@@ -8,6 +8,7 @@ const GET_VIEWER_QUERY = `
       id
       firstName
       email
+      affiliateStatus
     }
   }
 `;
@@ -29,7 +30,8 @@ export async function getCurrentUser() {
         query: GET_VIEWER_QUERY,
         variables: { key: secretKey },
       }),
-      cache: 'no-store', // Always fresh data
+      cache: 'no-store',
+      next: { revalidate: 0 }
     });
 
     const data = await response.json();

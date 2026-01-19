@@ -1,32 +1,70 @@
 // components/Header.tsx
-// components/Header.tsx
+
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '@/app/providers/AuthProvider';
 import SearchOverlay from './SearchOverlay';
 import MiniCart from './MiniCart';
 import Image from 'next/image';
-
-// IoPersonOutline রিমুভ করা হয়েছে কারণ এখন আর আইকন লাগবে না
-import { IoSearch, IoMenu, IoClose } from "react-icons/io5";
+import { 
+  IoSearch, 
+  IoMenu, 
+  IoClose, 
+  IoPersonOutline, 
+  IoLogOutOutline, 
+  IoTrendingUpOutline, 
+  IoPersonCircleOutline, 
+  IoSpeedometerOutline 
+} from "react-icons/io5";
 
 export default function Header() {
   const { cartItems, isMiniCartOpen, openMiniCart, closeMiniCart } = useCart();
-  const { user } = useAuth();
+  const { user, logout } = useAuth(); 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  // ড্রপডাউন স্টেট
+  const [isAuthDropdownOpen, setIsAuthDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  
   const pathname = usePathname();
+  const router = useRouter();
 
   const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
+
+  // Affiliate Status Check (Case Insensitive)
+  const status = user?.affiliateStatus ? user.affiliateStatus.toLowerCase() : '';
+  const isAffiliate = status === 'active' || status === 'pending' || status === 'approved';
 
   const closeAllOverlays = () => {
     setIsMenuOpen(false);
     setIsSearchOpen(false);
+    setIsAuthDropdownOpen(false);
   }
+
+  // ড্রপডাউনের বাইরে ক্লিক হ্যান্ডেল করা
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsAuthDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const toggleDropdown = () => {
+    setIsAuthDropdownOpen(!isAuthDropdownOpen);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    closeAllOverlays();
+  };
 
   return (
     <>
@@ -34,6 +72,7 @@ export default function Header() {
         
         <div className="max-w-[1400px] mx-auto px-6 flex lg:grid lg:grid-cols-3 items-center justify-between relative">
           
+          {/* Logo & Mobile Menu Button */}
           <div className="flex flex-1 lg:flex-none items-center justify-start">
             <button 
                 onClick={() => setIsMenuOpen(true)} 
@@ -56,6 +95,7 @@ export default function Header() {
             </div>
           </div>
 
+          {/* Mobile Logo Center */}
           <div className="block lg:hidden absolute left-1/2 -translate-x-1/2">
             <Link href="/" className="flex items-center no-underline">
                <Image 
@@ -69,6 +109,7 @@ export default function Header() {
             </Link>
           </div>
           
+          {/* Desktop Nav */}
           <nav className="hidden lg:flex gap-6 xl:gap-8 items-center justify-self-center">
             {['/', '/bikes', '/spare-parts', '/apparel', '/about', '/contact', '/faq', '/blog'].map((path) => (
                 <Link 
@@ -81,6 +122,7 @@ export default function Header() {
             ))}
           </nav>
 
+          {/* Right Icons */}
           <div className="flex flex-1 lg:flex-none items-center justify-end gap-2 justify-self-end">
             <button 
                 className="hidden lg:flex items-center gap-2 bg-transparent border-b border-[#d8d8d8] cursor-pointer px-2 pb-0.5 text-[#333] hover:border-black transition-colors" 
@@ -91,16 +133,92 @@ export default function Header() {
               <span className="text-sm font-medium">Search</span>
             </button>
             
-            {/* Desktop Account Link - Icon Removed, Text Added */}
-            <Link 
-                href={user ? "/account" : "/login"} 
-                className="hidden lg:flex bg-transparent border-none cursor-pointer p-2 text-[#333] items-center hover:text-black transition-colors font-medium text-sm whitespace-nowrap"
-                aria-label={user ? "My Account" : "Login"}
-            >
-              {/* IoPersonOutline Removed */}
-              <span>{user ? "My Account" : "Login / Register"}</span>
-            </Link>
+            {/* ★★★ DYNAMIC AUTH DROPDOWN (Desktop) ★★★ */}
+            <div className="relative" ref={dropdownRef}>
+                <button 
+                    onClick={toggleDropdown}
+                    className="hidden lg:flex bg-transparent border-none cursor-pointer p-2 text-[#333] items-center gap-2 hover:text-black transition-colors font-medium text-sm whitespace-nowrap"
+                    aria-label="Account"
+                >
+                  <IoPersonOutline size={24} />
+                  {/* লগইন থাকলে 'My Account' দেখাবে, না থাকলে শুধু আইকন */}
+                  {user && <span>My Account</span>}
+                </button>
+
+                {isAuthDropdownOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-60 bg-white border border-[#e0e0e0] rounded-lg shadow-lg z-50 overflow-hidden animate-fadeIn">
+                        
+                        {/* CASE 1: NOT LOGGED IN */}
+                        {!user && (
+                            <>
+                                <Link 
+                                    href="/login" 
+                                    className="flex items-center gap-3 px-4 py-3 text-sm text-[#333] hover:bg-[#f8f9fa] border-b border-[#f0f0f0]"
+                                    onClick={closeAllOverlays}
+                                >
+                                    <IoPersonCircleOutline size={20} />
+                                    <div className="flex flex-col">
+                                        <span className="font-semibold">Login / Register</span>
+                                        <span className="text-xs text-gray-500">Access your orders</span>
+                                    </div>
+                                </Link>
+                                <Link 
+                                    href="/affiliate/portal" 
+                                    className="flex items-center gap-3 px-4 py-3 text-sm text-[#333] hover:bg-[#f8f9fa]"
+                                    onClick={closeAllOverlays}
+                                >
+                                    <IoTrendingUpOutline size={20} />
+                                    <div className="flex flex-col">
+                                        <span className="font-semibold">Affiliate Portal</span>
+                                        <span className="text-xs text-gray-500">Earn commissions</span>
+                                    </div>
+                                </Link>
+                            </>
+                        )}
+
+                        {/* CASE 2: LOGGED IN */}
+                        {user && (
+                            <>
+                                <div className="px-4 py-3 bg-gray-50 border-b border-[#f0f0f0]">
+                                    <p className="text-xs text-gray-500">Signed in as</p>
+                                    <p className="text-sm font-bold text-[#333] truncate">{user.firstName || user.email}</p>
+                                </div>
+                                
+                                <Link 
+                                    href="/account" 
+                                    className="flex items-center gap-3 px-4 py-3 text-sm text-[#333] hover:bg-[#f8f9fa] border-b border-[#f0f0f0]"
+                                    onClick={closeAllOverlays}
+                                >
+                                    <IoPersonOutline size={18} />
+                                    My Account
+                                </Link>
+
+                                {/* ★★★ শুধু অ্যাফিলিয়েট হলে এই অপশন আসবে ★★★ */}
+                                {isAffiliate && (
+                                    <Link 
+                                        href="/affiliate/dashboard" 
+                                        className="flex items-center gap-3 px-4 py-3 text-sm text-[#333] hover:bg-[#f0f8ff] border-b border-[#f0f0f0]"
+                                        onClick={closeAllOverlays}
+                                    >
+                                        <IoSpeedometerOutline size={18} className="text-blue-600"/>
+                                        <span className="font-semibold text-blue-600">Affiliate Dashboard</span>
+                                    </Link>
+                                )}
+
+                                <button 
+                                    onClick={handleLogout}
+                                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 text-left transition-colors"
+                                >
+                                    <IoLogOutOutline size={18} />
+                                    Logout
+                                </button>
+                            </>
+                        )}
+                    </div>
+                )}
+            </div>
             
+            {/* Cart Icon */}
             <button 
                 className="bg-transparent border-none cursor-pointer relative text-[#333] p-2 hover:text-black transition-colors" 
                 onClick={openMiniCart} 
@@ -117,6 +235,7 @@ export default function Header() {
         </div>
       </header>
 
+      {/* MOBILE MENU */}
       <div 
         className={`fixed top-0 left-0 w-[350px] h-[95vh] bg-white z-[1001] transition-transform duration-300 ease-in-out flex flex-col p-6 shadow-[5px_0_15px_rgba(0,0,0,0.1)] ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
@@ -152,16 +271,57 @@ export default function Header() {
             </nav>
           
           <div className="border-t border-[#f0f0f0] pt-4 mt-6">
-            {/* Mobile Account Link - Icon Removed */}
-            <Link 
-                href={user ? "/account" : "/login"}
-                className={`text-[1.2rem] font-medium text-[#333] no-underline flex items-center gap-3 bg-transparent border-b border-[#ececec] w-full text-left cursor-pointer p-0 hover:text-black hover:font-bold ${pathname === '/account' || pathname === '/login' ? 'text-black font-bold' : ''}`} 
-                onClick={closeAllOverlays} 
-                aria-label={user ? "My Account" : "Login"}
-            >
-                {/* IoPersonOutline Removed */}
-                <span>{user ? "My Account" : "Login / Register"}</span>
-            </Link>
+            {/* ★★★ Mobile Auth Links (Dynamic) ★★★ */}
+            {user ? (
+                <>
+                 <Link 
+                    href="/account"
+                    className="text-[1.2rem] font-medium text-[#333] no-underline flex items-center gap-3 bg-transparent border-b border-[#ececec] w-full text-left cursor-pointer p-0 hover:text-black hover:font-bold mb-4"
+                    onClick={closeAllOverlays}
+                 >
+                    <IoPersonOutline />
+                    <span>My Account</span>
+                 </Link>
+                 
+                 {isAffiliate && (
+                    <Link 
+                        href="/affiliate/dashboard"
+                        className="text-[1.2rem] font-medium text-blue-600 no-underline flex items-center gap-3 bg-transparent border-b border-[#ececec] w-full text-left cursor-pointer p-0 hover:text-blue-800 hover:font-bold mb-4"
+                        onClick={closeAllOverlays}
+                    >
+                        <IoSpeedometerOutline />
+                        <span>Affiliate Dashboard</span>
+                    </Link>
+                 )}
+
+                 <button 
+                    onClick={handleLogout}
+                    className="text-[1.2rem] font-medium text-red-600 flex items-center gap-3 w-full text-left p-0 mt-2"
+                 >
+                    <IoLogOutOutline />
+                    <span>Logout</span>
+                 </button>
+                </>
+            ) : (
+                <div className="flex flex-col gap-4">
+                    <Link 
+                        href="/login"
+                        className="text-[1.2rem] font-medium text-[#333] no-underline flex items-center gap-3 bg-transparent border-b border-[#ececec] w-full text-left cursor-pointer p-0 hover:text-black hover:font-bold"
+                        onClick={closeAllOverlays}
+                    >
+                        <IoPersonCircleOutline />
+                        <span>Login / Register</span>
+                    </Link>
+                     <Link 
+                        href="/affiliate/portal"
+                        className="text-[1.2rem] font-medium text-[#333] no-underline flex items-center gap-3 bg-transparent border-b border-[#ececec] w-full text-left cursor-pointer p-0 hover:text-black hover:font-bold"
+                        onClick={closeAllOverlays}
+                    >
+                        <IoTrendingUpOutline />
+                        <span>Affiliate Portal</span>
+                    </Link>
+                </div>
+            )}
           </div>
       </div>
       

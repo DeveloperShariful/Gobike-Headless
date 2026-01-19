@@ -1,16 +1,27 @@
 // app/account/layout.tsx
 
-import { ReactNode } from 'react';
 import AccountSidebar from './AccountSidebar';
 
-export default function AccountLayout({ children }: { children: ReactNode }) {
+export default function AccountLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <div className="flex flex-col lg:flex-row max-w-[1200px] mx-auto my-4 lg:my-8 gap-6 lg:gap-8 px-0 lg:px-4 items-start">
-      <AccountSidebar />
+    <div className="max-w-[1400px] mx-auto px-6 py-10 md:py-16">
+      <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+        
+        {/* বাম পাশ (সাইডবার) */}
+        <aside className="lg:w-[280px] flex-shrink-0">
+          <AccountSidebar />
+        </aside>
 
-      <main className="flex-1 p-6 lg:p-8 bg-white rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.05)] w-full">
-        {children}
-      </main>
+        {/* ডান পাশ (মেইন কন্টেন্ট) */}
+        <main className="flex-1 min-w-0">
+          {children}
+        </main>
+
+      </div>
     </div>
   );
 }
