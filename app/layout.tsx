@@ -9,11 +9,8 @@ import DelayedScripts from '../components/DelayedScripts';
 import { ClientProviders } from "./providers";
 import { Suspense } from 'react';
 import SourceTracker from '@/components/SourceTracker';
-
-// ★★★ নতুন ইম্পোর্ট (Auth এর জন্য) ★★★
 import { AuthProvider } from '@/app/providers/AuthProvider';
-import { cookies } from 'next/headers';
-import { AUTH_COOKIE_NAME } from '@/lib/constants';
+import { getCurrentUser } from '@/lib/session';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -84,52 +81,13 @@ export const viewport: Viewport = {
   themeColor: '#ffffff',
 };
 
-// ★★★ ইউজার ডেটা ফেচ করার কুয়েরি এবং ফাংশন ★★★
-const GET_VIEWER_QUERY = `
-query GetViewer {
-  viewer {
-    id
-    firstName
-    lastName
-    email
-  }
-}
-`;
-
-async function getViewer(token: string | undefined) {
-  if (!token) return null;
-  
-  const endpoint = process.env.WORDPRESS_GRAPHQL_ENDPOINT;
-  if (!endpoint) return null;
-
-  try {
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({ query: GET_VIEWER_QUERY }),
-      cache: 'no-store', // সবসময় নতুন ডেটা ফেচ হবে
-    });
-
-    const data = await response.json();
-    return data?.data?.viewer || null;
-  } catch (error) {
-    return null;
-  }
-}
-
-// ★★★ RootLayout এখন async হতে হবে ★★★
+// RootLayout এখন async
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // ★★★ সার্ভার সাইডে কুকি এবং ইউজার চেক করা ★★★
-  const cookieStore = await cookies();
-  const token = cookieStore.get(AUTH_COOKIE_NAME)?.value;
-  const user = await getViewer(token);
+  const user = await getCurrentUser();
 
   return (
     <html lang="en">
@@ -137,11 +95,10 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning={true}
       >
-        {/* ★★★ AuthProvider দিয়ে পুরো অ্যাপ র‍্যাপ করা হয়েছে ★★★ */}
-        <AuthProvider initialUser={user}>
-          <Suspense>
-            <SourceTracker />
-          </Suspense>
+       <Suspense>
+          <SourceTracker />
+       </Suspense>
+       <AuthProvider initialUser={user}>
           <ClientProviders>
             <TopBar />
             <Header />
@@ -150,7 +107,6 @@ export default async function RootLayout({
             </main>
             <Footer />
           </ClientProviders>
-
         </AuthProvider>
         <DelayedScripts />
       </body>
