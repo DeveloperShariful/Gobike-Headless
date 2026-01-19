@@ -163,7 +163,7 @@ export default function Header() {
                                     </div>
                                 </Link>
                                 <Link 
-                                    href="/affiliate/portal" 
+                                    href="/affiliate-portal" 
                                     className="flex items-center gap-3 px-4 py-3 text-sm text-[#333] hover:bg-[#f8f9fa]"
                                     onClick={closeAllOverlays}
                                 >
@@ -313,7 +313,7 @@ export default function Header() {
                         <span>Login / Register</span>
                     </Link>
                      <Link 
-                        href="/affiliate/portal"
+                        href="/affiliate-portal"
                         className="text-[1.2rem] font-medium text-[#333] no-underline flex items-center gap-3 bg-transparent border-b border-[#ececec] w-full text-left cursor-pointer p-0 hover:text-black hover:font-bold"
                         onClick={closeAllOverlays}
                     >

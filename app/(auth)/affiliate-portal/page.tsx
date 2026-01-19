@@ -1,4 +1,4 @@
-//app/affiliate/portal/page.tsx
+//app/(auth)/portal/page.tsx
 'use client';
 
 import { useState } from 'react';
