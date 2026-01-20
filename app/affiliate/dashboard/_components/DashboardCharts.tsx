@@ -28,7 +28,7 @@ export default function DashboardCharts({
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-5">
       
       {/* Visits Chart */}
-      <div className="bg-white p-6 border border-gray-200 rounded-lg shadow-sm">
+      <div className="bg-white p-5 border border-gray-200 rounded-lg shadow-sm">
         <h3 className="text-gray-600 font-medium mb-1">Visits — Daily last 7 days</h3>
         <div className="h-[300px] w-full mt-4">
           <ResponsiveContainer width="100%" height="100%">
@@ -57,7 +57,7 @@ export default function DashboardCharts({
       </div>
 
       {/* Referrals Chart */}
-      <div className="bg-white p-6 border border-gray-200 rounded-lg shadow-sm">
+      <div className="bg-white p-5 border border-gray-200 rounded-lg shadow-sm">
         <h3 className="text-gray-600 font-medium mb-1">Referrals — Daily last 7 days</h3>
         <div className="h-[300px] w-full mt-4">
           <ResponsiveContainer width="100%" height="100%">

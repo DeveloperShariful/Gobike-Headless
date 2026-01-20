@@ -8,6 +8,10 @@ export const GET_AFFILIATE_DASHBOARD = `
       commissionRate
       referralUrl
       
+      # New Fields for Custom Slug
+      isCustomSlugEnabled
+      currentCustomSlug
+      
       # Stats Cards
       totalVisits
       totalReferrals
