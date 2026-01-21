@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuth } from '@/app/providers/AuthProvider';
+import { useAuth } from '@/app/providers';
 
 const REGISTER_USER_AND_AFFILIATE = `
 mutation RegisterUserAndAffiliate($username: String!, $email: String!, $password: String!) {
