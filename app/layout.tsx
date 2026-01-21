@@ -6,10 +6,10 @@ import TopBar from "../components/TopBar";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import DelayedScripts from '../components/DelayedScripts';
-import { ClientProviders } from "./providers";
+// ★★★ Updated Import: Single Provider ★★★
+import { Providers } from "./providers";
 import { Suspense } from 'react';
 import SourceTracker from '@/components/SourceTracker';
-import { AuthProvider } from '@/app/providers/AuthProvider';
 import { getCurrentUser } from '@/lib/session';
 
 const geistSans = Geist({
@@ -81,12 +81,12 @@ export const viewport: Viewport = {
   themeColor: '#ffffff',
 };
 
-// RootLayout এখন async
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // সার্ভার সাইড থেকে ইউজার ডাটা আনা হচ্ছে
   const user = await getCurrentUser();
 
   return (
@@ -95,19 +95,20 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning={true}
       >
-       <Suspense>
+        <Suspense>
           <SourceTracker />
-       </Suspense>
-       <AuthProvider initialUser={user}>
-          <ClientProviders>
-            <TopBar />
-            <Header />
-            <main>
-              {children}
-            </main>
-            <Footer />
-          </ClientProviders>
-        </AuthProvider>
+        </Suspense>
+
+        {/* ★★★ Single Provider wrapping everything (Auth + Cart + ProgressBar) ★★★ */}
+        <Providers initialUser={user}>
+          <TopBar />
+          <Header />
+          <main>
+            {children}
+          </main>
+          <Footer />
+        </Providers>
+        
         <DelayedScripts />
       </body>
     </html>

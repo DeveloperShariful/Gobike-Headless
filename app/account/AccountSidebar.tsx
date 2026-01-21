@@ -14,7 +14,7 @@ import {
   IoSpeedometerOutline,
   IoPersonOutline
 } from "react-icons/io5";
-import { useAuth } from '@/app/providers/AuthProvider';
+import { useAuth } from '@/app/providers';
 
 export default function AccountSidebar() {
   const [isOpen, setIsOpen] = useState(false);

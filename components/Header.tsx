@@ -6,7 +6,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCart } from '../context/CartContext';
-import { useAuth } from '@/app/providers/AuthProvider';
+import { useAuth } from '@/app/providers';
 import SearchOverlay from './SearchOverlay';
 import MiniCart from './MiniCart';
 import Image from 'next/image';
