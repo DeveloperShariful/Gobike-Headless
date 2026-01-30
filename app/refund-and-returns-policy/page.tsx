@@ -1,6 +1,5 @@
 // app/refund-and-returns-policy/page.tsx
 import Script from 'next/script';
-// import styles from './Returns.module.css'; // CSS Module সরানো হয়েছে
 import Breadcrumbs from '../../components/Breadcrumbs';
 import type { Metadata } from 'next';
 import Link from 'next/link';

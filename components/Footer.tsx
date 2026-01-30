@@ -155,15 +155,24 @@ export default function Footer() {
                   <h3 className="text-lg font-bold mb-4 capitalize border-b-2 border-[#1a1a1a] pb-2 inline-block">Customers</h3>
                   <ul className="list-none p-0 m-0 space-y-2">
                       <li><a href="https://gobikes.au/my-account/" className="text-[#555] hover:text-black hover:font-bold transition-all">Log In/Register</a></li>
-                      {['/contact', '/faq', '/terms-and-conditions', '/privacy-policy', '/refund-and-returns-policy'].map((path) => (
+                      
+                      {/* Updated Array: Added /track-order and /shipping-policy */}
+                      {['/track-order', '/shipping-policy', '/contact', '/faq', '/terms-and-conditions', '/privacy-policy', '/refund-and-returns-policy'].map((path) => (
                         <li key={path}>
                             <Link href={path} className="text-[#555] hover:text-black hover:font-bold transition-all">
-                                {path === '/contact' ? 'Contact Us' : path === '/faq' ? 'FAQs' : path === '/terms-and-conditions' ? 'Terms & Condition' : path.substring(1).replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                {
+                                  path === '/contact' ? 'Contact Us' : 
+                                  path === '/faq' ? 'FAQs' : 
+                                  path === '/terms-and-conditions' ? 'Terms & Condition' : 
+                                  // This automatically formats '/track-order' to 'Track Order' and '/shipping-policy' to 'Shipping Policy'
+                                  path.substring(1).replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+                                }
                             </Link>
                         </li>
                       ))}
                   </ul>
               </div>
+              
 
               {/* Our Promise Column */}
               <div>
