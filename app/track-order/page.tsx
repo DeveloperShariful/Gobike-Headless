@@ -141,14 +141,6 @@ export default function TrackOrderPage() {
                   </div>
                </div>
             </div>
-            {booking.special_instructions && booking.special_instructions.trim() !== "" && (
-                <div className="bg-orange-50 border-l-4 border-orange-400 p-4 rounded-r shadow-sm">
-                    <h4 className="text-xs font-bold text-orange-800 uppercase mb-1">Special Instructions</h4>
-                    <p className="text-sm text-orange-900 font-medium italic">
-                        "{booking.special_instructions}"
-                    </p>
-                </div>
-            )}
 
             {/* --- SECTION 3: ADDRESSES --- */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
