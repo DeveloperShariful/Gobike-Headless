@@ -19,6 +19,7 @@ export async function POST(request: Request) {
     }
 
     const authHeader = `Basic ${Buffer.from(`${email}:${password}`).toString('base64')}`;
+    
     const url = `https://www.transdirect.com.au/api/bookings/v4?q=${encodeURIComponent(cleanTrackingNum)}`;
     
     console.log(`🔍 Searching for: ${cleanTrackingNum}`);
@@ -29,6 +30,7 @@ export async function POST(request: Request) {
         'Content-Type': 'application/json',
         'Authorization': authHeader,
       },
+      cache: 'no-store'
     });
 
     if (!response.ok) {
@@ -41,6 +43,7 @@ export async function POST(request: Request) {
     if (!bookings || bookings.length === 0) {
       return NextResponse.json({ error: 'No booking found.' }, { status: 404 });
     }
+
     const exactMatch = bookings.find((b: any) => 
         (b.connote && b.connote.toLowerCase() === cleanTrackingNum.toLowerCase()) || 
         (b.id && b.id.toString() === cleanTrackingNum)
@@ -52,6 +55,40 @@ export async function POST(request: Request) {
     }
 
     console.log(`✅ Exact Match Found: ID ${exactMatch.id}`);
+
+    try {
+        if (exactMatch.connote) {
+            console.log(`🚚 Fetching live events for Connote: ${exactMatch.connote}`);
+            const trackUrl = `https://www.transdirect.com.au/api/bookings/v4/track/${exactMatch.connote}`;
+            
+            const trackResponse = await fetch(trackUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': authHeader,
+                },
+                cache: 'no-store'
+            });
+
+            if (trackResponse.ok) {
+                const trackData = await trackResponse.json();
+              
+                const events = Object.values(trackData)[0];
+
+                if (Array.isArray(events) && events.length > 0) {
+                    exactMatch.tracking_events = events;
+                    const latestEvent = events[events.length - 1];
+                    
+                    exactMatch.latest_status = latestEvent.status; 
+                    exactMatch.latest_description = latestEvent.description;
+                    exactMatch.latest_event_date = latestEvent.date;
+                }
+            }
+        }
+    } catch (trackError) {
+        console.error("⚠️ Tracking API fetch failed, sending booking info only.", trackError);
+    }
+
     return NextResponse.json(exactMatch);
 
   } catch (error) {

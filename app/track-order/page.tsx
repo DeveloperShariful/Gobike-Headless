@@ -53,15 +53,29 @@ export default function TrackOrderPage() {
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return 'N/A';
-    return new Date(dateStr).toLocaleDateString('en-AU', {
-      day: 'numeric', month: 'long', year: 'numeric',
-      hour: '2-digit', minute: '2-digit'
-    });
+    // Check if it looks like a full ISO date
+    if (dateStr.length > 10) {
+        return new Date(dateStr).toLocaleDateString('en-AU', {
+          day: 'numeric', month: 'long', year: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        });
+    }
+    return dateStr; // Return as represents if logic fails or simple date
   };
 
   const formatMoney = (amount: any) => {
     if (!amount) return '$0.00';
     return `$${Number(amount).toFixed(2)}`;
+  };
+
+  // Helper for Live Tracking Status Color (ALL Events)
+  const getTrackingColor = (status: string) => {
+    const s = status?.toLowerCase() || '';
+    if (s.includes('delivered') || s.includes('completed')) return 'bg-green-600 border-green-600 text-white';
+    if (s.includes('transit') || s.includes('board') || s.includes('driver')) return 'bg-blue-600 border-blue-600 text-white';
+    if (s.includes('picked') || s.includes('collected')) return 'bg-indigo-600 border-indigo-600 text-white';
+    if (s.includes('futile') || s.includes('failed')) return 'bg-red-600 border-red-600 text-white';
+    return 'bg-gray-600 border-gray-600 text-white';
   };
 
   return (
@@ -117,15 +131,26 @@ export default function TrackOrderPage() {
                         <span className="text-xl font-bold text-[#111827]">#{booking.order.order_number}</span>
                     </div>
                   )}
+
                </div>
                
-               {/* Main Details Grid (Pickup Window REMOVED) */}
+               {/* Main Details Grid */}
                <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   <div>
-                     <div className="text-xs text-[#6b7280] uppercase font-bold mb-1">Status</div>
-                     <span className="px-3 py-1 rounded-full text-sm font-bold bg-black text-white capitalize inline-block">
-                        {formatText(booking.status)}
-                     </span>
+                     <div className="text-xs text-[#6b7280] uppercase font-bold mb-2">Current Status</div>
+                     <div className="flex flex-col gap-2 items-start">
+                        {/* 1. BOOKING STATUS (Fixed from DB) */}
+                        <span className="px-3 py-1 rounded-full text-sm font-bold bg-black text-white capitalize inline-block">
+                           Booking: {formatText(booking.status)}
+                        </span>
+
+                        {/* 2. LIVE TRACKING STATUS (From Events) */}
+                        {booking.latest_status && (
+                           <span className={`px-3 py-1 rounded-full text-sm font-bold capitalize inline-block ${getTrackingColor(booking.latest_status)}`}>
+                              Latest: {formatText(booking.latest_status)}
+                           </span>
+                        )}
+                     </div>
                   </div>
                   <div>
                      <div className="text-xs text-[#6b7280] uppercase font-bold mb-1">Tracking / Connote</div>
@@ -140,7 +165,34 @@ export default function TrackOrderPage() {
                      <div className="text-base font-medium">{formatDate(booking.booked_at)}</div>
                   </div>
                </div>
+
             </div>
+
+            {/* --- SECTION 1.5: LIVE TRACKING HISTORY (ALL EVENTS) --- */}
+            {booking.tracking_events && booking.tracking_events.length > 0 && (
+                <div className="bg-white border border-[#e5e7eb] rounded-xl shadow-sm overflow-hidden p-6">
+                    <h3 className="text-lg font-bold text-[#111827] mb-6 border-b pb-2">🚚 Tracking Updates</h3>
+                    <div className="relative border-l-2 border-gray-200 ml-3 space-y-8">
+                        {/* REVERSE to show Newest First */}
+                        {[...booking.tracking_events].reverse().map((event: any, idx: number) => (
+                            <div key={idx} className="relative pl-8">
+                                {/* First item (Newest) gets Blue Dot, others Gray */}
+                                <div className={`absolute -left-[9px] top-1 w-4 h-4 rounded-full border-2 border-white ${idx === 0 ? 'bg-blue-600' : 'bg-gray-400'}`}></div>
+                                
+                                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
+                                    <div>
+                                        <p className="text-sm font-bold text-[#1a1a1a]">{event.status}</p>
+                                        <p className="text-sm text-gray-600">{event.description}</p>
+                                    </div>
+                                    <p className="text-xs text-gray-500 font-mono mt-1 sm:mt-0 bg-gray-50 px-2 py-1 rounded">
+                                        {event.date}
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* --- SECTION 3: ADDRESSES --- */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -208,6 +260,7 @@ export default function TrackOrderPage() {
               <div className="bg-white border border-[#e5e7eb] rounded-xl shadow-sm overflow-hidden">
                  <div className="bg-[#f9fafb] px-6 py-4 border-b border-[#e5e7eb] flex justify-center">
                     <h3 className="text-lg font-bold text-[#111827]">📦 Items</h3>
+                    
                  </div>
                  <div className="overflow-x-auto">
                    <table className="w-full text-sm text-left">

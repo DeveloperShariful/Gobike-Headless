@@ -64,14 +64,9 @@ export async function GET(request: NextRequest) {
         } 
       });
     }
-
-    // ৩. লগ: ইউজার পাওয়া যায়নি
-    console.error('❌ [API/ME] 401 Error: Invalid Secret Key (User not found in WP). Key used:', secretKey);
-    
     return NextResponse.json({ loggedIn: false }, { status: 401 });
 
   } catch (error) {
-    console.error('❌ [API/ME] 500 Error: Fetch failed:', error);
     return NextResponse.json({ loggedIn: false }, { status: 500 });
   }
 }
