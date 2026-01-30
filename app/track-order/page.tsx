@@ -214,9 +214,8 @@ export default function TrackOrderPage() {
             {/* --- SECTION 4: ITEMS --- */}
             {booking.items && booking.items.length > 0 && (
               <div className="bg-white border border-[#e5e7eb] rounded-xl shadow-sm overflow-hidden">
-                 <div className="bg-[#f9fafb] px-6 py-4 border-b border-[#e5e7eb] flex justify-between">
+                 <div className="bg-[#f9fafb] px-6 py-4 border-b border-[#e5e7eb] flex justify-center">
                     <h3 className="text-lg font-bold text-[#111827]">📦 Items</h3>
-                    <span className="text-sm text-gray-500">Charged Weight: {booking.charged_weight} kg</span>
                  </div>
                  <div className="overflow-x-auto">
                    <table className="w-full text-sm text-left">
