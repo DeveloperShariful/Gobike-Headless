@@ -6,7 +6,6 @@ import TopBar from "../components/TopBar";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import DelayedScripts from '../components/DelayedScripts';
-// ★★★ Updated Import: Single Provider ★★★
 import { Providers } from "./providers";
 import { Suspense } from 'react';
 import SourceTracker from '@/components/SourceTracker';
@@ -75,6 +74,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/', 
   },
+  other: {
+  'geo.region': 'AU',
+  'geo.placename': 'Australia',
+  'geo.position': '-25.2744;133.7751',
+  'ICBM': '-25.2744, 133.7751',
+},
 };
 
 export const viewport: Viewport = {
@@ -86,7 +91,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // সার্ভার সাইড থেকে ইউজার ডাটা আনা হচ্ছে
   const user = await getCurrentUser();
 
   return (
@@ -98,8 +102,6 @@ export default async function RootLayout({
         <Suspense>
           <SourceTracker />
         </Suspense>
-
-        {/* ★★★ Single Provider wrapping everything (Auth + Cart + ProgressBar) ★★★ */}
         <Providers initialUser={user}>
           <TopBar />
           <Header />
@@ -107,8 +109,7 @@ export default async function RootLayout({
             {children}
           </main>
           <Footer />
-        </Providers>
-        
+        </Providers>       
         <DelayedScripts />
       </body>
     </html>

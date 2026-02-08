@@ -4,7 +4,6 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-// import styles from './filters.module.css'; // CSS Module সরানো হয়েছে
 import { IoChevronDown } from 'react-icons/io5';
 
 interface Category {

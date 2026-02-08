@@ -1,10 +1,10 @@
-// app/product/[slug]/QuantityAddToCart.tsx
+// app/product/[slug]/_components/QuantityAddToCart.tsx
 
 'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCart } from '../../../context/CartContext';
+import { useCart } from '../../../../context/CartContext';
 import toast from 'react-hot-toast';
 
 interface ProductForCart {

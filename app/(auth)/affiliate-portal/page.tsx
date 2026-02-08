@@ -188,7 +188,7 @@ export default function AffiliatePortalPage() {
                             onChange={(e) => setAgreed(e.target.checked)}
                         />
                         <label htmlFor="terms" className="text-sm text-[#333] cursor-pointer select-none">
-                            I agree to the <Link href="/terms" className="underline font-bold">Terms of Service</Link>
+                            I agree to the <Link href="/terms-and-conditions" className="underline font-bold">Terms of Service</Link>
                         </label>
                     </div>
 

@@ -7,7 +7,6 @@ import { CartProvider } from "../context/CartContext";
 import ProgressBar from "../components/ProgressBar";
 import { Toaster } from 'react-hot-toast';
 
-// --- AUTH TYPES & CONTEXT ---
 type User = {
   id: string;
   email: string;
@@ -25,27 +24,23 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// --- MAIN PROVIDER COMPONENT ---
 type Props = {
   children: ReactNode;
-  initialUser: User; // লেআউট থেকে ইউজার ডাটা আসবে
+  initialUser: User; 
 };
 
 export function Providers({ children, initialUser }: Props) {
-  // Auth State
   const [user, setUser] = useState<User>(initialUser);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // 1. Initial User Sync
   useEffect(() => {
     if (initialUser) {
       setUser(initialUser);
     }
   }, [initialUser]);
 
-  // 2. Session Rehydration (Client Side Check)
   useEffect(() => {
     const checkSession = async () => {
       if (!user) {
@@ -65,13 +60,11 @@ export function Providers({ children, initialUser }: Props) {
     checkSession();
   }, []);
 
-  // Login Function
   const login = (userData: User) => {
     setUser(userData);
     setIsLoading(true);
     router.refresh();
     
-    // রিডাইরেক্ট লজিক (সাসপেন্স এড়ানোর জন্য try-catch বা if চেক)
     const nextUrl = searchParams ? searchParams.get('next') : null;
     if (nextUrl) {
       router.push(nextUrl);
@@ -81,7 +74,6 @@ export function Providers({ children, initialUser }: Props) {
     setIsLoading(false);
   };
 
-  // Logout Function
   const logout = async () => {
     setIsLoading(true);
     try {
@@ -99,7 +91,6 @@ export function Providers({ children, initialUser }: Props) {
   return (
     <AuthContext.Provider value={{ user, isLoading, login, logout }}>
       <CartProvider>
-        {/* Progress Bar with Suspense inside Provider */}
         <Suspense fallback={null}>
           <ProgressBar />
         </Suspense>
@@ -112,7 +103,6 @@ export function Providers({ children, initialUser }: Props) {
   );
 }
 
-// --- AUTH HOOK ---
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {

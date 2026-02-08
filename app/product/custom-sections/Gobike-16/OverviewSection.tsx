@@ -1,4 +1,4 @@
-import ImageSlider from '../../components/ImageSlider/ImageSlider';
+import ImageSlider from '../ImageSlider';
 import styles from '../GobikeSections.module.css';
 
 // Image list with descriptive alt tags for SEO and accessibility

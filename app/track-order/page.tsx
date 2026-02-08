@@ -60,7 +60,7 @@ export default function TrackOrderPage() {
           hour: '2-digit', minute: '2-digit'
         });
     }
-    return dateStr; // Return as represents if logic fails or simple date
+    return dateStr; 
   };
 
   const formatMoney = (amount: any) => {
@@ -68,7 +68,6 @@ export default function TrackOrderPage() {
     return `$${Number(amount).toFixed(2)}`;
   };
 
-  // Helper for Live Tracking Status Color (ALL Events)
   const getTrackingColor = (status: string) => {
     const s = status?.toLowerCase() || '';
     if (s.includes('delivered') || s.includes('completed')) return 'bg-green-600 border-green-600 text-white';

@@ -1,13 +1,12 @@
 // ফাইল পাথ: app/product/components/YouTubeVideo/LazyLoadYouTube.tsx
+
 'use client';
 
 import { useState } from 'react';
 import Image from 'next/image';
-// import styles from './LazyLoadYouTube.module.css'; // CSS Module সরানো হয়েছে
 
 const LazyLoadYouTube = ({ videoId, title }: { videoId: string; title: string }) => {
   const [showVideo, setShowVideo] = useState(false);
-
   const thumbnailUrl = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
   const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
 

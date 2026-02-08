@@ -1,5 +1,5 @@
 // ফাইল পাথ: app/product/custom-sections/Gobike-20/PowerSection.tsx
-import TextWithImage from '../../components/TextWithImage/TextWithImage';
+import TextWithImage from '../TextWithImage';
 // import styles from '../GobikeSections.module.css'; // CSS Module সরানো হয়েছে
 
 export default function PowerSection() {

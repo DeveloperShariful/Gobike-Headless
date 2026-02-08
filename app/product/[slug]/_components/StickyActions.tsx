@@ -1,10 +1,9 @@
-// app/product/[slug]/StickyActions.tsx
+// app/product/[slug]/_components/StickyActions.tsx
 
 'use client';
 
 import { useState } from 'react';
-import { useCart } from '../../../context/CartContext';
-// import styles from './StickyActions.module.css'; // CSS Module সরানো হয়েছে
+import { useCart } from '../../../../context/CartContext';
 
 interface ProductForCart {
   id: string;
@@ -46,14 +45,10 @@ export default function StickyActions({ product, isValid }: StickyActionsProps) 
     setQuantity(prev => Math.max(1, prev + amount));
   };
 
-  // বাটন টেক্সট লজিক
   const buttonText = isAdding ? 'Adding...' : (isValid ? 'Add to Cart' : 'Select color and size');
 
   return (
-    // .actionsWrapper replaced
     <div className="flex items-center gap-2 w-full md:w-auto justify-between md:justify-start">
-      
-      {/* .quantitySelector replaced */}
       <div className="flex items-center border border-[#e0e0e0] rounded-md overflow-hidden h-[40px] md:h-[42px]">
         <button 
           onClick={() => handleQuantityChange(-1)} 
@@ -73,8 +68,6 @@ export default function StickyActions({ product, isValid }: StickyActionsProps) 
           +
         </button>
       </div>
-      
-      {/* .addToCartButton replaced */}
       <button 
         onClick={handleAddToCart}
         disabled={isCartLoading || isAdding || !isValid}

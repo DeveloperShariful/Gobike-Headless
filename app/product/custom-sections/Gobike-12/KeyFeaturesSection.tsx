@@ -1,6 +1,6 @@
 // ফাইল পাথ: app/product/custom-sections/Gobike-12/KeyFeaturesSection.tsx
-import FeatureSlider from '../../components/FeatureSlider/FeatureSlider';
-// import styles from '../GobikeSections.module.css'; // CSS Module সরানো হয়েছে
+
+import FeatureSlider from '../FeatureSlider';
 
 const keyFeatures = [
   {

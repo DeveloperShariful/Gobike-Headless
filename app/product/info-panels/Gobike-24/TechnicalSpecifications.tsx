@@ -1,9 +1,8 @@
 // ফাইল পাথ: app/product/info-panels/Gobike-24/TechnicalSpecifications.tsx
 
-
 const specs = [
-    { label: 'Age Range', value: '13+ years to Adults' }, // Updated for 24" size
-    { label: 'Max Load', value: '120 kg' }, // Standard for this frame size
+    { label: 'Age Range', value: '13+ years to Adults' }, 
+    { label: 'Max Load', value: '120 kg' }, 
     { label: 'Frame', value: '6061 Full Aluminum frame w/proprietary shaped tubes' },
     { label: 'Net Weight', value: '23.0kgs with battery' },
     { label: 'Wheel Size', value: '24" x 2.60" KENDA Fat off-road tires' },
@@ -23,14 +22,10 @@ const specs = [
 
 export default function TechnicalSpecifications() {
   return (
-    // .specTableContainer replaced
     <div className="flex flex-col">
       {specs.map(spec => (
-        // .specRow replaced
         <div key={spec.label} className="grid grid-cols-[30%_1fr] gap-4 items-center py-2.5 border-b border-[#eeeeee] font-sans text-base last:border-b-0">
-          {/* .specLabel replaced */}
           <span className="font-bold text-black text-left">{spec.label}:</span>
-          {/* .specValue replaced */}
           <span className="font-semibold text-black text-left">{spec.value}</span>
         </div>
       ))}

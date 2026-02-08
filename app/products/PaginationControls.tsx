@@ -3,7 +3,6 @@
 
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-// import styles from './pagination.module.css'; // CSS Module সরানো হয়েছে
 
 interface PageInfo {
   hasNextPage: boolean;

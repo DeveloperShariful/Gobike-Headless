@@ -1,7 +1,5 @@
 // ফাইল পাথ: app/product/info-panels/Gobike-20/TechnicalSpecifications.tsx
 
-
-// ডেটা আপনার আগের ছবি থেকে হুবহু নেওয়া হয়েছে
 const specs = [
     { label: 'Age Range', value: '9–16 years' },
     { label: 'Max Rider Weight', value: '100 kg' },
@@ -25,14 +23,10 @@ const specs = [
 
 export default function TechnicalSpecifications() {
   return (
-    // .specTableContainer replaced
     <div className="flex flex-col">
       {specs.map(spec => (
-        // .specRow replaced
         <div key={spec.label} className="grid grid-cols-[30%_1fr] gap-4 items-center py-2.5 border-b border-[#eeeeee] font-sans text-base last:border-b-0">
-          {/* .specLabel replaced */}
           <span className="font-bold text-black text-left">{spec.label}:</span>
-          {/* .specValue replaced */}
           <span className="font-semibold text-black text-left">{spec.value}</span>
         </div>
       ))}

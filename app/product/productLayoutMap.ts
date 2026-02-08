@@ -52,7 +52,7 @@ export const productLayoutMap: { [key: string]: SectionComponent[] } = {
     FaqSection20,
   ],
   
-  // GoBike 24 Design (New)
+  // GoBike 24 Design 
   'gobike-24-inch-electric-bike-teens-high-speed-performance-for-ages-13': [
     OverviewSection24,
     PowerSection24,

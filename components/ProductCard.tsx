@@ -5,8 +5,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation'; 
-// import styles from './products.module.css'; // CSS Module সরানো হয়েছে
-import { useCart } from '../../context/CartContext';
+import { useCart } from '@/context/CartContext';
 
 // --- Interface Update ---
 interface Product {

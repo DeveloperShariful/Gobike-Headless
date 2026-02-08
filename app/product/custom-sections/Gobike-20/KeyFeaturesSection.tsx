@@ -1,5 +1,5 @@
 // ফাইল পাথ: app/product/custom-sections/Gobike-20/KeyFeaturesSection.tsx
-import FeatureSlider from '../../components/FeatureSlider/FeatureSlider';
+import FeatureSlider from '../FeatureSlider';
 import styles from '../GobikeSections.module.css';
 
 const keyFeatures = [

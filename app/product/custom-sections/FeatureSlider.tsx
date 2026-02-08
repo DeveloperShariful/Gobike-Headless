@@ -1,10 +1,10 @@
-// ফাইল পাথ: app/product/components/FeatureSlider/FeatureSlider.tsx
+// ফাইল পাথ: app/product//custom-sections/FeatureSlider.tsx
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-// import styles from './FeatureSlider.module.css'; // CSS Module সরানো হয়েছে
-import { useWindowSize } from './useWindowSize';
+import { useWindowSize } from '../useWindowSize';
 
 interface Feature {
   imageSrc: string;
@@ -21,17 +21,15 @@ interface FeatureSliderProps {
 export default function FeatureSlider({ title, features }: FeatureSliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const { width } = useWindowSize();
-
-  // === মূল পরিবর্তন: স্ক্রিন সাইজ অনুযায়ী কতগুলো আইটেম দেখাবে তা নির্ধারণ করা ===
   const [itemsPerPage, setItemsPerPage] = useState(3);
 
   useEffect(() => {
     if (width < 768) {
-      setItemsPerPage(1); // মোবাইল
+      setItemsPerPage(1); 
     } else if (width < 1024) {
-      setItemsPerPage(2); // ট্যাবলেট
+      setItemsPerPage(2); 
     } else {
-      setItemsPerPage(3); // ডেস্কটপ
+      setItemsPerPage(3); 
     }
   }, [width]);
   // =======================================================================
@@ -53,18 +51,13 @@ export default function FeatureSlider({ title, features }: FeatureSliderProps) {
   };
 
   return (
-    // .sliderComponent replaced
     <div className="w-full">
-      {/* .header replaced */}
       <div className="flex justify-between items-center mb-10 px-2">
-        {/* .title replaced */}
         <h2 className="text-2xl md:text-[2rem] font-bold text-slate-900">{title}</h2>
         {canSlide && (
-          // .navArrows replaced
           <div className="flex gap-2">
             <button 
                 onClick={goToPrevious} 
-                // .arrow replaced
                 className="w-10 h-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-lg text-slate-600 cursor-pointer transition-all duration-200 ease-in-out hover:bg-slate-200 hover:text-slate-900"
             >
                 &#10094;
@@ -78,32 +71,22 @@ export default function FeatureSlider({ title, features }: FeatureSliderProps) {
           </div>
         )}
       </div>
-
-      {/* .sliderContainer replaced */}
       <div className="relative w-full overflow-hidden">
         <div 
-          // .sliderTrack replaced
           className="flex transition-transform duration-500 ease-in-out"
-          // === মূল পরিবর্তন: স্লাইড করার দূরত্ব এখন ডাইনামিক ===
           style={{ 
             width: `${(100 / itemsPerPage) * features.length}%`,
             transform: `translateX(-${(100 / features.length) * currentIndex}%)` 
           }}
         >
           {features.map((feature, index) => (
-            // .slide replaced
             <div key={index} className="box-border px-2">
-              {/* .card replaced */}
               <div className="rounded-xl overflow-hidden bg-white border border-slate-200 h-full">
-                {/* .imageWrapper replaced */}
                 <div className="relative w-full pt-[60%] bg-slate-50">
                   <Image src={feature.imageSrc} alt={feature.imageAlt} fill style={{ objectFit: 'cover' }} sizes="33vw"/>
                 </div>
-                {/* .contentWrapper replaced */}
                 <div className="p-6">
-                  {/* .featureTitle replaced */}
                   <h3 className="text-xl font-semibold mb-2 text-slate-800">{feature.title}</h3>
-                  {/* .description replaced */}
                   <p className="text-[0.95rem] text-slate-500 leading-relaxed m-0">{feature.description}</p>
                 </div>
               </div>
@@ -113,10 +96,8 @@ export default function FeatureSlider({ title, features }: FeatureSliderProps) {
       </div>
       
       {canSlide && (
-        // .progressBarContainer replaced
         <div className="w-[calc(100%-1rem)] h-1 bg-slate-200 rounded-sm mx-auto mt-8">
             <div 
-                // .progressFill replaced
                 className="h-full bg-sky-500 rounded-sm transition-[width] duration-300 ease-in-out"
                 style={{ width: `${(100 / (features.length - itemsPerPage + 1)) * (currentIndex + 1)}%` }}
             ></div>

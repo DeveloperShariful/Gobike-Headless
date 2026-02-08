@@ -1,8 +1,5 @@
 // ফাইল পাথ: app/product/productInfoPanelsMap.ts
 import { ComponentType } from 'react';
-
-// === সম্পূর্ণ এবং সঠিক Product ইন্টারফেস ===
-// এই ইন্টারফেসটি ProductClient.tsx থেকে আনা হয়েছে যাতে টাইপ সামঞ্জস্যপূর্ণ থাকে।
 interface ImageNode { sourceUrl: string; }
 interface Product {
   id: string;
@@ -23,7 +20,6 @@ interface Product {
   length?: number;
   width?: number;
   height?: number;
-  // প্রয়োজনে এখানে আরও প্রোপার্টি যোগ করা যাবে
 }
 
 // === GoBike 16 Panels ===
@@ -45,7 +41,6 @@ import InTheBox24 from './info-panels/Gobike-24/WhatsInTheBox';
 // === Common Panels ===
 import PaymentMethods from './info-panels/Common/PaymentMethods';
 
-// PanelConfig ইন্টারফেস এখন সঠিক Product টাইপ ব্যবহার করবে
 interface PanelConfig {
   id: string;
   label: string;
@@ -76,7 +71,6 @@ export const productInfoPanelsMap: { [key: string]: PanelConfig[] } = {
   ],
   
   // --- GoBike 24 (New) ---
-  // Slug-টি আপনার ওয়েবসাইটের URL এর সাথে মিলিয়ে নিন
   'gobike-24-inch-electric-bike-teens-high-speed-performance-for-ages-13': [
     { id: 'specs24', label: 'TECHNICAL SPECIFICATIONS', component: TechSpec24 },
     { id: 'box24', label: "WHAT'S IN THE BOX", component: InTheBox24 },

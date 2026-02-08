@@ -8,6 +8,12 @@ Allow: /
 Disallow: /cart
 Disallow: /checkout
 Disallow: /account
+Disallow: /login
+Disallow: /register
+Disallow: /affiliate-portal
+Disallow: /reset-password
+Disallow: /forgot-password
+Disallow: /api/
 
 
 # Provide the location of the sitemap to all crawlers

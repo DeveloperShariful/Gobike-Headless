@@ -1,5 +1,5 @@
 // ফাইল পাথ: app/product/custom-sections/Gobike-24/KeyFeaturesSection.tsx
-import FeatureSlider from '../../components/FeatureSlider/FeatureSlider';
+import FeatureSlider from '../FeatureSlider';
 import styles from '../GobikeSections.module.css';
 
 // Note: Using existing image placeholders. Update URLs to actual 24" bike images if available.

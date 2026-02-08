@@ -1,15 +1,11 @@
 // ফাইল পাথ: app/product/info-panels/PaymentMethods.tsx
-import Image from 'next/image';
-// import styles from '../PanelStyles.module.css'; // CSS Module সরানো হয়েছে
 
+import Image from 'next/image';
 export default function PaymentMethods() {
   return (
-    // .paymentContainer replaced
     <div className="w-full">
       <h4 className="text-[1.2rem] font-bold mb-2">100% Secure & Trusted</h4>
       <p className="text-[0.95rem] text-[#555] leading-[1.6] mb-6">We accept all major credit cards and payment providers for a safe and secure checkout process.</p>
-      
-      {/* .paymentGrid replaced */}
       <div className="w-full">
         <Image 
           src="https://gobikes.au/wp-content/uploads/2018/07/trust-symbols_b-1.jpg" 

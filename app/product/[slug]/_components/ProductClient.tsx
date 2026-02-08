@@ -1,4 +1,4 @@
-// app/product/[slug]/ProductClient.tsx
+// app/product/[slug]/_components/ProductClient.tsx
 
 'use client';
 
@@ -6,17 +6,16 @@ import { useState, useEffect, useRef, ComponentType } from 'react';
 import Image from 'next/image';
 import QuantityAddToCart from './QuantityAddToCart';
 import ReviewForm from './ReviewForm';
-import ProductCard from '../../products/ProductCard';
-import { gtmViewItem } from '../../../lib/gtm';
-import { klaviyoTrackViewedProduct } from '../../../lib/klaviyo';
-import { productVideoMap } from '../productVideos';
-import LazyLoadYouTube from '../components/YouTubVideo/LazyLoadYouTube';
+import ProductCard from '@/components/ProductCard';
+import { gtmViewItem } from '../../../../lib/gtm';
+import { klaviyoTrackViewedProduct } from '../../../../lib/klaviyo';
+import { productVideoMap } from '../../productVideos';
+import LazyLoadYouTube from '../../custom-sections/YouTubVideo/LazyLoadYouTube';
 import StickyAddToCart from './StickyAddToCart';
-import { productLayoutMap } from '../productLayoutMap';
-import { productInfoPanelsMap } from '../productInfoPanelsMap';
-import SlideOutPanel from '../components/SlideOutPanel/SlideOutPanel';
+import { productLayoutMap } from '../../productLayoutMap';
+import { productInfoPanelsMap } from '../../productInfoPanelsMap';
+import SlideOutPanel from '../../custom-sections/SlideOutPanel';
 
-// --- Interfaces (No changes) ---
 interface ImageNode { sourceUrl: string; }
 interface Attribute { name: string; options: string[]; label?: string; }
 interface VariationAttribute { name: string; value: string; }
@@ -204,7 +203,7 @@ export default function ProductClient({ product }: { product: Product }) {
   };
 
   const allImages = [product.image, ...product.galleryImages.nodes].filter(Boolean) as ImageNode[];
-  const videoId = productVideoMap[product.slug];   
+  const videoData = productVideoMap[product.slug];  
   const sortedAttributeNodes = product.attributes?.nodes ? [...product.attributes.nodes].sort((a, b) => {
     const nameA = a.name.toLowerCase();
     const nameB = b.name.toLowerCase();
@@ -394,10 +393,10 @@ export default function ProductClient({ product }: { product: Product }) {
         </div>
       )}
 
-      {videoId && (
+      {videoData  && (
         <section className="mt-8 border-t border-[#eaeaea] pt-8">
             <h2 className="text-center underline text-[1.8rem] font-bold mb-6">From Wobbles to Woo-hoos!</h2>
-            <LazyLoadYouTube videoId={videoId} title={product.name} />
+            <LazyLoadYouTube videoId={videoData.id} title={product.name} />
         </section>
       )}
       

@@ -3,12 +3,8 @@ import { gql } from '@apollo/client';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
-
-// --- সমাধান: সঠিক ফাইল থেকে getClient import করা হচ্ছে ---
 import { getClient } from '../../lib/apollo-rsc-client';
-
-import styles from './BikesPage.module.css';
-import ProductCard from '../products/ProductCard';
+import ProductCard from '@/components/ProductCard';
 import PaginationControls from '../products/PaginationControls';
 import Breadcrumbs from '../../components/Breadcrumbs';
 
@@ -40,7 +36,6 @@ interface QueryData {
     pageInfo: PageInfo;
   } | null;
 }
-// --- SEO: Dynamic Metadata Function ---
 export async function generateMetadata(): Promise<Metadata> {
   const title = "Shop All Kids Top Rated Electric Bikes";
   const description = "Browse our full collection of top-rated electric balance bikes for kids of all ages. Safe, durable, and built for adventure. Find the perfect e-bike for your child today!";
@@ -70,9 +65,6 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-
-// --- Data Fetching Function ---
-// --- Data Fetching Function ---
 async function getBikeProducts(
   first: number | null,
   after: string | null,
@@ -136,8 +128,6 @@ export default async function BikesPage({ searchParams }: {
   const resolvedSearchParams = await searchParams;
   const after = typeof resolvedSearchParams.after === 'string' ? resolvedSearchParams.after : null;
   const before = typeof resolvedSearchParams.before === 'string' ? resolvedSearchParams.before : null;
-  //const after = typeof searchParams.after === 'string' ? searchParams.after : null;
-  //const before = typeof searchParams.before === 'string' ? searchParams.before : null;
 
   const { products, pageInfo } = await getBikeProducts(
     before ? null : PRODUCTS_PER_PAGE,
@@ -146,7 +136,6 @@ export default async function BikesPage({ searchParams }: {
     before
   );
 
- // --- নতুন সংযোজন: Schema Markup / Structured Data ---
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -223,7 +212,6 @@ export default async function BikesPage({ searchParams }: {
         {/* --- Products Grid --- */}
         <main className="mb-16">
           {products.length > 0 ? (
-            // Grid: Mobile 1 column, Tablet 2 columns, Desktop 3, Large 4
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
               {products.map((product) => (
                 <ProductCard key={product.id} product={product} />

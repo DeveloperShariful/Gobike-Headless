@@ -4,11 +4,10 @@ import { gql } from '@apollo/client';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getClient } from '../../lib/apollo-rsc-client';
-// import styles from './products.module.css'; // CSS Module সরানো হয়েছে
 import ProductFilters from './ProductFilters';
 import PaginationControls from './PaginationControls';
-import ProductsGrid from './ProductsGrid';
-import Breadcrumbs from '../../components/Breadcrumbs';
+import ProductsGrid from '@/components/ProductsGrid';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 const PRODUCTS_PER_PAGE = 12;
 

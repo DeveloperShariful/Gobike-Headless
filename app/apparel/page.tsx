@@ -5,8 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 import { getClient } from '../../lib/apollo-rsc-client';
-// import styles from './ApparelPage.module.css'; // CSS Module সরানো হয়েছে
-import ProductCard from '../products/ProductCard';
+import ProductCard from '@/components/ProductCard';
 import PaginationControls from '../products/PaginationControls';
 import Breadcrumbs from '../../components/Breadcrumbs';
 
@@ -175,17 +174,12 @@ export default async function ApparelPage({ searchParams }: {
 
   return (
     <div>
-      {/* --- JSON-LD Script --- */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Breadcrumbs pageTitle="GoBike T-Shirts & Apparel" />
-      
-      {/* Container with Tailwind */}
       <div className="max-w-[1300px] mx-auto px-1.5 font-sans">
-        
-        {/* Header / Hero Section */}
         <header className="flex flex-col md:flex-row items-center gap-6 md:gap-12 mb-8 md:mb-12 bg-gray-50 rounded-lg md:rounded-xl p-4 md:p-12">
           <div className="flex-1 text-center md:text-left w-full">
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-3 md:mb-4 leading-tight">
@@ -196,7 +190,6 @@ export default async function ApparelPage({ searchParams }: {
             </p>
           </div>
           <div className="flex-1 w-full max-w-[580px]">
-              {/* TODO: Update src to an actual T-Shirt image URL */}
               <Image 
                   src="https://gobikes.au/wp-content/uploads/2025/09/Gobike-kids-electric-bike-ebike-for-kids-scaled.webp"
                   alt="Kid wearing GoBike branded t-shirt"
@@ -228,7 +221,6 @@ export default async function ApparelPage({ searchParams }: {
         {/* Why Choose Us Section */}
         <section className="flex flex-col md:flex-row items-center gap-8 md:gap-16 bg-white border border-gray-100 rounded-lg md:rounded-xl p-4 py-8 md:p-10 shadow-sm mb-12 md:mb-16">
           <div className="w-full md:w-1/2 flex justify-center">
-               {/* TODO: Update src to an actual T-Shirt detail image URL */}
                <Image 
                   src="https://gobikes.au/wp-content/uploads/2025/08/Gobike-kids-electric-bike-ebike-for-kids-4-scaled-1.webp"
                   alt="Premium fabric quality of GoBike t-shirts"
@@ -259,7 +251,6 @@ export default async function ApparelPage({ searchParams }: {
           </div>
         </section>
 
-        {/* SEO Bottom Section */}
         <section className="text-center bg-gray-50 rounded-xl p-8 md:p-12 mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
             Wear Your Passion

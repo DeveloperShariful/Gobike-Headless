@@ -5,8 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 import { getClient } from '../../lib/apollo-rsc-client';
-// import styles from './SparePartsPage.module.css'; // CSS Module সরানো হয়েছে
-import ProductCard from '../products/ProductCard';
+import ProductCard from '@/components/ProductCard';
 import PaginationControls from '../products/PaginationControls';
 import Breadcrumbs from '../../components/Breadcrumbs'; 
 
@@ -76,7 +75,6 @@ async function getSpareParts(
     before: string | null
 ) {
   try {
-    // --- সমাধান: getClient() এখন সঠিকভাবে কাজ করবে ---
     const { data } = await getClient().query<QueryData>({
       query: gql`
         query GetSparePartsCursor($first: Int, $after: String, $last: Int, $before: String) {
@@ -138,7 +136,6 @@ export default async function SparePartsPage({ searchParams }: {
     before
   );
 
- // Schema Markup / Structured Data তৈরি করা হয়েছে
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -173,14 +170,11 @@ export default async function SparePartsPage({ searchParams }: {
 
   return (
     <div>
-      {/* JSON-LD স্ক্রিপ্টটি পেজে যোগ করা হয়েছে */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Breadcrumbs pageTitle="Spare Parts" />
-      
-      {/* Container with Tailwind match Bikes Page */}
       <div className="max-w-[1300px] mx-auto px-1.5 font-sans">
         
         {/* Header / Hero Section */}

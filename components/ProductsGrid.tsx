@@ -2,7 +2,6 @@
 'use client'; 
 
 import ProductCard from './ProductCard';
-// import styles from './products.module.css'; // CSS Module সরানো হয়েছে
 
 interface Product {
   id: string;

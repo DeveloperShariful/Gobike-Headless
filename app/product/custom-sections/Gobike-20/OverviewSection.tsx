@@ -1,5 +1,5 @@
 // ফাইল পাথ: app/product/custom-sections/Gobike-20/OverviewSection.tsx
-import ImageSlider from '../../components/ImageSlider/ImageSlider';
+import ImageSlider from '../ImageSlider';
 import styles from '../GobikeSections.module.css';
 
 const overviewImages = [

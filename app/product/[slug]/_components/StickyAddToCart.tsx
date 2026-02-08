@@ -1,9 +1,8 @@
-// app/product/[slug]/StickyAddToCart.tsx
+// app/product/[slug]/_components/StickyAddToCart.tsx
 
 'use client';
 
 import Image from 'next/image';
-// import styles from './StickyAddToCart.module.css'; // CSS Module সরানো হয়েছে
 import StickyActions from './StickyActions';
 
 interface ProductForCart {
