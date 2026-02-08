@@ -5,7 +5,7 @@
 import { useState, useEffect } from 'react';
 import { gql } from '@apollo/client';
 import client from '../../lib/apolloClient';
-import ProductCard from '../products/ProductCard';
+import ProductCard from '@/components/ProductCard';
 
 // --- টাইপ ইন্টারফেস (অপরিবর্তিত) ---
 interface Product {
