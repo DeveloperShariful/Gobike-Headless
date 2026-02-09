@@ -603,12 +603,8 @@ const FaqSection = () => {
 export default function HomePageClient() {
   return (
     <>
-      {/* Hero & TrustBadges লোড হবে তাৎক্ষণিকভাবে (LCP এর জন্য) */}
       <HeroSlider />
       <TrustBadges />
-      
-      {/* বাকি সব সেকশন Lazy Load হবে - যখন ইউজার স্ক্রল করে নিচে যাবে */}
-      
       <LazyLoadSection>
         <div className="max-w-[1500px] mx-auto px-4"><hr className="border-t border-[#e0e0e0] my-4" /></div>
         <ProductCollection />

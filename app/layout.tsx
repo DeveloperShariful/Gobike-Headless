@@ -1,4 +1,5 @@
 //app/layout.tsx
+
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -25,22 +26,35 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://gobike.au'),
   
   title: {
-    default: 'GoBike - Kids Electric Bikes Australia',
+    default: 'GoBike - Kids Electric Bikes Australia | Top Rated Balance Bikes',
     template: '%s | GoBike Australia',
   },
-  description: "Australia's top-rated electric balance bikes for kids aged 2-16. Engineered for safety and built for fun. Shop now for the perfect e-bike for your child, backed by a 1-year warranty and local Aussie support.",
+  description: "Australia's #1 rated electric balance bikes for kids (ages 2-16). Engineered for safety, built for fun. Shop 12\", 16\", 20\" & 24\" e-bikes with 1-year warranty.",
   
+  applicationName: 'GoBike Australia',
+  authors: [{ name: 'GoBike Australia', url: 'https://gobike.au' }],
+  generator: 'Next.js',
+  keywords: ['kids electric bike', 'kids ebike', 'electric balance bike', 'electric dirt bike for kids', 'GoBike', 'toddler electric bike', 'kids motorcycle Australia', 'buy kids ebike online'],
+  referrer: 'origin-when-cross-origin',
+  creator: 'GoBike Team',
+  publisher: 'GoBike Australia',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+
   openGraph: {
     title: 'GoBike - Kids Electric Bikes Australia',
-    description: "Australia's top-rated electric balance bikes for kids.",
-    url: '/',
+    description: "Australia's top-rated electric balance bikes for kids. Safe, fun, and built for adventure.",
+    url: 'https://gobike.au',
     siteName: 'GoBike Australia',
     images: [
       {
         url: 'https://gobikes.au/wp-content/uploads/2025/11/gobike-ebike-safe-speed-modes.jpg', 
         width: 1200,
         height: 857,
-        alt: 'A child riding a GoBike electric bike.',
+        alt: 'A happy child riding a GoBike electric bike in Australia.',
       },
     ],
     locale: 'en_AU',
@@ -51,14 +65,10 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'GoBike - Kids Electric Bikes Australia',
     description: "Australia's top-rated electric balance bikes for kids.",
+    creator: '@GoBikeAU', 
     images: ['https://gobikes.au/wp-content/uploads/2025/11/gobike-ebike-safe-speed-modes.jpg'], 
   },
 
-  keywords: ['kids electric bike','kids ebike', 'electric bike','electric bike for kids','electric balance bike', 'ebike for kids', 'GoBike','childrens electric motorbike','toddler electric bike','buy kids ebike online','GoBike Australia'],
-  authors: [{ name: 'GoBike Australia', url: 'https://gobike.au' }],
-  creator: 'Shariful Islam',
-  publisher: 'GoBike Australia',
-  
   robots: {
     index: true,
     follow: true,
@@ -74,16 +84,19 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/', 
   },
+
   other: {
-  'geo.region': 'AU',
-  'geo.placename': 'Australia',
-  'geo.position': '-25.2744;133.7751',
-  'ICBM': '-25.2744, 133.7751',
-},
+    'geo.region': 'AU-NSW',
+    'geo.placename': 'Camden',
+    'geo.position': '-34.05;150.69', 
+    'ICBM': '-34.05, 150.69',
+  },
 };
 
 export const viewport: Viewport = {
   themeColor: '#ffffff',
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default async function RootLayout({
@@ -92,9 +105,51 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await getCurrentUser();
+  const organizationSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': 'https://gobike.au/#organization',
+    name: 'GoBike Australia',
+    url: 'https://gobike.au',
+    logo: {
+      '@type': 'ImageObject',
+      url: 'https://gobikes.au/wp-content/uploads/2025/06/cropped-GOBIKE-Electric-Bike-for-kids-1.webp',
+      width: 112,
+      height: 112
+    },
+    description: "Australia's top-rated electric balance bikes for kids aged 2-16.",
+    email: "gobike@gobike.au", 
+    telephone: "+61-426-067-277",
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: '52 Bligh Ave ', 
+      addressLocality: 'Camden south',
+      addressRegion: 'NSW',
+      postalCode: '2570',
+      addressCountry: 'AU'
+    },
+    sameAs: [
+      'https://www.facebook.com/Go-Bike-104997195659873',
+      'https://www.instagram.com/gobikeoz/',
+      'https://www.youtube.com/@Gobike-r7b'
+    ],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      telephone: '+61-426-067-277',
+      contactType: 'customer service',
+      areaServed: 'AU',
+      availableLanguage: 'en'
+    }
+  };
 
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning={true}

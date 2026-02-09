@@ -1,6 +1,6 @@
 //// app/shipping-policy/page.tsx
 import Script from 'next/script';
-import Breadcrumbs from '../../components/Breadcrumbs'; // তোমার পাথ অনুযায়ী ঠিক করে নিবে
+import Breadcrumbs from '../../components/Breadcrumbs'; 
 import type { Metadata } from 'next';
 import Link from 'next/link';
 

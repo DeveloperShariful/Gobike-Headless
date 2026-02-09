@@ -10,7 +10,6 @@ import Breadcrumbs from '../../components/Breadcrumbs';
 
 const PRODUCTS_PER_PAGE = 12;
 
-// --- Interfaces ---
 interface Product {
   id: string;
   databaseId: number;
@@ -36,15 +35,41 @@ interface QueryData {
     pageInfo: PageInfo;
   } | null;
 }
-export async function generateMetadata(): Promise<Metadata> {
-  const title = "Shop All Kids Top Rated Electric Bikes";
-  const description = "Browse our full collection of top-rated electric balance bikes for kids of all ages. Safe, durable, and built for adventure. Find the perfect e-bike for your child today!";
-  
+
+export async function generateMetadata({ searchParams }: { 
+  searchParams: { [key: string]: string | string[] | undefined } 
+}): Promise<Metadata> {
+  const resolvedSearchParams = await searchParams;
+  const isPaged = !!(resolvedSearchParams.after || resolvedSearchParams.before);
+  const title = isPaged ? "Shop Kids Electric Bikes | Page 2+ | GoBike Australia" : "Shop All Kids Top Rated Electric Bikes | Electric Cycles Australia";
+  const description = "Browse our full collection of top-rated electric balance bikes for kids. From balancing bikes to childrens electric motorbikes. Safe, durable, and built for adventure.";
+  let canonicalUrl = '/bikes';
+  if (typeof resolvedSearchParams.after === 'string') {
+    canonicalUrl += `?after=${resolvedSearchParams.after}`;
+  }
+
   return {
     title,
     description,
+    keywords: [
+      'kids electric bike',
+      'balancing bikes',
+      'electric cycles australia',
+      'childrens electric dirt bike',
+      'childrens electric bike',
+      'balance bike electric',
+      'childrens electric motorbikes',
+      'australia electric bike',
+      'australian electric bikes',
+      'electric childs motorbike',
+      'electric bikes for 10 year olds'
+    ],
     alternates: {
-      canonical: '/bikes',
+      canonical: canonicalUrl,
+    },
+    robots: {
+      index: true,
+      follow: true,
     },
     openGraph: {
       title: title,
@@ -140,7 +165,8 @@ export default async function BikesPage({ searchParams }: {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     'name': 'Kids Electric Bikes',
-    'description': 'Browse our collection of top-rated electric bikes for kids.',
+    'description': 'Browse our collection of top-rated electric bikes for kids including balancing bikes and dirt bikes.',
+    'numberOfItems': products.length,
     'itemListElement': products.map((product, index) => ({
       '@type': 'ListItem',
       'position': index + 1,
@@ -149,7 +175,7 @@ export default async function BikesPage({ searchParams }: {
         'name': product.name,
         'url': `https://gobike.au/product/${product.slug}`,
         'image': product.image?.sourceUrl,
-        'description': `Discover the ${product.name}, a top-rated electric bike for kids. Safe, durable, and built for adventure.`,
+         'description': `Discover the ${product.name}, a top-rated electric bike for kids. Safe, durable, and built for adventure.`,
         'sku': product.databaseId.toString(),
         'brand': {
           '@type': 'Brand',
@@ -162,6 +188,7 @@ export default async function BikesPage({ searchParams }: {
             'reviewCount': product.reviewCount
           }
         }),
+
         'offers': {
           '@type': 'Offer',
           'priceCurrency': 'AUD',
@@ -169,7 +196,7 @@ export default async function BikesPage({ searchParams }: {
             ? product.salePrice.replace(/[^0-9.]+/g, "") 
             : product.regularPrice?.replace(/[^0-9.]+/g, ""),
           'availability': 'https://schema.org/InStock',
-          'url': `https://gobike.au/product/${product.slug}`
+          'url': `https://gobike.au/product/${product.slug}`,
         }
       }
     }))
@@ -183,11 +210,7 @@ export default async function BikesPage({ searchParams }: {
       />
 
       <Breadcrumbs pageTitle="All Bikes" />
-
-      {/* Container with Tailwind */}
       <div className="max-w-[1300px] mx-auto px-1.5 font-sans">
-        
-        {/* --- Header / Hero Section --- */}
         <header className="flex flex-col md:flex-row items-center gap-6 md:gap-12 mb-8 md:mb-12 bg-gray-50 rounded-lg md:rounded-xl p-4 md:p-12">
           <div className="flex-1 text-center md:text-left w-full">
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-3 md:mb-4 leading-tight">
@@ -209,7 +232,7 @@ export default async function BikesPage({ searchParams }: {
           </div>
         </header>
 
-        {/* --- Products Grid --- */}
+        {/* --- Products Grid (Original UI) --- */}
         <main className="mb-16">
           {products.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
@@ -228,7 +251,7 @@ export default async function BikesPage({ searchParams }: {
           </div>
         </main>
 
-        {/* --- Why Choose Us Section --- */}
+        {/* --- Why Choose Us Section (Original UI) --- */}
         <section className="flex flex-col md:flex-row items-center gap-8 md:gap-16 bg-white border border-gray-100 rounded-lg md:rounded-xl p-4 py-8 md:p-10 shadow-sm mb-12 md:mb-16">
           <div className="w-full md:w-1/2 flex justify-center">
             <Image
@@ -281,14 +304,55 @@ export default async function BikesPage({ searchParams }: {
           </div>
         </section>
 
-        {/* --- SEO Bottom Section --- */}
-        <section className="text-center bg-gray-50 rounded-xl p-8 md:p-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Your Journey to Adventure Starts Here
-          </h2>
-          <p className="text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed">
-            At GoBike, we believe in the power of outdoor play. Our electric bikes are the perfect tool to get your kids off screens and into the great outdoors, building confidence and coordination along the way. We are a proud Aussie brand, committed to providing the best quality and service.
-          </p>
+        {/* --- New SEO Content Block (Added for High Quality SEO) --- */}
+        {/* UI design matches existing sections (white bg, gray text) */}
+        <section className="text-left  bg-gray-50 rounded-xl p-3 md:p-5">
+            <div className="max-w-[1100px] mx-auto text-gray-700 leading-relaxed">
+                
+                 <h2 className="text-2xl text-center font-bold text-gray-900 mb-4">The Ultimate Guide to Kids Electric Bikes in Australia</h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10 ">
+                    <div>
+                        <h3 className="text-xl font-bold text-gray-800 mb-3">Why Choose an Electric Balance Bike?</h3>
+                        <p className="mb-4 text-base">
+                            Transitioning from a tricycle to a pedal bike can be daunting. That is where <strong>balancing bikes</strong> powered by electricity come in. They allow children to master the art of balance without the struggle of pedaling. At GoBike, our range of <strong>electric cycles Australia</strong> is designed to offer a seamless learning curve, making us the top choice for Aussie parents.
+                        </p>
+                        <p className="mb-4 text-base">
+                            Unlike a traditional bicycle, an <strong>electric childs motorbike</strong> gives kids the thrill of powered speed (safely governed) while teaching them throttle control and hand-eye coordination.
+                        </p>
+                    </div>
+                    <div>
+                        <h3 className="text-xl font-bold text-gray-800 mb-3">Safety Features You Can Trust</h3>
+                        <p className="mb-4 text-base">
+                            Safety is paramount when choosing a <strong>childrens electric dirt bike</strong>. All GoBike models feature speed limiters, meaning you can lock the bike to a safe &quot;Low Speed&quot; mode while your child learns. Our <strong>australian electric bikes</strong> are built with robust aluminium frames, hydraulic disc brakes (on larger models), and auto-cutoff power sensors.
+                        </p>
+                    </div>
+                </div>
+
+                <div className="mt-8 bg-gray-50 p-3 rounded-lg">
+                     <h3 className="text-xl font-bold text-gray-800 mb-3">Which Size is Right for Your Child?</h3>
+                     <ul className="list-disc pl-5 space-y-2">
+                        <li><strong>GoBike 12:</strong> Perfect for toddlers (Ages 2-5). Low seat height, lightweight, and the ideal <strong>balance bike electric</strong> starter.</li>
+                        <li><strong>GoBike 16:</strong> The best <strong>kids electric bike</strong> for ages 5-9. More power, suspension forks, and true dirt bike styling.</li>
+                        <li><strong>GoBike 20:</strong> For the serious young rider. Ideal for <strong>electric bikes for 10 year olds</strong> and up, capable of handling rougher off-road terrain.</li>
+                     </ul>
+                     <p className="mt-4 text-sm text-gray-600">
+                        Whether you are looking for an <strong>australia electric bike</strong> for your toddler or a powerful ride for your teen, GoBike has the perfect model to start their adventure.
+                     </p>
+                </div>
+            </div>
+        </section>
+
+        {/* --- SEO Bottom Section (Original UI) --- */}
+        <section className="text-left bg-gray-50 rounded-xl p-3 md:p-5">
+          <div className="max-w-[1100px] mx-auto text-gray-700 leading-relaxed">
+            <h2 className="text-center text-2xl font-bold text-gray-900 mb-4">
+              Your Journey to Adventure Starts Here
+            </h2>
+            <p className="text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed">
+              At GoBike, we believe in the power of outdoor play. Our electric bikes are the perfect tool to get your kids off screens and into the great outdoors, building confidence and coordination along the way. We are a proud Aussie brand, committed to providing the best quality and service.
+            </p>
+          </div>
           <div className="flex flex-wrap justify-center gap-4 md:gap-6 mt-8">
             <Link
               href="/spare-parts"
@@ -311,6 +375,7 @@ export default async function BikesPage({ searchParams }: {
               Find Answers (FAQ)
             </Link>
           </div>
+          
         </section>
       </div>
     </div>
