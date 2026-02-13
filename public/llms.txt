@@ -1,0 +1,26 @@
+# GoBike Australia
+
+> Australia's trusted online store for kids' electric balance bikes, spare parts, and safety gear. We promote outdoor fun and skill development for children.
+
+## Sitemaps
+- https://gobike.au/sitemap.xml
+
+## Main Shopping Categories
+- [Home](https://gobike.au/)
+- [Shop All Products](https://gobike.au/products)
+- [Electric Bikes](https://gobike.au/bikes)
+- [Spare Parts](https://gobike.au/spare-parts)
+- [Apparel](https://gobike.au/apparel)
+
+## Customer Support & Company Info
+- [About Us](https://gobike.au/about)
+- [Contact Us](https://gobike.au/contact)
+- [Frequently Asked Questions (FAQ)](https://gobike.au/faq)
+- [Track Your Order](https://gobike.au/track-order)
+- [Blog & News](https://gobike.au/blog)
+
+## Legal & Store Policies
+- [Shipping Policy](https://gobike.au/shipping-policy)
+- [Refund and Returns Policy](https://gobike.au/refund-and-returns-policy)
+- [Terms and Conditions](https://gobike.au/terms-and-conditions)
+- [Privacy Policy](https://gobike.au/privacy-policy)

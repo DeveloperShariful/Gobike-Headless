@@ -1,4 +1,5 @@
 // app/refund-and-returns-policy/page.tsx
+
 import Script from 'next/script';
 import Breadcrumbs from '../../components/Breadcrumbs';
 import type { Metadata } from 'next';

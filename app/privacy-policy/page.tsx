@@ -1,6 +1,5 @@
 // app/privacy-policy/page.tsx
 
-// import styles from './Privacy.module.css'; // CSS Module সরানো হয়েছে
 import Breadcrumbs from '../../components/Breadcrumbs';
 import type { Metadata } from 'next';
 import Link from 'next/link';

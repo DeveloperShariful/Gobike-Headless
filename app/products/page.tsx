@@ -45,16 +45,21 @@ interface QueryData {
   } | null;
 }
 
+// --- METADATA GENERATION (Fixed for SEO Audit) ---
 export async function generateMetadata({ searchParams }: { 
   searchParams: { [key: string]: string | string[] | undefined } 
 }): Promise<Metadata> {
   const resolvedSearchParams = await searchParams;
   const categorySlug = typeof resolvedSearchParams.category === 'string' ? resolvedSearchParams.category : undefined;
+  
+  // Check if we are on a paginated page (Page 2, 3, etc.)
   const isPaged = !!(resolvedSearchParams.after || resolvedSearchParams.before);
+  
   let title = "Shop All Products | GoBike Australia";
   let description = "Explore our curated selection of high-quality bikes, spare parts, and accessories. From electric childs motorbikes to balancing bikes, find it all at GoBike.";
   let canonicalUrl = '/products';
 
+  // Update Title/Desc based on Category
   if (categorySlug) {
     const categoryName = categorySlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     title = `Shop ${categoryName} | GoBike Australia`;
@@ -62,12 +67,17 @@ export async function generateMetadata({ searchParams }: {
     canonicalUrl = `/products?category=${categorySlug}`;
   }
 
+  // Update Title/Desc based on Pagination to avoid Duplicates
   if (isPaged) {
     title = `${title} - Page 2+`;
+    // FIX: Modifying description for paginated pages to satisfy SEO tools
+    description = `${description} Browse more items in our collection on page 2 and beyond.`;
   }
 
+  // Construct Canonical URL accurately
   if (typeof resolvedSearchParams.after === 'string') {
-     canonicalUrl += (categorySlug ? `&after=${resolvedSearchParams.after}` : `?after=${resolvedSearchParams.after}`);
+     const separator = categorySlug ? '&' : '?';
+     canonicalUrl += `${separator}after=${resolvedSearchParams.after}`;
   }
 
   return {
@@ -85,8 +95,10 @@ export async function generateMetadata({ searchParams }: {
     alternates: {
       canonical: canonicalUrl,
     },
+    // FIX: Using 'noindex' for paginated pages prevents "Duplicate Title" errors 
+    // in audits while still allowing bots to follow links to products.
     robots: {
-      index: true,
+      index: !isPaged, 
       follow: true,
     },
     openGraph: {
@@ -162,6 +174,7 @@ export default async function ProductsPage({ searchParams }: {
   const category = typeof resolvedSearchParams.category === 'string' ? resolvedSearchParams.category : null;
   const after = typeof resolvedSearchParams.after === 'string' ? resolvedSearchParams.after : null;
   const before = typeof resolvedSearchParams.before === 'string' ? resolvedSearchParams.before : null;
+  
   const { products, categories, pageInfo } = await getProductsAndCategories(
     category,
     before ? null : PRODUCTS_PER_PAGE,
@@ -171,6 +184,7 @@ export default async function ProductsPage({ searchParams }: {
   );
 
   const currentCategoryName = categories.find((c: Category) => c.slug === category)?.name || "All Products";
+  
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -209,7 +223,7 @@ export default async function ProductsPage({ searchParams }: {
       <Breadcrumbs pageTitle={currentCategoryName} />
       
       <div className="max-w-[1300px] mx-auto px-1.5 font-sans mb-12">
-        {/* Header (Original UI) */}
+        {/* Header */}
         <header className="text-center mb-12 bg-gray-50 rounded-lg p-8 md:p-12">
           <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">{currentCategoryName}</h1>
           <p className="text-gray-600 max-w-2xl mx-auto text-lg">Explore our curated selection of high-quality products. Find exactly what you are looking for.</p>
@@ -247,7 +261,7 @@ export default async function ProductsPage({ searchParams }: {
             </div>
         </section>
 
-        {/* Internal Links (Original UI) */}
+        {/* Internal Links */}
         <div className="flex justify-center gap-4 flex-wrap mt-12 pb-8 border-t border-gray-100 pt-8">
             <Link 
                 href="/contact" 

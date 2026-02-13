@@ -5,8 +5,6 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-// import styles from './FaqPage.module.css'; // CSS Module সরানো হয়েছে
-
 export const metadata: Metadata = {
   title: 'Frequently Asked Questions (FAQ) | GoBike Australia',
   description: 'Find answers to common questions about our kids electric bikes, shipping, warranty, safety, and more. Get all the information you need before you buy.',

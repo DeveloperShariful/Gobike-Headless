@@ -1,18 +1,27 @@
 //// app/shipping-policy/page.tsx
+
 import Script from 'next/script';
-import Breadcrumbs from '../../components/Breadcrumbs'; 
+import Breadcrumbs from '../../components/Breadcrumbs';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+// --- Enterprise SEO Metadata ---
 export const metadata: Metadata = {
-  title: 'Shipping Policy | GoBike Australia',
-  description: 'Information on shipping rates, delivery times, and handling for GoBike Australia orders. We use trusted couriers like Transdirect.',
+  title: 'Shipping Policy | Fast Delivery Kids Electric Bikes Australia',
+  description: "We ship Australia-wide! Fast, reliable delivery for childrens electric bikes, balance bikes, and spare parts via Transdirect. Check delivery times for NSW, VIC, QLD & more.",
+  keywords: [
+    'kids electric bike shipping', 
+    'australia electric bike delivery', 
+    'shipping childrens electric motorbikes', 
+    'GoBike shipping policy',
+    'electric cycles australia delivery'
+  ],
   alternates: {
     canonical: '/shipping-policy',
   },
   openGraph: {
-    title: 'Shipping Policy | GoBike Australia',
-    description: 'Fast and reliable shipping across Australia using Transdirect couriers.',
+    title: 'Shipping Policy | Fast Delivery Kids Electric Bikes Australia',
+    description: 'Fast and safe shipping for all kids electric bikes and parts across Australia.',
     url: 'https://gobike.au/shipping-policy',
     siteName: 'GoBike Australia',
     locale: 'en_AU',
@@ -20,7 +29,7 @@ export const metadata: Metadata = {
   },
 };
 
-// SEO Schema for Shipping
+// --- Structured Data (Schema) ---
 const shippingSchema = {
   "@context": "https://schema.org",
   "@type": "ShippingDeliveryTime",
@@ -36,7 +45,7 @@ const shippingSchema = {
     "maxValue": 7,
     "unitCode": "d"
   },
-  "cutOffTime": "14:00:00-05:00",
+  "cutOffTime": "14:00:00+10:00", // Sydney Time
   "operatingHours": {
     "@type": "OpeningHoursSpecification",
     "dayOfWeek": [
@@ -67,14 +76,14 @@ export default function ShippingPolicyPage() {
           <div className="text-center mb-10">
             <h1 className="text-[32px] font-bold text-[#1a1a1a] mb-[15px]">Shipping & Delivery Policy</h1>
             <p className="text-center text-[18px] text-[#555] max-w-[700px] mx-auto mb-[30px]">
-              We are committed to delivering your ebike kits and accessories quickly and safely across Australia using our trusted partner, Transdirect.
+              We are committed to delivering your **kids electric bike**, spare parts, and accessories quickly and safely across Australia using our trusted partner, Transdirect.
             </p>
           </div>
 
           {/* Section 1: Processing Time */}
           <div className="mb-10">
             <h2 className="text-[24px] font-semibold text-[#1a1a1a] mb-5 pb-[10px] border-b-2 border-[#f0f0f0]">Order Processing & Handling</h2>
-            <p className="text-base mb-[15px]">All orders are processed within <strong className="font-semibold text-[#1a1a1a]">1-2 business days</strong> (excluding weekends and holidays) after receiving your order confirmation email.</p>
+            <p className="text-base mb-[15px]">All orders, including **childrens electric motorbikes** and parts, are processed within <strong className="font-semibold text-[#1a1a1a]">1-2 business days</strong> (excluding weekends and holidays) after receiving your order confirmation email.</p>
             
             <div className="bg-[#f8f9fa] border-l-4 border-[#007bff] p-5 rounded-r-lg my-5">
               <p className="text-base mb-0"><strong className="font-semibold text-[#1a1a1a]">Note:</strong> You will receive another notification when your order has shipped, including your tracking number.</p>
@@ -84,7 +93,7 @@ export default function ShippingPolicyPage() {
           {/* Section 2: Delivery Estimates */}
           <div className="mb-10">
             <h2 className="text-[24px] font-semibold text-[#1a1a1a] mb-5 pb-[10px] border-b-2 border-[#f0f0f0]">Domestic Shipping Estimates (Australia)</h2>
-            <p className="text-base mb-[15px]">We use <strong className="font-semibold text-[#1a1a1a]">Transdirect</strong> to find the fastest and most affordable courier services (like CouriersPlease, Aramex, TNT) for your location.</p>
+            <p className="text-base mb-[15px]">We use <strong className="font-semibold text-[#1a1a1a]">Transdirect</strong> to find the fastest and most affordable courier services for your **australia electric bike** order.</p>
             
             <ul className="list-none pl-0 mb-[15px]">
               <li className="relative pl-[30px] mb-[10px] text-base before:content-['✓'] before:text-[#28a745] before:font-bold before:absolute before:left-0 before:top-[1px]">
@@ -99,10 +108,10 @@ export default function ShippingPolicyPage() {
           {/* Section 3: Batteries Shipping */}
           <div className="mb-10">
             <h2 className="text-[24px] font-semibold text-[#1a1a1a] mb-5 pb-[10px] border-b-2 border-[#f0f0f0]">Shipping E-Bike Batteries</h2>
-            <p className="text-base mb-[15px]">Please note that E-Bike batteries are classified as <strong className="font-semibold text-[#1a1a1a]">Dangerous Goods (DG)</strong>. Because of this:</p>
+            <p className="text-base mb-[15px]">Please note that batteries for **electric cycles Australia** are classified as <strong className="font-semibold text-[#1a1a1a]">Dangerous Goods (DG)</strong>. Because of this:</p>
             <ul className="list-disc pl-[20px] text-base mb-[15px]">
                <li className="mb-[10px]">They cannot be shipped via Express Air services.</li>
-               <li className="mb-[10px]">They are strictly road freight only.</li>
+               <li className="mb-[10px]">They are strictly road freight only to ensure safety.</li>
                <li className="mb-[10px]">Shipping to PO Boxes or Parcel Lockers is generally <strong>not available</strong> for batteries. Please provide a physical street address.</li>
             </ul>
           </div>
@@ -111,12 +120,13 @@ export default function ShippingPolicyPage() {
           <div className="mb-10 bg-[#f8f9fa] p-[30px] rounded-xl">
              <h2 className="text-[24px] font-semibold text-[#1a1a1a] mb-5 pb-[10px] border-b-2 border-[#f0f0f0]">How do I check the status of my order?</h2>
              <p className="text-base mb-[15px]">
-               When your order has shipped, you will receive an email notification from us which will include a tracking number. 
+               When your **balancing bikes** or accessories have shipped, you will receive an email notification from us which will include a tracking number. 
              </p>
              <p className="text-base">
                You can track your order directly on our <Link href="/track-order" className="text-[#007bff] font-semibold underline">Tracking Page</Link> or via the courier's website.
              </p>
           </div>
+          
           {/* Section 5: Helpful Links & Resources */}
           <div className="mb-10 bg-[#f8f9fa] p-[30px] rounded-xl border border-[#e9e9e9]">
              <h2 className="text-[24px] font-semibold text-[#1a1a1a] mb-5 pb-[10px] border-b-2 border-[#f0f0f0]">

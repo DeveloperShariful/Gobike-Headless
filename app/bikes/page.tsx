@@ -41,7 +41,7 @@ export async function generateMetadata({ searchParams }: {
 }): Promise<Metadata> {
   const resolvedSearchParams = await searchParams;
   const isPaged = !!(resolvedSearchParams.after || resolvedSearchParams.before);
-  const title = isPaged ? "Shop Kids Electric Bikes | Page 2+ | GoBike Australia" : "Shop All Kids Top Rated Electric Bikes | Electric Cycles Australia";
+  const title = isPaged ? "Shop Kids Electric Bikes | Page 2+ | GoBike Australia" : "All Kids Top Rated Electric Bikes | Electric Cycles Australia";
   const description = "Browse our full collection of top-rated electric balance bikes for kids. From balancing bikes to childrens electric motorbikes. Safe, durable, and built for adventure.";
   let canonicalUrl = '/bikes';
   if (typeof resolvedSearchParams.after === 'string') {

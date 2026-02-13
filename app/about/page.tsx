@@ -1,6 +1,6 @@
 // app/about/page.tsx
+
 import Link from 'next/link';
-// import styles from './AboutPage.module.css'; // CSS Module সরানো হয়েছে
 import Breadcrumbs from '../../components/Breadcrumbs';
 import Image from 'next/image';
 import type { Metadata } from 'next';

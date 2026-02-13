@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   
   title: {
     default: 'GoBike - Kids Electric Bikes Australia | Top Rated Balance Bikes',
-    template: '%s | GoBike Australia',
+    template: '%s ',
   },
   description: "Australia's #1 rated electric balance bikes for kids (ages 2-16). Engineered for safety, built for fun. Shop 12\", 16\", 20\" & 24\" e-bikes with 1-year warranty.",
   
