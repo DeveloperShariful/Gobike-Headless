@@ -15,13 +15,8 @@ export default function NotFound() {
   useEffect(() => {
     if (pathname) {
       const match = findClosestMatch(pathname);
-      
-      // যদি ম্যাচ পাওয়া যায় এবং সেটি বর্তমান পেজ না হয়
       if (match && match !== pathname) {
         setIsRedirecting(true);
-        
-        // ১ সেকেন্ডের একটি ছোট বিরতি দেওয়া হয়েছে যাতে ইউজার বুঝতে পারে রিডাইরেক্ট হচ্ছে
-        // আপনি চাইলে ০ মিলি-সেকেন্ডও করে দিতে পারেন
         const timer = setTimeout(() => {
           router.replace(match);
         }, 800); 
@@ -34,7 +29,6 @@ export default function NotFound() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[75vh] text-center px-4 font-sans bg-white">
       {isRedirecting ? (
-        // রিডাইরেক্ট হওয়ার সময় এই সুন্দর লোডিং মেসেজটি দেখাবে
         <div className="animate-in fade-in duration-500">
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
           <h2 className="text-2xl font-bold text-gray-800 uppercase tracking-wider">
@@ -43,7 +37,6 @@ export default function NotFound() {
           <p className="text-gray-500 mt-2">Please wait a moment.</p>
         </div>
       ) : (
-        // যদি কোনো ম্যাচ না পাওয়া যায় তবেই কেবল এই অংশটি দেখাবে
         <div className="animate-in fade-in zoom-in duration-500">
           <h1 className="text-9xl font-extrabold text-gray-50 tracking-tighter">404</h1>
           <h2 className="text-3xl font-black mt-[-40px] mb-6 text-gray-900">

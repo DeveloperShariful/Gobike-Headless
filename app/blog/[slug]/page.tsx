@@ -34,8 +34,8 @@ function getRelatedPosts(currentSlug: string) {
             const { data: frontmatter } = matter(markdownWithMeta);
             return { slug, frontmatter };
         })
-        .filter(post => post.slug !== currentSlug) // বর্তমান পোস্ট বাদ দিয়ে
-        .slice(0, 3); // সর্বোচ্চ ৩টি রিলেটেড পোস্ট
+        .filter(post => post.slug !== currentSlug) 
+        .slice(0, 3); 
 
     return posts;
 } 

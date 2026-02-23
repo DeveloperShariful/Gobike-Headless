@@ -138,12 +138,12 @@ export default async function RootLayout({
       telephone: '+61-426-067-277',
       contactType: 'customer service',
       areaServed: 'AU',
-      availableLanguage: 'en'
+      availableLanguage: 'en-AU'
     }
   };
 
   return (
-    <html lang="en">
+    <html lang="en-AU">
       <head>
         <script
           type="application/ld+json"
