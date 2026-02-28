@@ -1,19 +1,17 @@
-// app/api/create-payment-intent/route.ts
+// File: app/api/create-payment-intent/route.ts
 
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-// আপনার Stripe ভার্সন এবং ইনিশিয়ালাইজেশন অপরিবর্তিত থাকবে
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-01-27.acacia" as any, 
-      typescript: true, // অনুগ্রহ করে একটি স্থিতিশীল API ভার্সন ব্যবহার করুন
+  typescript: true,
 });
 
 export async function POST(request: Request) {
   try {
-    
-    // ★★★ পরিবর্তন ১: metadata কেও রিকোয়েস্ট বডি থেকে গ্রহণ করুন ★★★
-    const { amount, payment_method_types, metadata, orderId  } = await request.json();
+    // আমরা বডি থেকে cartItems, customerInfo, shippingInfo রিসিভ করব (যদি পাঠানো হয়)
+    const { amount, payment_method_types, metadata: incomingMetadata, orderId, cartItems, customerInfo, shippingInfo } = await request.json();
 
     if (!amount || amount < 1) {
       return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
@@ -30,12 +28,40 @@ export async function POST(request: Request) {
       intentOptions.automatic_payment_methods = { enabled: true };
     }
     
-    // ★★★ পরিবর্তন ২: যদি metadata থাকে, তাহলে সেটিকে intentOptions এ যোগ করুন ★★★
-    if (metadata) {
-      intentOptions.metadata = metadata;
-    }
+    // ★★★ মেটাডেটা প্রসেসিং লজিক (update-payment-intent এর মতো) ★★★
+    const metadata: Record<string, string> = { ...incomingMetadata };
+
     if (orderId) {
       intentOptions.description = `Order #${orderId} for GOBIKE`;
+      metadata.order_id = orderId.toString();
+    }
+
+    // কাস্টমার ইনফো সেভ (JSON স্ট্রিং হিসেবে)
+    if (customerInfo) {
+        metadata.customer_email = customerInfo.email || '';
+        metadata.customer_name = `${customerInfo.firstName || ''} ${customerInfo.lastName || ''}`.trim();
+        metadata.billing_json = JSON.stringify(customerInfo).substring(0, 499); 
+    }
+
+    // শিপিং ইনফো সেভ
+    if (shippingInfo) {
+        metadata.shipping_json = JSON.stringify(shippingInfo).substring(0, 499);
+    }
+
+    // কার্ট আইটেম সেভ
+    if (cartItems && Array.isArray(cartItems)) {
+        const simplifiedCart = cartItems.map((item: any) => ({
+            product_id: item.databaseId || item.id,
+            quantity: item.quantity,
+            variation_id: item.variationId || 0,
+            price: item.price
+        }));
+        metadata.cart_items_json = JSON.stringify(simplifiedCart).substring(0, 499);
+    }
+
+    // ফাইনাল মেটাডেটা যোগ করা
+    if (Object.keys(metadata).length > 0) {
+      intentOptions.metadata = metadata;
     }
 
     const paymentIntent = await stripe.paymentIntents.create(intentOptions);

@@ -1,4 +1,4 @@
-//app/checkout/components/StripePaymentGateway.tsx
+// File: app/checkout/components/StripePaymentGateway.tsx
 
 import React, { useState, forwardRef, useEffect } from 'react';
 import Image from 'next/image';
@@ -39,10 +39,13 @@ interface StripePaymentGatewayProps {
   }) => Promise<{ orderId: number, orderKey: string } | void | null>;
   customerInfo: CustomerInfo;
   total: number;
+  // ★★★ Added: মেটাডেটা সিঙ্ক করার জন্য কার্ট এবং শিপিং ইনফো প্রয়োজন ★★★
+  cartItems: any[];
+  shippingInfo?: CustomerInfo;
 }
 
 const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { clientSecret?: string }>(
-  ({ selectedPaymentMethod, onPlaceOrder, customerInfo, total, clientSecret }, ref) => {
+  ({ selectedPaymentMethod, onPlaceOrder, customerInfo, shippingInfo, cartItems, total, clientSecret }, ref) => {
     const stripe = useStripe();
     const elements = useElements();
     const [isProcessing, setIsProcessing] = useState(false);
@@ -68,6 +71,31 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
           }
       };
 
+      // ★★★ ১. মেটাডেটা সিঙ্ক লজিক (কার্ড পেমেন্টের জন্য) ★★★
+      // পেমেন্ট কনফার্ম করার ঠিক আগে আমরা স্ট্রাইপের মেটাডেটা আপডেট করব।
+      if (selectedPaymentMethod === 'stripe' && clientSecret) {
+         try {
+             const paymentIntentId = clientSecret.split('_secret_')[0];
+             
+             // এই কলটি ব্যাকগ্রাউন্ডে স্ট্রাইপের কাছে কার্ট এবং কাস্টমার ডেটা সেভ করে আসবে
+             // যাতে ফ্রন্টএন্ড ফেইল করলে Webhook অর্ডার বানাতে পারে
+             await fetch('/api/update-payment-intent', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    paymentIntentId: paymentIntentId,
+                    amount: total,
+                    customerInfo: customerInfo, // বিলিং
+                    shippingInfo: shippingInfo || customerInfo, // শিপিং (না থাকলে বিলিং যাবে)
+                    cartItems: cartItems, // কার্ট আইটেম
+                }),
+            });
+         } catch (err) {
+             console.error("Failed to sync metadata with Stripe:", err);
+             // মেটাডেটা ফেইল করলেও আমরা পেমেন্ট আটকাবো না
+         }
+      }
+
       const isStandaloneRedirect = selectedPaymentMethod === 'stripe_klarna' || selectedPaymentMethod === 'stripe_afterpay_clearpay';
       const isRedirectFromElement = selectedPaymentMethod === 'stripe' && (internalStripeMethod === 'klarna' || internalStripeMethod === 'afterpay_clearpay');
       const isRedirectFlow = isStandaloneRedirect || isRedirectFromElement;
@@ -92,7 +120,10 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
               amount: Math.round(total * 100),
               payment_method_types: [paymentMethodType],
               metadata: { order_id: orderDetails.orderId },
-              orderId: orderDetails.orderId
+              orderId: orderDetails.orderId,
+              customerInfo: customerInfo, 
+              shippingInfo: shippingInfo, 
+              cartItems: cartItems,
             }),
           });
           const { clientSecret: redirectClientSecret, error: piError } = await res.json();
@@ -192,6 +223,7 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
         }
         
         else {
+            // ★★★ ২. পেমেন্ট কনফার্মেশন (মেটাডেটা সিঙ্ক হওয়ার পর) ★★★
             const { error, paymentIntent } = await stripe.confirmPayment({
               elements,
               clientSecret,

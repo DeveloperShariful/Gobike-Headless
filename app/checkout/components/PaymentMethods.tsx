@@ -1,4 +1,4 @@
-// app/checkout/components/paymentMethod.tsx
+// app/checkout/components/PaymentMethods.tsx
 
 'use client';
 import Image from 'next/image';
@@ -47,10 +47,12 @@ interface PaymentMethodsProps {
     paymentMethodId?: string; 
   }) => Promise<{ orderId: number; orderKey: string } | void | null>;
   isPlacingOrder: boolean;
-  // ★★★ পরিবর্তন: isShippingSelected prop-টি এখানে যোগ করা হয়েছে ★★★
   isShippingSelected: boolean;
   total: number;
   customerInfo: CustomerInfo;
+  // ★★★ নতুন প্রপস: মেটাডেটা সিঙ্ক করার জন্য ★★★
+  cartItems: any[];
+  shippingInfo?: CustomerInfo;
 }
 
 export default function PaymentMethods(props: PaymentMethodsProps) {
@@ -62,7 +64,10 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
     onPlaceOrder, 
     isPlacingOrder, 
     isShippingSelected,
-    customerInfo 
+    customerInfo,
+    // ★★★ নতুন প্রপস ডিস্ট্রাকচার করা হলো ★★★
+    cartItems,
+    shippingInfo
   } = props;
 
   const stripeFormRef = useRef<HTMLFormElement>(null);
@@ -119,7 +124,6 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
   return (
     <PayPalScriptProvider options={initialOptions}>
       <div className="w-full flex flex-col gap-2.5">
-      {/* ★★★ পরিবর্তন: isShippingSelected prop-টি ExpressCheckouts-এ পাস করা হয়েছে ★★★ */}
       <div className="w-full">
         <ExpressCheckouts total={total} onOrderPlace={onPlaceOrder } isShippingSelected={isShippingSelected} />
       </div>
@@ -141,7 +145,16 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
             </div>
             {selectedPaymentMethod === gateway.id && gateway.id.includes('stripe') && (
               <div className="p-[10px_5px_5px_5px] bg-[#f9f9f9] border-t border-[#e0e0e0]">
-                <StripePaymentGateway ref={stripeFormRef} selectedPaymentMethod={selectedPaymentMethod} onPlaceOrder={onPlaceOrder} customerInfo={customerInfo} total={total} />
+                {/* ★★★ এখানে আমরা নতুন প্রপস পাস করছি ★★★ */}
+                <StripePaymentGateway 
+                    ref={stripeFormRef} 
+                    selectedPaymentMethod={selectedPaymentMethod} 
+                    onPlaceOrder={onPlaceOrder} 
+                    customerInfo={customerInfo} 
+                    total={total}
+                    cartItems={cartItems}
+                    shippingInfo={shippingInfo}
+                />
               </div>
             )}
             {selectedPaymentMethod === gateway.id && !gateway.id.includes('stripe') && gateway.description && (

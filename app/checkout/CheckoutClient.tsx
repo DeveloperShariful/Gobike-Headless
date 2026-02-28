@@ -554,6 +554,8 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
           total={total} 
           isShippingSelected={isShippingSelected} 
           customerInfo={customerInfoRef.current}
+          cartItems={cartItems}
+          shippingInfo={shipToDifferentAddress ? shippingInfoRef.current : customerInfoRef.current}
         />
       </div>
     </div>

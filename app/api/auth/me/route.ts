@@ -20,9 +20,8 @@ export async function GET(request: NextRequest) {
   const cookieStore = await cookies();
   const secretKey = cookieStore.get(AUTH_COOKIE_NAME)?.value;
 
-  // ১. লগ: কুকি পাওয়া গেছে কি না?
   if (!secretKey) {
-    console.error('❌ [API/ME] 401 Error: No Secret Key found in cookies.');
+    //console.error('❌ [API/ME] 401 Error: No Secret Key found in cookies.');
     return NextResponse.json({ loggedIn: false }, { status: 401 });
   }
 
@@ -40,12 +39,11 @@ export async function GET(request: NextRequest) {
         query: GET_VIEWER_QUERY,
         variables: { key: secretKey },
       }),
-      cache: 'no-store', // হার্ড রিফ্রেশের জন্য ক্যাশ অফ রাখা জরুরি
+      cache: 'no-store', 
     });
 
     const data = await response.json();
     
-    // ২. লগ: ওয়ার্ডপ্রেস কী রেসপন্স দিল?
     if (data.errors) {
         console.error('❌ [API/ME] GraphQL Error:', data.errors[0].message);
     }
@@ -53,7 +51,6 @@ export async function GET(request: NextRequest) {
     const user = data?.data?.viewerByKey;
 
     if (user) {
-      // ✅ সফল লগইন
       return NextResponse.json({ 
         loggedIn: true, 
         user: { 
