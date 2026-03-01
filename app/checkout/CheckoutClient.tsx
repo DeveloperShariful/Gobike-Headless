@@ -10,14 +10,12 @@ import { useRouter } from 'next/navigation';
 import { gql } from '@apollo/client';
 import client from '../../lib/apolloClient';
 import toast from 'react-hot-toast';
-import Cookies from 'js-cookie'; // ★★★ 1. Added: Affiliate ID রিড করার জন্য ইম্পোর্ট
-// CSS Module import removed: import styles from './CheckoutClient.module.css';
+import Cookies from 'js-cookie'; 
 import OrderNotes from './components/OrderNotes';
 import ShippingForm from './components/ShippingForm';
 import OrderSummary from './components/OrderSummary';
 import PaymentMethods from './components/PaymentMethods';
 
-// --- Interfaces, GraphQL Queries, Reducer ---
 interface GraphQLError {
   message: string;
   [key: string]: unknown;
@@ -167,24 +165,16 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
 
   const refetchCartData = useCallback(async () => { dispatch({ type: 'SET_LOADING', key: 'cart', payload: true }); try { const { data } = await client.query<{ cart: CartData }>({ query: GET_CHECKOUT_DATA, fetchPolicy: 'network-only' }); if (data?.cart) { dispatch({ type: 'SET_CHECKOUT_DATA', payload: { cart: data.cart } }); } } catch (err) {console.error("Error updating customer address:", err); toast.error('Could not refresh cart data.'); } finally { dispatch({ type: 'SET_LOADING', key: 'cart', payload: false }); } }, []);
   useEffect(() => { if (!isCartContextLoading && cartItems.length === 0 && !orderPlacementInProgress) router.push('/cart'); else refetchCartData(); }, [isCartContextLoading, cartItems.length, router, refetchCartData, orderPlacementInProgress]);
-  const handleAddressChange = useCallback(async (address: Partial<ShippingFormData>) => {
-    // ১. লোকাল স্টেট আপডেট
-    dispatch({ type: 'SET_CUSTOMER_INFO', payload: address });
+  const handleAddressChange = useCallback(async (address: Partial<ShippingFormData>) => { dispatch({ type: 'SET_CUSTOMER_INFO', payload: address });
     
     if (!addressInputStarted) { 
         dispatch({ type: 'SET_ADDRESS_INPUT_STARTED', payload: true });
     }
 
-    // ২. বর্তমান বিলিং এবং শিপিং ডেটা প্রস্তুত করা
     const updatedBilling = { ...customerInfoRef.current, ...address };
-    
-    // লজিক: যদি 'shipToDifferentAddress' সত্য হয়, তবে শিপিং ডেটা আগেরটাই থাকবে (Shipping Form থেকে)।
-    // আর যদি মিথ্যা হয়, তবে বিলিং ডেটাই শিপিং ডেটা হিসেবে যাবে।
     const updatedShipping = shipToDifferentAddress 
         ? shippingInfoRef.current 
         : updatedBilling;
-
-    // ৩. সার্ভারে ডেটা পাঠানো (যদি প্রয়োজনীয় তথ্য থাকে)
     if (updatedBilling.city && updatedBilling.postcode && updatedBilling.state) { 
         dispatch({ type: 'SET_LOADING', key: 'shipping', payload: true }); 
         try { 
@@ -209,16 +199,11 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
   const handleApplyCoupon = async (couponCode: string) => { if (cartData?.appliedCoupons && cartData.appliedCoupons.length > 0) { toast.error("Only one coupon can be applied per order."); return; } dispatch({ type: 'SET_LOADING', key: 'applyingCoupon', payload: true }); toast.loading('Applying coupon...'); try { await client.mutate({ mutation: APPLY_COUPON_MUTATION, variables: { input: { code: couponCode } } }); await refetchCartData(); toast.dismiss(); toast.success('Coupon applied!'); } catch (error) { toast.dismiss(); toast.error(getErrorMessage(error)); } finally { dispatch({ type: 'SET_LOADING', key: 'applyingCoupon', payload: false }); } };
   const handleRemoveCoupon = async (couponCode: string) => { if (loading.removingCoupon) return; dispatch({ type: 'SET_LOADING', key: 'removingCoupon', payload: true }); toast.loading('Removing coupon...'); try { await client.mutate({ mutation: REMOVE_COUPON_MUTATION, variables: { input: { codes: [couponCode] } } }); await refetchCartData(); toast.dismiss(); toast.success('Coupon removed.'); } catch (error) { toast.dismiss(); toast.error(getErrorMessage(error)); } finally { dispatch({ type: 'SET_LOADING', key: 'removingCoupon', payload: false }); } };
   const handleShippingSelect = (rateId: string) => {  dispatch({ type: 'SET_SELECTED_SHIPPING', payload: rateId }); const selectedRate = shippingRates.find(rate => rate.id === rateId); if (cartData && selectedRate) { const subtotal = parseFloat(cartData.subtotal.replace(/[^0-9.]/g, '')) || 0; const discount = parseFloat(cartData.discountTotal.replace(/[^0-9.]/g, '')) || 0; const shippingCost = parseFloat(selectedRate.cost) || 0; const newTotal = (subtotal - discount) + shippingCost; dispatch({ type: 'UPDATE_TOTALS', payload: { shippingTotal: `$${shippingCost.toFixed(2)}`, total: `$${newTotal.toFixed(2)}` } }); } client.mutate({ mutation: UPDATE_SHIPPING_METHOD_MUTATION, variables: { input: { shippingMethods: [rateId] } }, }).catch(err => { console.error("Failed to sync shipping method with server:", err); toast.error("Could not save shipping preference."); }); };
-  
-  const handleShippingAddressChange = useCallback(async (address: Partial<ShippingFormData>) => {
-    // ১. লোকাল স্টেট আপডেট
-    dispatch({ type: 'SET_SHIPPING_INFO', payload: address });
+  const handleShippingAddressChange = useCallback(async (address: Partial<ShippingFormData>) => { dispatch({ type: 'SET_SHIPPING_INFO', payload: address });
 
-    // ২. আপডেটেড শিপিং এবং বর্তমান বিলিং ডেটা নেওয়া
     const updatedShipping = { ...shippingInfoRef.current, ...address };
     const currentBilling = customerInfoRef.current;
 
-    // ৩. সার্ভারে আপডেট পাঠানো (শুধুমাত্র যদি প্রয়োজনীয় ফিল্ড থাকে)
     if (updatedShipping.city && updatedShipping.postcode && updatedShipping.state) {
         dispatch({ type: 'SET_LOADING', key: 'shipping', payload: true });
         try {
@@ -226,12 +211,12 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
                 mutation: UPDATE_CUSTOMER_MUTATION,
                 variables: {
                     input: {
-                        billing: currentBilling, // বিলিং অপরিবর্তিত থাকবে
-                        shipping: updatedShipping // নতুন শিপিং এড্রেস যাবে
+                        billing: currentBilling, 
+                        shipping: updatedShipping 
                     }
                 }
             });
-            await refetchCartData(); // নতুন শিপিং কস্ট নিয়ে আসবে
+            await refetchCartData(); 
         } catch (err) {
             console.error("Error updating shipping address:", err);
             toast.error('Could not update shipping cost.');
@@ -243,12 +228,7 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
 
   const handleToggleShipToDifferent = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const isChecked = e.target.checked;
-    
-    // ১. স্টেট আপডেট
     dispatch({ type: 'SET_SHIP_TO_DIFFERENT_ADDRESS', payload: isChecked });
-
-    // ২. যদি ইউজার চেকবক্সটি **তুলে দেয় (Uncheck)**, তবে শিপিং এড্রেস আবার বিলিং এড্রেস হয়ে যাবে।
-    // তাই সার্ভারকে জানাতে হবে।
     if (!isChecked) {
         const billing = customerInfoRef.current;
         
@@ -260,7 +240,7 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
                     variables: {
                         input: {
                             billing: billing,
-                            shipping: billing // শিপিং = বিলিং
+                            shipping: billing 
                         }
                     }
                 });
@@ -274,7 +254,6 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
     }
   };
 
-  // ★★★ পরিবর্তন: paymentData অবজেক্টে paymentMethodId যোগ করা হয়েছে ★★★
   const handlePlaceOrder = async (paymentData?: { 
     transaction_id?: string; 
     shippingAddress?: Partial<ShippingFormData>; 
@@ -302,12 +281,8 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
 
     const isStandaloneRedirect = selectedPaymentMethod === 'stripe_klarna' || selectedPaymentMethod === 'stripe_afterpay_clearpay';
     const isEmbeddedRedirect = paymentData?.is_embedded_redirect === true;
-
-    // ★★★ 2. Added: কুকি থেকে এফিলিয়েট আইডি নেওয়া ★★★
     const affiliateId = Cookies.get('solid_affiliate_id');
     const visitId = Cookies.get('solid_affiliate_visit_id');
-
-    // মেটা ডেটা অ্যারে প্রস্তুত করা
     const affiliateMetaData = [];
     if (affiliateId) {
         affiliateMetaData.push({ key: 'solid_affiliate_id', value: affiliateId });
@@ -369,8 +344,6 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
               }],
               coupon_lines: cartData.appliedCoupons?.map(coupon => ({ code: coupon.code })) || [],
               customer_note: orderNotes,
-              
-              // ★★★ 3. Added: REST API অর্ডারের সাথে এফিলিয়েট আইডি মেটা ডেটা হিসেবে পাঠানো ★★★
               meta_data: affiliateMetaData
             };
 
@@ -417,8 +390,6 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
           : customerInfoRef.current;
         
         const shippingDetails = shipToDifferentAddress ? shippingInfoRef.current : billingDetails;
-    
-        // ★★★ পরিবর্তন: এখানে শর্তসাপেক্ষ লজিক ব্যবহার করে সঠিক paymentMethod নির্ধারণ করা হচ্ছে ★★★
         const mutationInput = {
           clientMutationId: `checkout-${Date.now()}`,
           billing: billingDetails,
@@ -428,8 +399,6 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
           customerNote: orderNotes,
           transactionId: paymentData?.transaction_id || '',
           isPaid: !!paymentData?.transaction_id,
-
-          // ★★★ 4. Added: GraphQL অর্ডারের সাথে এফিলিয়েট আইডি মেটা ডেটা হিসেবে পাঠানো ★★★
           metaData: affiliateMetaData
         };
     
@@ -461,7 +430,6 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
                     variables: { id: result.order.id }
                   });
               
-              // ★★★ পরিবর্তন: এখানে Optional Chaining (`?.`) ব্যবহার করা হয়েছে ★★★
               const paymentIntentId = mutationInput.transactionId.startsWith('pi_')
                 ? mutationInput.transactionId
                 : queryResponse?.data?.order?.transactionId;
@@ -556,6 +524,8 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
           customerInfo={customerInfoRef.current}
           cartItems={cartItems}
           shippingInfo={shipToDifferentAddress ? shippingInfoRef.current : customerInfoRef.current}
+          selectedShipping={selectedShipping}
+          shippingRates={shippingRates}
         />
       </div>
     </div>

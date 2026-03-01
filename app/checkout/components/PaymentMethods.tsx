@@ -9,13 +9,12 @@ import StripePaymentGateway from './StripePaymentGateway';
 import PayPalMessage from './PayPalMessage';
 import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 
-
-// --- TypeScript Interfaces ---
 interface PaymentGateway {
   id: string;
   title: string;
   description: string;
 }
+
 interface CustomerInfo {
   firstName?: string;
   lastName?: string;
@@ -26,6 +25,7 @@ interface CustomerInfo {
   state?: string;
   postcode?: string;
 }
+
 export interface ShippingFormData {
   firstName: string;
   lastName: string;
@@ -36,6 +36,13 @@ export interface ShippingFormData {
   email: string;
   phone: string;
 }
+
+interface ShippingRate {
+  id: string;
+  label: string;
+  cost: string;
+}
+
 interface PaymentMethodsProps {
   gateways: PaymentGateway[];
   selectedPaymentMethod: string;
@@ -50,9 +57,10 @@ interface PaymentMethodsProps {
   isShippingSelected: boolean;
   total: number;
   customerInfo: CustomerInfo;
-  // ★★★ নতুন প্রপস: মেটাডেটা সিঙ্ক করার জন্য ★★★
   cartItems: any[];
   shippingInfo?: CustomerInfo;
+  selectedShipping: string;
+  shippingRates: ShippingRate[];
 }
 
 export default function PaymentMethods(props: PaymentMethodsProps) {
@@ -65,9 +73,10 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
     isPlacingOrder, 
     isShippingSelected,
     customerInfo,
-    // ★★★ নতুন প্রপস ডিস্ট্রাকচার করা হলো ★★★
     cartItems,
-    shippingInfo
+    shippingInfo,
+    selectedShipping,
+    shippingRates
   } = props;
 
   const stripeFormRef = useRef<HTMLFormElement>(null);
@@ -102,6 +111,7 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
     }
     return null;
   };
+
   const handlePlaceOrderClick = () => {
     if (selectedPaymentMethod.includes('stripe') && stripeFormRef.current) {
       stripeFormRef.current.requestSubmit();
@@ -125,7 +135,15 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
     <PayPalScriptProvider options={initialOptions}>
       <div className="w-full flex flex-col gap-2.5">
       <div className="w-full">
-        <ExpressCheckouts total={total} onOrderPlace={onPlaceOrder } isShippingSelected={isShippingSelected} />
+        <ExpressCheckouts 
+            total={total} 
+            onOrderPlace={onPlaceOrder} 
+            isShippingSelected={isShippingSelected}
+            cartItems={cartItems}
+            customerInfo={customerInfo}
+            selectedShipping={selectedShipping}
+            shippingRates={shippingRates}
+        />
       </div>
       
       <PayPalMessage total={total} />
@@ -145,7 +163,6 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
             </div>
             {selectedPaymentMethod === gateway.id && gateway.id.includes('stripe') && (
               <div className="p-[10px_5px_5px_5px] bg-[#f9f9f9] border-t border-[#e0e0e0]">
-                {/* ★★★ এখানে আমরা নতুন প্রপস পাস করছি ★★★ */}
                 <StripePaymentGateway 
                     ref={stripeFormRef} 
                     selectedPaymentMethod={selectedPaymentMethod} 
@@ -154,6 +171,8 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
                     total={total}
                     cartItems={cartItems}
                     shippingInfo={shippingInfo}
+                    selectedShipping={selectedShipping}
+                    shippingRates={shippingRates}
                 />
               </div>
             )}

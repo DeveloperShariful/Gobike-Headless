@@ -39,17 +39,18 @@ interface StripePaymentGatewayProps {
   }) => Promise<{ orderId: number, orderKey: string } | void | null>;
   customerInfo: CustomerInfo;
   total: number;
-  // ★★★ Added: মেটাডেটা সিঙ্ক করার জন্য কার্ট এবং শিপিং ইনফো প্রয়োজন ★★★
   cartItems: any[];
   shippingInfo?: CustomerInfo;
+  selectedShipping: string;
+  shippingRates: any[];
 }
 
 const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { clientSecret?: string }>(
-  ({ selectedPaymentMethod, onPlaceOrder, customerInfo, shippingInfo, cartItems, total, clientSecret }, ref) => {
+  ({ selectedPaymentMethod, onPlaceOrder, customerInfo, shippingInfo, cartItems, total, clientSecret, selectedShipping, shippingRates }, ref) => {
     const stripe = useStripe();
     const elements = useElements();
     const [isProcessing, setIsProcessing] = useState(false);
-    const [internalStripeMethod, setInternalStripeMethod] = useState<string>('card');
+    const[internalStripeMethod, setInternalStripeMethod] = useState<string>('card');
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -71,28 +72,30 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
           }
       };
 
-      // ★★★ ১. মেটাডেটা সিঙ্ক লজিক (কার্ড পেমেন্টের জন্য) ★★★
-      // পেমেন্ট কনফার্ম করার ঠিক আগে আমরা স্ট্রাইপের মেটাডেটা আপডেট করব।
+      const selectedRate = shippingRates.find(rate => rate.id === selectedShipping);
+      const shippingMetadata = {
+          shipping_method_id: selectedShipping || '',
+          shipping_method_title: selectedRate?.label || 'Standard Shipping',
+          shipping_cost: selectedRate?.cost || '0'
+      };
+
       if (selectedPaymentMethod === 'stripe' && clientSecret) {
          try {
              const paymentIntentId = clientSecret.split('_secret_')[0];
-             
-             // এই কলটি ব্যাকগ্রাউন্ডে স্ট্রাইপের কাছে কার্ট এবং কাস্টমার ডেটা সেভ করে আসবে
-             // যাতে ফ্রন্টএন্ড ফেইল করলে Webhook অর্ডার বানাতে পারে
              await fetch('/api/update-payment-intent', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     paymentIntentId: paymentIntentId,
                     amount: total,
-                    customerInfo: customerInfo, // বিলিং
-                    shippingInfo: shippingInfo || customerInfo, // শিপিং (না থাকলে বিলিং যাবে)
-                    cartItems: cartItems, // কার্ট আইটেম
+                    customerInfo: customerInfo, 
+                    shippingInfo: shippingInfo || customerInfo, 
+                    cartItems: cartItems, 
+                    metadata: shippingMetadata
                 }),
             });
          } catch (err) {
              console.error("Failed to sync metadata with Stripe:", err);
-             // মেটাডেটা ফেইল করলেও আমরা পেমেন্ট আটকাবো না
          }
       }
 
@@ -119,7 +122,7 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
             body: JSON.stringify({
               amount: Math.round(total * 100),
               payment_method_types: [paymentMethodType],
-              metadata: { order_id: orderDetails.orderId },
+              metadata: { order_id: orderDetails.orderId, ...shippingMetadata },
               orderId: orderDetails.orderId,
               customerInfo: customerInfo, 
               shippingInfo: shippingInfo, 
@@ -197,7 +200,11 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         paymentIntentId: paymentIntentId,
-                        orderId: orderDetails.orderId
+                        orderId: orderDetails.orderId,
+                        customerInfo: customerInfo,
+                        shippingInfo: shippingInfo,
+                        cartItems: cartItems,
+                        metadata: shippingMetadata
                     })
                 });
 
@@ -223,7 +230,6 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
         }
         
         else {
-            // ★★★ ২. পেমেন্ট কনফার্মেশন (মেটাডেটা সিঙ্ক হওয়ার পর) ★★★
             const { error, paymentIntent } = await stripe.confirmPayment({
               elements,
               clientSecret,
@@ -299,7 +305,7 @@ const StripePaymentGateway = forwardRef<HTMLFormElement, StripePaymentGatewayPro
             ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) 
             : null
     );
-    const [clientSecret, setClientSecret] = useState<string>('');
+    const[clientSecret, setClientSecret] = useState<string>('');
     
     useEffect(() => {
         if (props.selectedPaymentMethod === 'stripe' && props.total > 0) {
