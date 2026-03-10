@@ -4,7 +4,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useCart } from '../context/CartContext';
-// import styles from './MiniCart.module.css'; // CSS Module সরানো হয়েছে
 import { IoClose } from 'react-icons/io5';
 import Image from 'next/image';
 
@@ -15,8 +14,6 @@ interface MiniCartProps {
 
 export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
   const { cartItems, removeFromCart, updateQuantity, loading } = useCart();
-  
-  // ১. নির্দিষ্ট আইটেম রিমুভ হচ্ছে কিনা তা ট্র্যাক করার জন্য স্টেট
   const [removingKey, setRemovingKey] = useState<string | null>(null);
 
   useEffect(() => {
@@ -31,20 +28,17 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
   };
 
   const subtotal = cartItems.reduce((total, item) => {
-    // সাবটোটালের জন্য লাইন টোটাল ব্যবহার করা ভালো
     if (item.total) return total + parsePrice(item.total);
     const price = parsePrice(item.price);
     return total + price * item.quantity;
   }, 0);
 
-  // ২. রিমুভ হ্যান্ডলার যা Removing স্টেট সেট করবে
   const handleRemove = async (key: string) => {
     setRemovingKey(key); 
     await removeFromCart(key);
     setRemovingKey(null);
   };
 
-  // অ্যাট্রিবিউট নাম সুন্দর করার ফাংশন (pa_size -> Size)
   const formatLabel = (name: string) => {
     const clean = name.replace(/^pa_/, '').replace(/_/g, ' ');
     return clean.charAt(0).toUpperCase() + clean.slice(1);
@@ -54,17 +48,14 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
 
   return (
     <>
-      {/* .miniCartOverlay replaced */}
       <div 
         className={`fixed top-0 left-0 w-full h-full bg-black/50 z-[1000] transition-opacity duration-300 ease-in-out ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} 
         onClick={onClose}
       ></div>
 
-      {/* .miniCartContainer replaced */}
       <div 
         className={`fixed top-0 right-0 w-full max-w-[450px] h-full bg-white shadow-[-5px_0_25px_rgba(0,0,0,0.15)] z-[1001] flex flex-col transition-transform duration-[400ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
       >
-        {/* .header replaced */}
         <header className="flex justify-between items-center p-6 border-b border-[#eaeaea] flex-shrink-0">
           <h3 className="m-0 text-[1.3rem] font-bold">Shopping Cart</h3>
           <button 
@@ -74,17 +65,12 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
             <IoClose />
           </button>
         </header>
-
-        {/* .loadingBar replaced */}
         {loading && <div className="p-2 bg-[#fffbe6] text-[#9f7a00] text-center text-sm">Processing...</div>}
-
-        {/* .cartBody replaced */}
         <div className="flex-grow overflow-y-auto p-6">
           {cartItems.length === 0 ? (
             <p className="text-center mt-20 text-[#777] text-[1.1rem]">Your cart is empty.</p>
           ) : (
             cartItems.map(item => {
-                // ৩. সঠিক প্রাইস বের করার লজিক (Total / Qty)
                 let displayPrice = item.price;
                 if (item.total && item.quantity > 0) {
                     const totalPrice = parsePrice(item.total);
@@ -93,10 +79,7 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
                 }
 
                 return (
-                  // .cartItem replaced
                   <div key={item.key} className="grid grid-cols-[80px_1fr] gap-x-6 gap-y-2 items-start mb-6 pb-6 border-b border-[#f0f0f0] last:border-b-0 last:mb-0">
-                    
-                    {/* .itemImage replaced */}
                     <div className="col-start-1 row-span-2 self-center w-[80px] h-[80px] rounded-lg border border-[#eee] overflow-hidden">
                         {item.image ? (
                             <Image src={item.image} alt={item.name} className="w-full h-full object-cover" width={100} height={100} />
@@ -104,17 +87,11 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
                             <div className="w-full h-full bg-[#f0f0f0]"/>
                         )}
                     </div>
-                    
-                    {/* .itemDetails replaced */}
                     <div className="col-start-2 row-start-1 flex flex-col gap-3">
                       {/* .itemName replaced */}
                       <p className="font-semibold m-0 leading-[1.3] text-base">{item.name}</p>
-                      
-                      {/* ৪. Size এবং Color দেখানো (যদি থাকে) */}
-                      {/* @ts-ignore */}
                       {item.attributes && item.attributes.length > 0 && (
                           <div className="text-xs text-[#666] -mb-1">
-                              {/* @ts-ignore */}
                               {item.attributes.map((attr: any, index: number) => (
                                   <span key={index} className="mr-2 capitalize">
                                       <strong>{formatLabel(attr.name)}:</strong> {attr.value}
@@ -122,8 +99,6 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
                               ))}
                           </div>
                       )}
-
-                      {/* .quantityControl replaced */}
                       <div className="flex items-center border border-[#e0e0e0] rounded-md w-fit">
                         <span className="text-base font-semibold px-4 border-r border-[#e0e0e0]">Qty: </span>
                         <button 
@@ -143,14 +118,10 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
                         </button>
                       </div>
                       
-                      {/* .itemPrice replaced */}
                       <p className="text-[#555] m-0 text-base font-medium" dangerouslySetInnerHTML={{ __html: displayPrice }}></p>
                     </div>
-                    
-                    {/* .itemActions replaced */}
                     <div className="col-start-2 row-start-2 mt-2">
                         <button 
-                            // .removeButton replaced
                             className="bg-transparent text-[#e53e3e] border border-[#e53e3e] rounded-md px-3 py-1.5 text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-[#e53e3e] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                             onClick={() => handleRemove(item.key)} 
                             disabled={loading || removingKey === item.key}
@@ -166,18 +137,14 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
         </div>
 
         {cartItems.length > 0 && (
-          // .footer replaced
           <footer className="p-6 border-t border-[#eaeaea] bg-[#f8f9fa] flex-shrink-0 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
-            {/* .subtotal replaced */}
             <div className="flex justify-between text-[1.2rem] font-bold mb-6">
               <span>Subtotal:</span>
               <span>${subtotal.toFixed(2)}</span>
             </div>
-            {/* .actionButtons replaced */}
             <div className="flex flex-col gap-3">
               <Link 
                 href="/cart" 
-                // .actionButton & .viewCart replaced
                 className="block w-full p-2 text-center no-underline rounded-lg font-bold transition-all duration-200 bg-white text-black border-2 border-black text-[1.3rem] hover:bg-[#f0f0f0]" 
                 onClick={onClose}
               >
@@ -185,7 +152,6 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
               </Link>
               <Link 
                 href="/checkout"
-                // .actionButton & .checkout replaced
                 className="block w-full p-2 text-center no-underline rounded-lg font-bold transition-all duration-200 bg-black text-white border-2 border-black text-[1.5rem] hover:bg-[#333]"
                 onClick={onClose}
               >

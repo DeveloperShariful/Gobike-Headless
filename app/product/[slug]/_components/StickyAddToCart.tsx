@@ -27,7 +27,6 @@ const StickyAddToCart = ({
   if (!product) return null;
 
   return (
-    // .stickyWrapper replaced
     <div 
       className={`fixed bottom-0 left-0 w-full bg-white border-t border-[#e5e5e5] shadow-[0_-2px_10px_rgba(0,0,0,0.08)] z-[1000] flex items-center transition-transform duration-300 ease-in-out
       ${isVisible ? 'translate-y-0 visible' : 'translate-y-full invisible'}
@@ -36,7 +35,6 @@ const StickyAddToCart = ({
       /* Desktop Styles (Min-width: 769px approx to md) */
       md:justify-center md:gap-[10rem] md:p-[0px_5px]`}
     >
-      {/* .productInfo replaced */}
       <div className="flex items-center gap-0.5 min-w-0 flex-1 md:flex-initial">
         {product.image && (
           <Image
@@ -44,21 +42,16 @@ const StickyAddToCart = ({
             alt={product.name}
             width={50}
             height={50}
-            // .productImage replaced
             className="rounded-md shrink-0 w-[45px] h-[45px] md:w-[50px] md:h-[50px]"
           />
         )}
         <div className="flex flex-col">
-             {/* .productName replaced */}
              <span className="font-semibold whitespace-nowrap overflow-hidden text-ellipsis text-[14px] md:text-[16px]">
                 {product.name}
              </span>
-             {/* .productPrice replaced */}
              <span className="hidden" dangerouslySetInnerHTML={{ __html: product.price || '' }} />
         </div>
       </div>
-      
-      {/* .actions replaced */}
       <div className="flex items-center shrink-0">
         <StickyActions product={product} isValid={isValid} /> 
       </div>

@@ -243,19 +243,14 @@ export default function ReviewForm({ productId, averageRating, reviewCount, revi
             </div>
         )}
 
-        {/* --- Reviews List --- */}
-        {/* .reviewsListContainer replaced */}
         <div className="mt-8 border-t border-[#e5e7eb] pt-8">
-            {/* .reviewsListHeader replaced */}
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
-                {/* .reviewSearchInput replaced */}
                 <input 
                     type="search" 
                     placeholder="Search customer reviews" 
                     className="p-2.5 px-4 border border-[#d1d5db] rounded-md w-full md:w-[300px] text-[0.9rem]" 
                 />
                 <span>{`1-${Math.min(visibleReviews, reviews.length)} of ${reviews.length} reviews`}</span>
-                {/* .reviewSortDropdown replaced */}
                 <select className="p-2.5 pr-8 pl-4 border border-[#d1d5db] rounded-md text-[0.9rem] bg-white cursor-pointer">
                     <option>Most Recent</option>
                     <option>Highest Rating</option>
@@ -265,32 +260,23 @@ export default function ReviewForm({ productId, averageRating, reviewCount, revi
 
             {reviews.length > 0 ? (
                 reviews.slice(0, visibleReviews).map((edge: ReviewEdge) => (
-                    // .reviewItem replaced
                     <div key={edge.node.id} className="flex gap-4 sm:gap-6 py-6 border-b border-[#f3f4f6] items-start last:border-b-0">
-                        {/* .reviewAuthor replaced */}
                         <div className="flex-shrink-0 w-[50px]">
-                            {/* .authorAvatar replaced */}
                             <div className="w-12 h-12 rounded-full bg-[#e5e7eb] text-gray-700 flex items-center justify-center font-bold text-[1.1rem] relative after:content-['✓'] after:absolute after:-bottom-0.5 after:-right-0.5 after:bg-emerald-500 after:text-white after:w-[18px] after:h-[18px] after:rounded-full after:border-2 after:border-white after:flex after:items-center after:justify-center after:text-[10px] after:font-bold">
                                 {edge.node.author.node.name.substring(0, 2).toUpperCase()}
                             </div>
                         </div>
-                        
-                        {/* .reviewDetails replaced */}
                         <div className="flex-grow w-full">
-                            {/* .reviewHeader replaced */}
                             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-1">
                                 <strong className="text-base text-gray-900 font-bold">{edge.node.author.node.name}</strong>
                                 <FormattedDate dateString={edge.node.date} />
                             </div>
                             {typeof edge.rating === 'number' && edge.rating > 0 && 
-                                // .reviewRating replaced
                                 <div className="flex gap-0.5 text-base text-amber-500 mb-2">
                                     <StarRatingDisplay rating={edge.rating} />
                                 </div>
                             }
-                            {/* .verifiedLink replaced */}
                             <div className="text-[0.8rem] text-emerald-500 font-semibold inline-block mb-3">✓ Verified review</div>
-                            {/* .reviewContent replaced */}
                             <div className="text-[0.95rem] leading-[1.6] text-gray-600" dangerouslySetInnerHTML={{ __html: edge.node.content }} />
                         </div>
                     </div>
@@ -298,9 +284,7 @@ export default function ReviewForm({ productId, averageRating, reviewCount, revi
             ) : ( <p>There are no reviews yet.</p> )}
             
             {hasMoreReviews && (
-                // .showMoreContainer replaced
                 <div className="text-center mt-8 pt-4">
-                    {/* .showMoreButton replaced */}
                     <button 
                         className="bg-transparent border border-[#d1d5db] py-3 px-8 rounded-md cursor-pointer font-semibold text-gray-700 transition-all duration-200 hover:bg-[#f3f4f6] hover:border-[#9ca3af]" 
                         onClick={() => setVisibleReviews(reviews.length)}

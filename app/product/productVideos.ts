@@ -4,7 +4,7 @@ export interface VideoData {
   id: string;
   title: string;
   description: string;
-  uploadDate: string; // ISO 8601 format (YYYY-MM-DD)
+  uploadDate: string; 
   thumbnailUrl: string;
 }
 

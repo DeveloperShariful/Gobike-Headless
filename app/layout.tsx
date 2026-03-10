@@ -11,6 +11,8 @@ import { Providers } from "./providers";
 import { Suspense } from 'react';
 import SourceTracker from '@/components/SourceTracker';
 import { getCurrentUser } from '@/lib/session';
+import { CompareProvider } from "@/context/CompareContext";
+import FloatingCompareBar from "@/components/FloatingCompareBar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -158,12 +160,16 @@ export default async function RootLayout({
           <SourceTracker />
         </Suspense>
         <Providers initialUser={user}>
+          <CompareProvider>
           <TopBar />
           <Header />
           <main>
             {children}
           </main>
+          <FloatingCompareBar />
+          </CompareProvider>
           <Footer />
+          
         </Providers>       
         <DelayedScripts />
       </body>
