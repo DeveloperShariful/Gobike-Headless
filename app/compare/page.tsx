@@ -362,8 +362,7 @@ export default function ComparePage() {
                                                     <td key={`${product.id}-desc`} className="p-4 md:p-6 border-b border-r border-gray-200 text-left text-xs md:text-[14px] text-gray-600 align-top bg-white last:rounded-br-xl">
                                                         {!isMainBike && product.description ? (
                                                             <div 
-                                                                className="leading-relaxed space-y-2 [&_h2]:text-sm md:[&_h2]:text-base [&_h2]:font-bold [&_h2]:text-gray-900 [&_h3]:text-xs md:[&_h3]:text-sm [&_h3]:font-bold [&_ul]:pl-4 [&_ul]:list-disc line-clamp-[10] hover:line-clamp-none transition-all duration-300 cursor-pointer"
-                                                                title="Click to read more"
+                                                                className="leading-relaxed space-y-2 [&_h2]:text-sm md:[&_h2]:text-base [&_h2]:font-bold [&_h2]:text-gray-900 [&_h3]:text-xs md:[&_h3]:text-sm [&_h3]:font-bold [&_ul]:pl-4 [&_ul]:list-disc"
                                                                 dangerouslySetInnerHTML={{ __html: product.description }} 
                                                             />
                                                         ) : (
