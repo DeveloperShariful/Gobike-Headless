@@ -43,10 +43,11 @@ interface StripePaymentGatewayProps {
   shippingInfo?: CustomerInfo;
   selectedShipping: string;
   shippingRates: any[];
+  appliedCoupons: any[];
 }
 
 const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { clientSecret?: string }>(
-  ({ selectedPaymentMethod, onPlaceOrder, customerInfo, shippingInfo, cartItems, total, clientSecret, selectedShipping, shippingRates }, ref) => {
+  ({ selectedPaymentMethod, onPlaceOrder, customerInfo, shippingInfo, cartItems, total, clientSecret, selectedShipping, shippingRates , appliedCoupons }, ref) => {
     const stripe = useStripe();
     const elements = useElements();
     const [isProcessing, setIsProcessing] = useState(false);
@@ -91,7 +92,8 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
                     customerInfo: customerInfo, 
                     shippingInfo: shippingInfo || customerInfo, 
                     cartItems: cartItems, 
-                    metadata: shippingMetadata
+                    metadata: shippingMetadata,
+                    appliedCoupons: appliedCoupons
                 }),
             });
          } catch (err) {
@@ -127,6 +129,7 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
               customerInfo: customerInfo, 
               shippingInfo: shippingInfo, 
               cartItems: cartItems,
+              appliedCoupons: appliedCoupons
             }),
           });
           const { clientSecret: redirectClientSecret, error: piError } = await res.json();
@@ -204,7 +207,8 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
                         customerInfo: customerInfo,
                         shippingInfo: shippingInfo,
                         cartItems: cartItems,
-                        metadata: shippingMetadata
+                        metadata: shippingMetadata,
+                        appliedCoupons: appliedCoupons
                     })
                 });
 
@@ -307,6 +311,9 @@ const StripePaymentGateway = forwardRef<HTMLFormElement, StripePaymentGatewayPro
     );
     const[clientSecret, setClientSecret] = useState<string>('');
     
+    // ★★★ নতুন লাইন: ইনফিনিট লুপ ঠেকানোর জন্য Array কে String করে নেওয়া হলো ★★★
+    const couponsDependency = JSON.stringify(props.appliedCoupons || []);
+
     useEffect(() => {
         if (props.selectedPaymentMethod === 'stripe' && props.total > 0) {
             if (clientSecret) return;
@@ -315,6 +322,7 @@ const StripePaymentGateway = forwardRef<HTMLFormElement, StripePaymentGatewayPro
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     amount: Math.round(props.total * 100),
+                    appliedCoupons: props.appliedCoupons
                 })
             })
             .then(res => res.json())
@@ -326,7 +334,8 @@ const StripePaymentGateway = forwardRef<HTMLFormElement, StripePaymentGatewayPro
                 }
             });
         }
-    }, [props.total, props.selectedPaymentMethod, clientSecret]);
+    // ★★★ পরিবর্তন: props.appliedCoupons এর বদলে couponsDependency ব্যবহার করা হলো ★★★
+    }, [props.total, props.selectedPaymentMethod, clientSecret, couponsDependency]);
 
     if (!stripePromise) {
         return <div className="p-5 text-center text-[#555] bg-[#f9f9f9] rounded-lg">Loading Stripe...</div>;

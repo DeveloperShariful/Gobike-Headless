@@ -1,4 +1,5 @@
-//app/page.tsx
+// app/page.tsx
+
 import type { Metadata } from 'next';
 import HomePageClient from './HomePageClient';
 import dynamic from 'next/dynamic';
@@ -17,7 +18,7 @@ const siteConfig = {
   facebook: 'https://www.facebook.com/Go-Bike-104997195659873',
   instagram: 'https://www.instagram.com/gobikeoz/',
   youtube: 'https://www.youtube.com/@Gobike-r7b',
-  phone: '+61-4-XXXX-XXXX',
+  phone: '+61-426-067-277',
 };
 
 export const metadata: Metadata = {
@@ -50,26 +51,23 @@ export const metadata: Metadata = {
     images: [siteConfig.ogImage],
   },
 };
+
 export default function Home() {
   const schema = {
     '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': 'Organization',
-        'name': siteConfig.siteName,
-        'url': siteConfig.url,
-        'logo': siteConfig.logo,
-        'contactPoint': { '@type': 'ContactPoint', 'telephone': siteConfig.phone, 'contactType': 'Customer Service' },
-        'sameAs': [ siteConfig.facebook, siteConfig.instagram, siteConfig.youtube, ]
-      },
-      {
-        '@type': 'WebSite',
-        'url': siteConfig.url,
-        'name': siteConfig.siteName,
-        'potentialAction': { '@type': 'SearchAction', 'target': { '@type': 'EntryPoint', 'urlTemplate': `${siteConfig.url}/search?q={search_term_string}` }, 'query-input': 'required name=search_term_string' }
-      }
-    ]
+    '@type': 'WebSite',
+    'url': siteConfig.url,
+    'name': siteConfig.siteName,
+    'potentialAction': { 
+      '@type': 'SearchAction', 
+      'target': { 
+        '@type': 'EntryPoint', 
+        'urlTemplate': `${siteConfig.url}/search?q={search_term_string}` 
+      }, 
+      'query-input': 'required name=search_term_string' 
+    }
   };
+
   return (
     <main>
       <script

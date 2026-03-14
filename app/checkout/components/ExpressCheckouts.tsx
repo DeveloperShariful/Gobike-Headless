@@ -22,7 +22,6 @@ interface ShippingFormData {
   phone: string;
 }
 
-// ★★★ পরিবর্তন ১: নতুন প্রপসগুলো ইন্টারফেসে যোগ করা হলো ★★★
 interface ShippingRate {
   id: string;
   label: string;
@@ -37,11 +36,11 @@ interface ExpressCheckoutsProps {
     paymentMethodId?: string; 
   }) => Promise<{ orderId: number; orderKey: string } | void | null>;
   isShippingSelected: boolean;
-  // নতুন প্রপস
   cartItems: any[];
   customerInfo: Partial<ShippingFormData>;
   selectedShipping: string;
   shippingRates: ShippingRate[];
+  appliedCoupons: any[];
 }
 
 const CheckoutForm = ({ onOrderPlace, clientSecret }: { onOrderPlace: ExpressCheckoutsProps['onOrderPlace'], clientSecret: string }) => {
@@ -68,7 +67,6 @@ const CheckoutForm = ({ onOrderPlace, clientSecret }: { onOrderPlace: ExpressChe
     } else if (paymentIntent?.status === 'succeeded') {
       toast.success('Payment Successful!');
 
-      // Apple Pay/Google Pay থেকে পাওয়া আসল শিপিং অ্যাড্রেস
       const stripeAddress = paymentIntent.shipping;
       const names = stripeAddress?.name?.split(' ') || [];
       const shippingDetails = {
@@ -100,24 +98,24 @@ export default function ExpressCheckouts({
   total, 
   onOrderPlace, 
   isShippingSelected,
-  // ★★★ প্রপসগুলো রিসিভ করা হলো ★★★
   cartItems,
   customerInfo,
   selectedShipping,
-  shippingRates
+  shippingRates,
+  appliedCoupons 
 }: ExpressCheckoutsProps) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
   const [remountKey, setRemountKey] = useState(0);
-
-  // ★★★ পরিবর্তন ২: শিপিং মেথডের বিস্তারিত তথ্য বের করা ★★★
   const selectedRate = shippingRates.find(rate => rate.id === selectedShipping);
+
+  // ★★★ নতুন লাইন: ইনফিনিট লুপ ঠেকানোর জন্য Array কে String করে নেওয়া হলো ★★★
+  const couponsDependency = JSON.stringify(appliedCoupons || []);
 
   useEffect(() => {
     const managePaymentIntent = async () => {
       if (total <= 0) return;
 
-      // ★★★ পরিবর্তন ৩: মেটাডেটা সহ পेलोড তৈরি করা ★★★
       const metadataInfo = {
         shipping_method_id: selectedShipping || '',
         shipping_method_title: selectedRate?.label || 'Standard Shipping',
@@ -130,10 +128,11 @@ export default function ExpressCheckouts({
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-              amount: Math.round(total * 100), // Create API expects cents
+              amount: Math.round(total * 100), 
               cartItems,
               customerInfo,
-              metadata: metadataInfo
+              metadata: metadataInfo,
+              appliedCoupons 
             }),
           });
           const data = await res.json();
@@ -153,10 +152,11 @@ export default function ExpressCheckouts({
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
               paymentIntentId, 
-              amount: total, // Update API handles the math (* 100) inside
+              amount: total, 
               cartItems,
               customerInfo,
-              metadata: metadataInfo
+              metadata: metadataInfo,
+              appliedCoupons 
             }),
           });
           setRemountKey(prevKey => prevKey + 1);
@@ -167,8 +167,9 @@ export default function ExpressCheckouts({
     };
 
     managePaymentIntent();
-    // ★★★ পরিবর্তন ৪: Dependency array তে প্রয়োজনীয় ভ্যালু যোগ করা হলো ★★★
-  },[total, paymentIntentId, selectedShipping, cartItems.length]);
+
+  // ★★★ পরিবর্তন: appliedCoupons এর বদলে couponsDependency ব্যবহার করা হলো ★★★
+  }, [total, paymentIntentId, selectedShipping, cartItems.length, couponsDependency]); 
 
   if (!clientSecret || !stripePromise) {
     return <div className="h-12 w-full bg-[#f0f0f0] rounded-lg animate-pulse"></div>;

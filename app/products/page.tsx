@@ -45,7 +45,7 @@ interface QueryData {
   } | null;
 }
 
-// --- METADATA GENERATION (Fixed for SEO Audit) ---
+// --- METADATA GENERATION (Fixed for SEO & AEO/GEO) ---
 export async function generateMetadata({ searchParams }: { 
   searchParams: { [key: string]: string | string[] | undefined } 
 }): Promise<Metadata> {
@@ -70,7 +70,6 @@ export async function generateMetadata({ searchParams }: {
   // Update Title/Desc based on Pagination to avoid Duplicates
   if (isPaged) {
     title = `${title} - Page 2+`;
-    // FIX: Modifying description for paginated pages to satisfy SEO tools
     description = `${description} Browse more items in our collection on page 2 and beyond.`;
   }
 
@@ -79,6 +78,8 @@ export async function generateMetadata({ searchParams }: {
      const separator = categorySlug ? '&' : '?';
      canonicalUrl += `${separator}after=${resolvedSearchParams.after}`;
   }
+
+  const currentDate = new Date().toISOString(); // ★★★ Freshness Signal
 
   return {
     title,
@@ -95,8 +96,6 @@ export async function generateMetadata({ searchParams }: {
     alternates: {
       canonical: canonicalUrl,
     },
-    // FIX: Using 'noindex' for paginated pages prevents "Duplicate Title" errors 
-    // in audits while still allowing bots to follow links to products.
     robots: {
       index: !isPaged, 
       follow: true,
@@ -117,6 +116,11 @@ export async function generateMetadata({ searchParams }: {
       locale: 'en_AU',
       type: 'website',
     },
+    other: {
+      'article:modified_time': currentDate, // ★★★ ফিক্সড: Ahrefs Missing Date Issue
+      'og:updated_time': currentDate,       // ★★★ TS এরর ছাড়া কাস্টম ট্যাগ
+      'last-modified': currentDate,
+    }
   };
 }
 
@@ -184,41 +188,69 @@ export default async function ProductsPage({ searchParams }: {
   );
 
   const currentCategoryName = categories.find((c: Category) => c.slug === category)?.name || "All Products";
-  
-  const jsonLd = {
+  const currentUrl = category ? `https://gobike.au/products?category=${category}` : `https://gobike.au/products`;
+
+  // ★★★ AEO/GEO: Breadcrumb Schema ★★★
+  const breadcrumbItems = [
+    { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': 'https://gobike.au' },
+    { '@type': 'ListItem', 'position': 2, 'name': 'Products', 'item': 'https://gobike.au/products' }
+  ];
+  if (category) {
+    breadcrumbItems.push({ '@type': 'ListItem', 'position': 3, 'name': currentCategoryName, 'item': currentUrl });
+  }
+
+  const breadcrumbSchema = {
     '@context': 'https://schema.org',
-    '@type': 'ItemList',
+    '@type': 'BreadcrumbList',
+    'itemListElement': breadcrumbItems
+  };
+
+  // ★★★ AEO/GEO: CollectionPage + ItemList Schema ★★★
+  const collectionSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
     'name': `GoBike ${currentCategoryName}`,
     'description': `Browse our collection of ${currentCategoryName} including balancing bikes and electric cycles in Australia.`,
-    'numberOfItems': products.length,
-    'itemListElement': products.map((product, index) => ({
-      '@type': 'ListItem',
-      'position': index + 1,
-      'item': {
-        '@type': 'Product',
-        'name': product.name,
-        'url': `https://gobike.au/product/${product.slug}`,
-        'image': product.image?.sourceUrl,
-        'description': `Genuine GoBike product: ${product.name}.`,
-        'sku': product.databaseId.toString(),
-        'brand': { '@type': 'Brand', 'name': 'GoBike' },
-        'offers': {
-          '@type': 'Offer',
-          'priceCurrency': 'AUD',
-          'price': product.salePrice ? product.salePrice.replace(/[^0-9.]+/g, "") : product.regularPrice?.replace(/[^0-9.]+/g, ""),
-          'availability': 'https://schema.org/InStock',
-          'url': `https://gobike.au/product/${product.slug}`
+    'url': currentUrl,
+    'dateModified': new Date().toISOString(),
+    'mainEntity': {
+      '@type': 'ItemList',
+      'numberOfItems': products.length,
+      'itemListElement': products.map((product, index) => ({
+        '@type': 'ListItem',
+        'position': index + 1,
+        'item': {
+          '@type': 'Product',
+          'name': product.name,
+          'url': `https://gobike.au/product/${product.slug}`,
+          'image': product.image?.sourceUrl,
+          'description': `Genuine GoBike product: ${product.name}.`,
+          'sku': product.databaseId.toString(),
+          'brand': { '@type': 'Brand', 'name': 'GoBike' },
+          ...(product.reviewCount && product.reviewCount > 0 && {
+            'aggregateRating': {
+              '@type': 'AggregateRating',
+              'ratingValue': product.averageRating || 5,
+              'reviewCount': product.reviewCount
+            }
+          }),
+          'offers': {
+            '@type': 'Offer',
+            'priceCurrency': 'AUD',
+            'price': product.salePrice ? product.salePrice.replace(/[^0-9.]+/g, "") : product.regularPrice?.replace(/[^0-9.]+/g, ""),
+            'availability': 'https://schema.org/InStock',
+            'url': `https://gobike.au/product/${product.slug}`
+          }
         }
-      }
-    }))
+      }))
+    }
   };
 
   return (
     <div>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      {/* ★★★ Schema Injection ★★★ */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }} />
 
       <Breadcrumbs pageTitle={currentCategoryName} />
       

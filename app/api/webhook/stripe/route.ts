@@ -13,8 +13,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
-
-// Delay তৈরি করার জন্য Helper Function
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function POST(request: Request) {
@@ -38,7 +36,6 @@ export async function POST(request: Request) {
     console.log(`💰 Payment succeeded for PI: ${paymentIntent.id}`);
 
     try {
-      // ১. প্রথম চেক: ফ্রন্টএন্ড কি এতো দ্রুত কাজ শেষ করেছে?
       if (initialMetadata.order_id) {
           console.log(`✅ Order #${initialMetadata.order_id} already exists (handled by Frontend instantly). Updating status...`);
           
@@ -51,18 +48,14 @@ export async function POST(request: Request) {
           return NextResponse.json({ received: true, message: "Order updated instantly" });
       }
 
-      // ২. যদি প্রথম চেকে Order ID না পাওয়া যায়, তবে গতির প্রতিযোগিতা (Race Condition) চলছে।
-      console.warn(`⏳ No Order ID found immediately. Waiting 8 seconds for frontend to finish...`);
+      console.warn(`⏳ No Order ID found immediately. Waiting 9 seconds for frontend to finish...`);
       
-      // ৮ সেকেন্ড অপেক্ষা করা হচ্ছে (Delay)
       await sleep(9000);
 
-      // ৩. ৮ সেকেন্ড পর Stripe থেকে লেটেস্ট মেটাডেটা Re-fetch করা
       console.log(`🔄 Re-fetching Payment Intent data from Stripe...`);
       const freshPaymentIntent = await stripe.paymentIntents.retrieve(paymentIntent.id);
       const freshMetadata = freshPaymentIntent.metadata;
 
-      // ৪. দ্বিতীয় চেক: ফ্রন্টএন্ড কি এই ৮ সেকেন্ডের মধ্যে মেটাডেটা আপডেট করেছে?
       if (freshMetadata.order_id) {
           console.log(`✅ Order #${freshMetadata.order_id} found after delay (Frontend won). Updating status...`);
           
@@ -75,16 +68,53 @@ export async function POST(request: Request) {
           return NextResponse.json({ received: true, message: "Order updated after delay" });
       }
 
-      // ৫. ৮ সেকেন্ড পরও যদি Order ID না থাকে, তার মানে ফ্রন্টএন্ড আসলেই ফেইল করেছে (ইউজার ট্যাব কেটে দিয়েছে)।
-      console.warn(`⚠️ Frontend officially failed. Creating fallback order via Webhook...`);
+      console.log(`🔍 Checking WooCommerce for any existing order with transaction ID: ${paymentIntent.id}...`);
+      // ★★★ পরিবর্তন: 10 এর জায়গায় 30 করা হলো সেফটির জন্য ★★★
+      const recentOrders = await wooCommerceRequest<any[]>("orders", "GET", { per_page: 30, orderby: 'date', order: 'desc' });
+      
+      const existingOrder = recentOrders.find((o: any) => 
+        o.transaction_id === paymentIntent.id || 
+        (o.meta_data && o.meta_data.some((m: any) => m.key === 'stripe_payment_intent' && m.value === paymentIntent.id))
+      );
+
+      if (existingOrder) {
+          console.log(`✅ Order #${existingOrder.id} found in WooCommerce DB! (Frontend was slow but successful). Updating status...`);
+          
+          await wooCommerceRequest(`orders/${existingOrder.id}`, 'PUT', {
+              status: 'processing',
+              set_paid: true,
+              transaction_id: paymentIntent.id
+          });
+
+          await stripe.paymentIntents.update(paymentIntent.id, {
+              metadata: { order_id: existingOrder.id.toString() },
+              description: `Order #${existingOrder.id} for GOBIKE`
+          });
+
+          return NextResponse.json({ received: true, message: "Order found in DB and updated" });
+      }
+
+      console.warn(`⚠️ Frontend officially failed and no order found in DB. Creating fallback order via Webhook...`);
 
       if (!freshMetadata.cart_items_json || !freshMetadata.billing_json) {
           throw new Error("Missing necessary metadata to create fallback order.");
       }
 
-      const cartItems = JSON.parse(freshMetadata.cart_items_json);
-      const billingInfo = JSON.parse(freshMetadata.billing_json);
-      const shippingInfo = freshMetadata.shipping_json ? JSON.parse(freshMetadata.shipping_json) : billingInfo;
+      // ★★★ নতুন: Webhook ক্র্যাশ ঠেকানোর জন্য Safe JSON Parsing ★★★
+      const safeParseJSON = (jsonString: string, fallbackResult: any) => {
+          try {
+              return JSON.parse(jsonString);
+          } catch (e) {
+              console.error("⚠️ JSON Parse Warning (String might be truncated):", jsonString);
+              return fallbackResult;
+          }
+      };
+
+      const cartItems = safeParseJSON(freshMetadata.cart_items_json, []);
+      const billingInfo = safeParseJSON(freshMetadata.billing_json, {});
+      const shippingInfo = freshMetadata.shipping_json ? safeParseJSON(freshMetadata.shipping_json, billingInfo) : billingInfo;
+      const couponLines = freshMetadata.applied_coupons_json ? safeParseJSON(freshMetadata.applied_coupons_json, []) : [];
+
       const shippingMethodId = freshMetadata.shipping_method_id || 'flat_rate';
       const shippingMethodTitle = freshMetadata.shipping_method_title || 'Standard Shipping';
       const shippingCost = freshMetadata.shipping_cost || '0';
@@ -127,18 +157,17 @@ export async function POST(request: Request) {
                 total: shippingCost.toString()
             }
         ],
+        coupon_lines: couponLines,
         meta_data:[
             { key: '_is_webhook_created', value: 'yes' }, 
             { key: 'stripe_payment_intent', value: paymentIntent.id }
         ]
       };
 
-      // ৬. Fallback অর্ডার তৈরি করা
       const newOrder = await wooCommerceRequest<any>("orders", "POST", orderData);
 
       console.log(`🎉 Fallback Order Created Successfully: #${newOrder.id}`);
       
-      // ৭. স্ট্রাইপে মেটাডেটা আপডেট করা (যাতে ভবিষ্যতে কনফিউশন না হয়)
       await stripe.paymentIntents.update(paymentIntent.id, {
           metadata: {
               order_id: newOrder.id.toString(),

@@ -44,7 +44,6 @@ async function getPaymentGateways(): Promise<PaymentGateway[]> {
 export default async function CheckoutPage() {
   const paymentGateways = await getPaymentGateways();
   return (
-    // Tailwind applied here replacing .pageContainer and .container
     <div className="w-full p-4 md:p-8 bg-[#f8f9fa]">
       <div className="w-full max-w-full mx-auto relative overflow-x-hidden">
         <CheckoutClient paymentGateways={paymentGateways} />

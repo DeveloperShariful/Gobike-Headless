@@ -10,7 +10,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(request: Request) {
   try {
-    const { amount, payment_method_types, metadata: incomingMetadata, orderId, cartItems, customerInfo, shippingInfo } = await request.json();
+    // ★★★ পরিবর্তন: appliedCoupons রিসিভ করা হলো ★★★
+    const { amount, payment_method_types, metadata: incomingMetadata, orderId, cartItems, customerInfo, shippingInfo, appliedCoupons } = await request.json();
 
     if (!amount || amount < 1) {
       return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
@@ -52,6 +53,12 @@ export async function POST(request: Request) {
             price: item.price
         }));
         metadata.cart_items_json = JSON.stringify(simplifiedCart).substring(0, 499);
+    }
+
+    // ★★★ নতুন: কুপন ডাটা মেটাডেটায় সেভ করা হচ্ছে ★★★
+    if (appliedCoupons && Array.isArray(appliedCoupons) && appliedCoupons.length > 0) {
+        const simplifiedCoupons = appliedCoupons.map((c: any) => ({ code: c.code }));
+        metadata.applied_coupons_json = JSON.stringify(simplifiedCoupons).substring(0, 499);
     }
 
     if (Object.keys(metadata).length > 0) {

@@ -65,6 +65,7 @@ export const metadata: Metadata = {
 
   twitter: {
     card: 'summary_large_image',
+    site: '@GoBikeAU',
     title: 'GoBike - Kids Electric Bikes Australia',
     description: "Australia's top-rated electric balance bikes for kids.",
     creator: '@GoBikeAU', 
@@ -85,6 +86,10 @@ export const metadata: Metadata = {
   
   alternates: {
     canonical: '/', 
+    languages: {
+      'en-AU': '/', 
+      'x-default': '/',
+    },
   },
 
   other: {

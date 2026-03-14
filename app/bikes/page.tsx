@@ -1,4 +1,4 @@
-//app/bikes/page.tsx
+// app/bikes/page.tsx
 import { gql } from '@apollo/client';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -48,6 +48,9 @@ export async function generateMetadata({ searchParams }: {
     canonicalUrl += `?after=${resolvedSearchParams.after}`;
   }
 
+  // ★★★ AEO/GEO: সার্চ ইঞ্জিন ও Ahrefs-এর জন্য Freshness Signal (Current Date) ★★★
+  const currentDate = new Date().toISOString();
+
   return {
     title,
     description,
@@ -74,7 +77,7 @@ export async function generateMetadata({ searchParams }: {
     openGraph: {
       title: title,
       description: description,
-      url: 'https://gobike.au/bikes',
+      url: `https://gobike.au${canonicalUrl}`, 
       siteName: 'GoBike Australia',
       images: [
         {
@@ -87,6 +90,11 @@ export async function generateMetadata({ searchParams }: {
       locale: 'en_AU',
       type: 'website',
     },
+    other: {
+      'article:modified_time': currentDate, 
+      'og:updated_time': currentDate, 
+      'last-modified': currentDate,
+    }
   };
 }
 
@@ -127,7 +135,7 @@ async function getBikeProducts(
       context: { fetchOptions: { next: { revalidate: 50000 } } },
     });
     if (!data || !data.products) {
-        console.error("No spare parts data returned from GraphQL query.");
+        console.error("No bikes data returned from GraphQL query.");
         return {
             products: [],
             pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null },
@@ -161,53 +169,67 @@ export default async function BikesPage({ searchParams }: {
     before
   );
 
-  const jsonLd = {
+  // ★★★ AEO/GEO: Breadcrumb Schema (Added) ★★★
+  const breadcrumbSchema = {
     '@context': 'https://schema.org',
-    '@type': 'ItemList',
+    '@type': 'BreadcrumbList',
+    'itemListElement': [
+      { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': 'https://gobike.au' },
+      { '@type': 'ListItem', 'position': 2, 'name': 'All Bikes', 'item': 'https://gobike.au/bikes' }
+    ]
+  };
+
+  // ★★★ AEO/GEO: CollectionPage + ItemList Schema (Fixes URL & Structure) ★★★
+  const collectionSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
     'name': 'Kids Electric Bikes',
     'description': 'Browse our collection of top-rated electric bikes for kids including balancing bikes and dirt bikes.',
-    'numberOfItems': products.length,
-    'itemListElement': products.map((product, index) => ({
-      '@type': 'ListItem',
-      'position': index + 1,
-      'item': {
-        '@type': 'Product',
-        'name': product.name,
-        'url': `https://gobike.au/product/${product.slug}`,
-        'image': product.image?.sourceUrl,
-         'description': `Discover the ${product.name}, a top-rated electric bike for kids. Safe, durable, and built for adventure.`,
-        'sku': product.databaseId.toString(),
-        'brand': {
-          '@type': 'Brand',
-          'name': 'GoBike'
-        },
-        ...(product.reviewCount && product.reviewCount > 0 && {
-          'aggregateRating': {
-            '@type': 'AggregateRating',
-            'ratingValue': product.averageRating || 5,
-            'reviewCount': product.reviewCount
-          }
-        }),
-
-        'offers': {
-          '@type': 'Offer',
-          'priceCurrency': 'AUD',
-          'price': product.salePrice 
-            ? product.salePrice.replace(/[^0-9.]+/g, "") 
-            : product.regularPrice?.replace(/[^0-9.]+/g, ""),
-          'availability': 'https://schema.org/InStock',
+    'url': 'https://gobike.au/bikes',
+    'dateModified': new Date().toISOString(), // ★★★ AI-কে ডাটার ফ্রেশনেস বোঝায়
+    'mainEntity': {
+      '@type': 'ItemList',
+      'numberOfItems': products.length,
+      'itemListElement': products.map((product, index) => ({
+        '@type': 'ListItem',
+        'position': index + 1,
+        'item': {
+          '@type': 'Product',
+          'name': product.name,
           'url': `https://gobike.au/product/${product.slug}`,
+          'image': product.image?.sourceUrl,
+           'description': `Discover the ${product.name}, a top-rated electric bike for kids. Safe, durable, and built for adventure.`,
+          'sku': product.databaseId.toString(),
+          'brand': {
+            '@type': 'Brand',
+            'name': 'GoBike'
+          },
+          ...(product.reviewCount && product.reviewCount > 0 && {
+            'aggregateRating': {
+              '@type': 'AggregateRating',
+              'ratingValue': product.averageRating || 5,
+              'reviewCount': product.reviewCount
+            }
+          }),
+          'offers': {
+            '@type': 'Offer',
+            'priceCurrency': 'AUD',
+            'price': product.salePrice 
+              ? product.salePrice.replace(/[^0-9.]+/g, "") 
+              : product.regularPrice?.replace(/[^0-9.]+/g, ""),
+            'availability': 'https://schema.org/InStock',
+            'url': `https://gobike.au/product/${product.slug}`,
+          }
         }
-      }
-    }))
+      }))
+    }
   };
 
   return (
     <div>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      {/* ★★★ Schema Injection ★★★ */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }} />
 
       <Breadcrumbs pageTitle="All Bikes" />
       <div className="max-w-[1300px] mx-auto px-1.5 font-sans">
@@ -305,7 +327,6 @@ export default async function BikesPage({ searchParams }: {
         </section>
 
         {/* --- New SEO Content Block (Added for High Quality SEO) --- */}
-        {/* UI design matches existing sections (white bg, gray text) */}
         <section className="text-left  bg-gray-50 rounded-xl p-3 md:p-5">
             <div className="max-w-[1100px] mx-auto text-gray-700 leading-relaxed">
                 

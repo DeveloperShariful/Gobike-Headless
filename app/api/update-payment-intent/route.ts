@@ -11,7 +11,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { paymentIntentId, amount, orderId, cartItems, customerInfo, shippingInfo, metadata: incomingMetadata } = body;
+    // ★★★ পরিবর্তন: appliedCoupons রিসিভ করা হলো ★★★
+    const { paymentIntentId, amount, orderId, cartItems, customerInfo, shippingInfo, metadata: incomingMetadata, appliedCoupons } = body;
 
     if (!paymentIntentId) {
       return NextResponse.json({ error: 'Missing Payment Intent ID.' }, { status: 400 });
@@ -47,6 +48,12 @@ export async function POST(request: Request) {
             variation_id: item.variationId || 0 
         }));
         metadata.cart_items_json = JSON.stringify(simplifiedCart).substring(0, 499);
+    }
+
+    // ★★★ নতুন: কুপন ডাটা মেটাডেটায় সেভ করা হচ্ছে ★★★
+    if (appliedCoupons && Array.isArray(appliedCoupons) && appliedCoupons.length > 0) {
+        const simplifiedCoupons = appliedCoupons.map((c: any) => ({ code: c.code }));
+        metadata.applied_coupons_json = JSON.stringify(simplifiedCoupons).substring(0, 499);
     }
 
     if (Object.keys(metadata).length > 0) {
