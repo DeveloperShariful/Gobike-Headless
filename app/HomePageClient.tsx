@@ -9,11 +9,7 @@ import HomePageReviews from '../components/HomePageReviews';
 // ====================================================================
 // Performance Optimization: Lazy Load Wrapper
 // ====================================================================
-/**
- * এই কম্পোনেন্টটি নিচের সেকশনগুলোকে তখনই রেন্ডার করবে
- * যখন ইউজার স্ক্রল করে তার কাছাকাছি আসবে।
- * এটি ইনিশিয়াল লোড টাইম (TBT) কমাতে সাহায্য করে।
- */
+
 const LazyLoadSection = ({ children }: { children: ReactNode }) => {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -59,150 +55,165 @@ const TickMark = () => <span className="text-red-600 font-bold text-xl">✓</spa
 const CrossMark = () => <span className="text-black font-bold text-xl">✕</span>;
 
 // ====================================================================
-// HeroSlider Component
+// HeroSlider Component (Upgraded & Optimized)
 // ====================================================================
-const HeroSlider = () => {
-  const totalSlides = 3;
-  const [currentSlide, setCurrentSlide] = useState(1);
+const slidesData =[
+  {
+    subtitle: "The Extreme Machine",
+    title: "GOBIKE 24",
+    desc: "The ultimate electric dirt bike for teens and adults aged 12+. Unleash raw power with a massive 2500W motor hitting top speeds of 61km/h. Featuring fully adjustable hydraulic suspension and 24-inch Kenda fat tires.",
+    link: "product/gobike-24-inch-electric-bike-teens-high-speed-performance-for-ages-13",
+    img: "https://gobikes.au/wp-content/uploads/2025/12/Slider-1-scaled.webp",
+    alt: "GoBike 24 Inch Electric Dirt Bike",
+    width: 1000, height: 774
+  },
+  {
+    subtitle: "The Ultimate Weapon",
+    title: "GOBIKE 20",
+    desc: "The best 20-inch kids electric bike on the market. Built tough for young adventurers and teens, it delivers powerful performance, long battery life with a 10Ah battery, and reliable fun every ride.",
+    link: "product/20-inch-electric-bikes-for-sale-ebike-for-kids",
+    img: "https://gobikes.au/wp-content/uploads/2025/08/Gobike-electric-bike-kids-ebike20-inch-ages-for10-16-1-1.webp",
+    alt: "GoBike 20 Electric Bike",
+    width: 1000, height: 774
+  },
+  {
+    subtitle: "The All-Rounder",
+    title: "GOBIKE 16",
+    desc: "The fastest 16-inch kids electric bike on the market! Designed for confident young riders. Three speed modes, hydraulic disc brakes, and front suspension.",
+    link: "product/ebike-for-sale-16-inch-gobike-ages-5-9",
+    img: "https://gobikes.au/wp-content/uploads/2025/08/Gobike-electric-bike-kids-ebike20-inch-ages-for10-16-2.webp",
+    alt: "GoBike 16 Electric Bike",
+    width: 1000, height: 849
+  },
+  {
+    subtitle: "The Everyday GoBike Range",
+    title: "GOBIKE 12",
+    desc: "The perfect first electric bike for toddlers aged 2 years and above transitioning from a balance bike. Features an extra-slow learning mode for beginners.",
+    link: "product/ebike-for-kids-12-inch-electric-bike-ages-2-5",
+    img: "https://gobikes.au/wp-content/uploads/2025/08/Gobike-electric-bike-kids-ebike12-inch-ages-for-2-5-1.webp",
+    alt: "GoBike 12 Electric Bike",
+    width: 1000, height: 803
+  }
+];
 
+const HeroSlider = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const[touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
+
+  // Auto Slider Setup
   useEffect(() => {
+    if (isPaused) return;
     const slideInterval = setInterval(() => {
-      setCurrentSlide((prev) => (prev % totalSlides) + 1);
+      setCurrentSlide((prev) => (prev === slidesData.length - 1 ? 0 : prev + 1));
     }, 5000);
     return () => clearInterval(slideInterval);
-  }, []);
+  }, [isPaused]);
 
-  const handleRadioChange = (index: number) => {
-    setCurrentSlide(index);
+  const nextSlide = () => setCurrentSlide((prev) => (prev === slidesData.length - 1 ? 0 : prev + 1));
+  const prevSlide = () => setCurrentSlide((prev) => (prev === 0 ? slidesData.length - 1 : prev - 1));
+
+  // Touch/Swipe Handlers for Mobile
+  const handleTouchStart = (e: React.TouchEvent) => setTouchStart(e.targetTouches[0].clientX);
+  const handleTouchMove = (e: React.TouchEvent) => setTouchEnd(e.targetTouches[0].clientX);
+  const handleTouchEnd = () => {
+    if (touchStart - touchEnd > 75) nextSlide(); // Swipe Left
+    if (touchStart - touchEnd < -75) prevSlide(); // Swipe Right
   };
 
   return (
-    <section className="bg-black">
-      <div className="relative w-full overflow-hidden bg-black">
-        {/* Radio Inputs (Hidden logic) */}
-        {[1, 2, 3, 4].map((num) => (
-            <input 
-                key={num}
-                type="radio" 
-                name="slider-radio" 
-                className="hidden" 
-                checked={currentSlide === num} 
-                onChange={() => handleRadioChange(num)} 
-            />
+    <section 
+      className="bg-black relative w-full overflow-hidden group"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Navigation Arrows (Visible on Desktop Hover) */}
+      <button 
+        onClick={prevSlide}
+        className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white/10 hover:bg-white/30 backdrop-blur-sm rounded-full items-center justify-center text-white transition-all opacity-0 group-hover:opacity-100"
+        aria-label="Previous Slide"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+
+      <button 
+        onClick={nextSlide}
+        className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white/10 hover:bg-white/30 backdrop-blur-sm rounded-full items-center justify-center text-white transition-all opacity-0 group-hover:opacity-100"
+        aria-label="Next Slide"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+
+      {/* Slider Wrapper */}
+      <div 
+        className="flex transition-transform duration-700 ease-in-out w-full" 
+        style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+      >
+        {slidesData.map((slide, index) => (
+          <div key={index} className="min-w-full box-border text-white flex flex-col lg:flex-row lg:h-[70vh] lg:min-h-[550px] relative">
+            
+            {/* Background Glow Effect (Optional for modern look) */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-transparent z-0 hidden lg:block" />
+
+            {/* Image Section */}
+            <div className="w-full lg:w-[55%] order-1 lg:order-2 flex items-center justify-center relative z-10 px-5 lg:px-0">
+              <Image 
+                className="w-full h-auto max-h-[350px] lg:max-h-full object-contain  transition-transform duration-700 hover:scale-105" 
+                loading={index === 0 ? "eager" : "lazy"}
+                src={slide.img} 
+                alt={slide.alt} 
+                width={slide.width} 
+                height={slide.height} 
+                priority={index === 0} 
+                sizes="(max-width: 768px) 100vw, 50vw" 
+              />
+            </div>
+
+            {/* Content Section */}
+            <div className="w-full lg:w-[45%] order-2 lg:order-1 p-8 lg:p-[60px] flex flex-col justify-center text-center lg:text-left lg:items-start relative z-10">
+              <p className={`text-sm font-semibold uppercase tracking-[2px] mb-3 text-white-500 transition-all duration-700 delay-100 ${currentSlide === index ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                {slide.subtitle}
+              </p>
+              <p className={`text-white text-[42px] lg:text-[56px] font-extrabold mb-5 leading-[1.1] transition-all duration-700 delay-200 ${currentSlide === index ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                {slide.title}
+              </p>
+              <p className={`text-lg leading-[1.6] mb-8 text-gray-300 max-w-[480px] lg:max-w-none mx-auto lg:mx-0 transition-all duration-700 delay-300 ${currentSlide === index ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                {slide.desc}
+              </p>
+              <div className={`transition-all duration-700 delay-500 ${currentSlide === index ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                <Link href={slide.link} className="inline-flex items-center gap-2 bg-white text-black py-3.5 px-9 rounded-full font-bold text-base transition-all duration-300 hover:bg-red-500 hover:text-white hover:shadow-lg hover:-translate-y-1">
+                  Shop Now
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </Link>
+              </div>
+            </div>
+
+          </div>
         ))}
+      </div>
 
-        {/* Slider Wrapper */}
-        <div 
-            className="flex transition-transform duration-[800ms] ease-[cubic-bezier(0.25,1,0.5,1)]" 
-            style={{ transform: `translateX(-${(currentSlide - 1) * 100}%)` }}
-        >
-      
-          {/* SLIDE 1: NEW GOBIKE 24 */}
-          <div className="min-w-full box-border text-white flex flex-col lg:flex-row lg:h-[70vh] lg:min-h-[550px]">
-            <div className="w-full lg:w-[55%] order-1 lg:order-2 flex items-center justify-center">
-              <Image 
-                className="w-full h-auto max-h-[400px] lg:max-h-full object-contain" 
-                loading="eager" 
-                src="https://gobikes.au/wp-content/uploads/2025/12/Slider-1-scaled.webp" 
-                alt="GoBike 24 Inch Electric Dirt Bike" 
-                width={1000} height={774} priority 
-                sizes="(max-width: 768px) 100vw, 50vw" 
-              />
-            </div>
-            <div className="w-full lg:w-[45%] order-2 lg:order-1 p-10 lg:p-[50px] flex flex-col justify-center text-center lg:text-left lg:items-start">
-              <p className="text-sm font-semibold uppercase tracking-[1.5px] mb-2.5 text-[#ccc]">The Extreme Machine</p>
-              <h2 className="text-white text-[48px] font-extrabold mb-5 leading-[1.1]">GOBIKE 24</h2>
-              <p className="text-lg leading-[1.7] mb-4 max-w-[480px] lg:max-w-none mx-auto lg:mx-0">
-                The ultimate electric dirt bike for teens and adults aged 12+. Unleash raw power with a massive 2500W motor hitting top speeds of 61km/h. Featuring fully adjustable hydraulic suspension and 24-inch Kenda fat tires.
-              </p>
-              <Link href="product/gobike-24-inch-electric-bike-teens-high-speed-performance-for-ages-13" className="inline-block bg-white text-black py-3.5 px-9 rounded-full font-bold text-base transition-all duration-300 hover:bg-[#ddd] hover:scale-105 self-center lg:self-start">Shop Now</Link>
-            </div>
-          </div>
-
-          {/* SLIDE 2: GOBIKE 20 */}
-          <div className="min-w-full box-border text-white flex flex-col lg:flex-row lg:h-[70vh] lg:min-h-[550px]">
-            <div className="w-full lg:w-[55%] order-1 lg:order-2 flex items-center justify-center">
-              <Image 
-                className="w-full h-auto max-h-[400px] lg:max-h-full object-contain" 
-                loading="eager" 
-                src="https://gobikes.au/wp-content/uploads/2025/08/Gobike-electric-bike-kids-ebike20-inch-ages-for10-16-1-1.webp" 
-                alt="GoBike 20 Electric Bike" 
-                width={1000} height={774} priority 
-                sizes="(max-width: 768px) 100vw, 50vw" 
-              />
-            </div>
-            <div className="w-full lg:w-[45%] order-2 lg:order-1 p-10 lg:p-[50px] flex flex-col justify-center text-center lg:text-left lg:items-start">
-              <p className="text-sm font-semibold uppercase tracking-[1.5px] mb-2.5 text-[#ccc]">The Ultimate Weapon</p>
-              <h2 className="text-white text-[48px] font-extrabold mb-5 leading-[1.1]">GOBIKE 20</h2>
-              <p className="text-lg leading-[1.7] mb-4 max-w-[480px] lg:max-w-none mx-auto lg:mx-0">
-                The best 20-inch kids electric bike on the market. Built tough for young adventurers and teens, it delivers powerful performance, long battery life with a 10Ah battery, and reliable fun every ride.
-              </p>
-              <Link href="product/20-inch-electric-bikes-for-sale-ebike-for-kids" className="inline-block bg-white text-black py-3.5 px-9 rounded-full font-bold text-base transition-all duration-300 hover:bg-[#ddd] hover:scale-105 self-center lg:self-start">Shop Now</Link>
-            </div>
-          </div>
-
-          {/* SLIDE 3: GOBIKE 16 */}
-          <div className="min-w-full box-border text-white flex flex-col lg:flex-row lg:h-[70vh] lg:min-h-[550px]">
-            <div className="w-full lg:w-[55%] order-1 lg:order-2 flex items-center justify-center">
-              <Image 
-                className="w-full h-auto max-h-[400px] lg:max-h-full object-contain" 
-                loading="lazy" 
-                src="https://gobikes.au/wp-content/uploads/2025/08/Gobike-electric-bike-kids-ebike20-inch-ages-for10-16-2.webp" 
-                alt="GoBike 16 Electric Bike" 
-                width={1000} height={849} 
-                sizes="(max-width: 768px) 100vw, 50vw" 
-              />
-            </div>
-            <div className="w-full lg:w-[45%] order-2 lg:order-1 p-10 lg:p-[50px] flex flex-col justify-center text-center lg:text-left lg:items-start">
-              <p className="text-sm font-semibold uppercase tracking-[1.5px] mb-2.5 text-[#ccc]">The All-Rounder</p>
-              <h2 className="text-white text-[48px] font-extrabold mb-5 leading-[1.1]">GOBIKE 16</h2>
-              <p className="text-lg leading-[1.7] mb-4 max-w-[480px] lg:max-w-none mx-auto lg:mx-0">
-                The fastest 16-inch kids electric bike on the market! Designed for confident young riders. Three speed modes, hydraulic disc brakes, and front suspension.
-              </p>
-              <Link href="product/ebike-for-sale-16-inch-gobike-ages-5-9" className="inline-block bg-white text-black py-3.5 px-9 rounded-full font-bold text-base transition-all duration-300 hover:bg-[#ddd] hover:scale-105 self-center lg:self-start">Shop Now</Link>
-            </div>
-          </div>
-
-          {/* SLIDE 4: GOBIKE 12 */}
-          <div className="min-w-full box-border text-white flex flex-col lg:flex-row lg:h-[70vh] lg:min-h-[550px]">
-            <div className="w-full lg:w-[55%] order-1 lg:order-2 flex items-center justify-center">
-              <Image 
-                className="w-full h-auto max-h-[400px] lg:max-h-full object-contain" 
-                loading="lazy" 
-                src="https://gobikes.au/wp-content/uploads/2025/08/Gobike-electric-bike-kids-ebike12-inch-ages-for-2-5-1.webp" 
-                alt="GoBike 12 Electric Bike" 
-                width={1000} height={803} 
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            </div>
-            <div className="w-full lg:w-[45%] order-2 lg:order-1 p-10 lg:p-[50px] flex flex-col justify-center text-center lg:text-left lg:items-start">
-              <p className="text-sm font-semibold uppercase tracking-[1.5px] mb-2.5 text-[#ccc]">The Everyday GoBike Range</p>
-              <h2 className="text-white text-[48px] font-extrabold mb-5 leading-[1.1]">GOBIKE 12</h2>
-              <p className="text-lg leading-[1.7] mb-4 max-w-[480px] lg:max-w-none mx-auto lg:mx-0">
-                The perfect first electric bike for toddlers aged 2 years and above transitioning from a balance bike. Features an extra-slow learning mode for beginners.
-              </p>
-              <Link href="product/ebike-for-kids-12-inch-electric-bike-ages-2-5" className="inline-block bg-white text-black py-3.5 px-9 rounded-full font-bold text-base transition-all duration-300 hover:bg-[#ddd] hover:scale-105 self-center lg:self-start">Shop Now</Link>
-            </div>
-          </div>
-
-        </div>
-
-        {/* Navigation Dots */}
-        <div className="absolute bottom-[25px] left-1/2 -translate-x-1/2 z-[4] flex gap-3 lg:left-[22.5%] lg:transform-none">
-          {[1, 2, 3, 4].map(num => (
-             <label 
-                key={num}
-                htmlFor={`slide-radio-${num}`} 
-                className={`w-2.5 h-2.5 rounded-full border border-[#888] cursor-pointer transition-all duration-300 ${currentSlide === num ? 'bg-white border-white' : 'bg-transparent'}`}
-                aria-label={`Go to slide ${num}`}
-             ></label>
-          ))}
-        </div>
+      {/* Modern Navigation Dots (Pill Shaped) */}
+      <div className="absolute bottom-[20px] left-1/2 -translate-x-1/2 z-20 flex gap-2.5 lg:left-[22.5%] lg:transform-none">
+        {slidesData.map((_, index) => (
+          <button 
+            key={index}
+            onClick={() => setCurrentSlide(index)}
+            className={`h-2.5 rounded-full transition-all duration-500 ${
+              currentSlide === index 
+                ? 'bg-red-500 w-8 shadow-[0_0_10px_rgba(239,68,68,0.8)]' 
+                : 'bg-white/40 w-2.5 hover:bg-white/70'
+            }`}
+            aria-label={`Go to slide ${index + 1}`}
+          />
+        ))}
       </div>
     </section>
   );
-}
-
+};
 // ====================================================================
 // TrustBadges Component
 // ====================================================================
