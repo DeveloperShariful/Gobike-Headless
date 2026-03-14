@@ -102,7 +102,6 @@ const HeroSlider = () => {
   const[touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
 
-  // Auto Slider Setup
   useEffect(() => {
     if (isPaused) return;
     const slideInterval = setInterval(() => {
@@ -113,13 +112,11 @@ const HeroSlider = () => {
 
   const nextSlide = () => setCurrentSlide((prev) => (prev === slidesData.length - 1 ? 0 : prev + 1));
   const prevSlide = () => setCurrentSlide((prev) => (prev === 0 ? slidesData.length - 1 : prev - 1));
-
-  // Touch/Swipe Handlers for Mobile
   const handleTouchStart = (e: React.TouchEvent) => setTouchStart(e.targetTouches[0].clientX);
   const handleTouchMove = (e: React.TouchEvent) => setTouchEnd(e.targetTouches[0].clientX);
   const handleTouchEnd = () => {
-    if (touchStart - touchEnd > 75) nextSlide(); // Swipe Left
-    if (touchStart - touchEnd < -75) prevSlide(); // Swipe Right
+    if (touchStart - touchEnd > 75) nextSlide(); 
+    if (touchStart - touchEnd < -75) prevSlide(); 
   };
 
   return (
@@ -131,7 +128,6 @@ const HeroSlider = () => {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Navigation Arrows (Visible on Desktop Hover) */}
       <button 
         onClick={prevSlide}
         className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white/10 hover:bg-white/30 backdrop-blur-sm rounded-full items-center justify-center text-white transition-all opacity-0 group-hover:opacity-100"
@@ -147,22 +143,16 @@ const HeroSlider = () => {
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
       </button>
-
-      {/* Slider Wrapper */}
       <div 
         className="flex transition-transform duration-700 ease-in-out w-full" 
         style={{ transform: `translateX(-${currentSlide * 100}%)` }}
       >
         {slidesData.map((slide, index) => (
           <div key={index} className="min-w-full box-border text-white flex flex-col lg:flex-row lg:h-[70vh] lg:min-h-[550px] relative">
-            
-            {/* Background Glow Effect (Optional for modern look) */}
             <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-transparent z-0 hidden lg:block" />
-
-            {/* Image Section */}
             <div className="w-full lg:w-[55%] order-1 lg:order-2 flex items-center justify-center relative z-10 px-5 lg:px-0">
               <Image 
-                className="w-full h-auto max-h-[350px] lg:max-h-full object-contain  transition-transform duration-700 hover:scale-105" 
+                className="w-full h-auto max-h-[350px] lg:max-h-full object-contain transition-transform duration-700 hover:scale-105" 
                 loading={index === 0 ? "eager" : "lazy"}
                 src={slide.img} 
                 alt={slide.alt} 
@@ -172,8 +162,6 @@ const HeroSlider = () => {
                 sizes="(max-width: 768px) 100vw, 50vw" 
               />
             </div>
-
-            {/* Content Section */}
             <div className="w-full lg:w-[45%] order-2 lg:order-1 p-8 lg:p-[60px] flex flex-col justify-center text-center lg:text-left lg:items-start relative z-10">
               <p className={`text-sm font-semibold uppercase tracking-[2px] mb-3 text-white-500 transition-all duration-700 delay-100 ${currentSlide === index ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                 {slide.subtitle}
@@ -195,8 +183,6 @@ const HeroSlider = () => {
           </div>
         ))}
       </div>
-
-      {/* Modern Navigation Dots (Pill Shaped) */}
       <div className="absolute bottom-[20px] left-1/2 -translate-x-1/2 z-20 flex gap-2.5 lg:left-[22.5%] lg:transform-none">
         {slidesData.map((_, index) => (
           <button 
