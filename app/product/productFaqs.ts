@@ -20,7 +20,7 @@ export const productFaqMap: { [key: string]: FaqItem[] } = {
 
   // --- GoBike 16 FAQs ---
   'ebike-for-sale-16-inch-gobike-ages-5-9': [
-    { question: "What is the top speed of the GoBike 16?", answer: "It has 3 speed modes: Low (8km/h), Medium (12km/h), and High (25km/h). You can limit the speed for safety." },
+    { question: "What is the top speed of the GoBike 16?", answer: "It has 3 speed modes: Low (10km/h), Medium (25km/h), and High (45km/h). You can limit the speed for safety." },
     { question: "Is this suitable for a 5-year-old?", answer: "Yes, it is perfect for ages 5-9. The seat height is adjustable to grow with your child." },
     { question: "How long does shipping take to Sydney/Melbourne?", answer: "We ship from our Australian warehouse. Delivery to metro areas like Sydney and Melbourne typically takes 2-4 business days." },
     { question: "Does it come with a warranty?", answer: "Yes, all GoBike models come with a 1-Year Australian Warranty covering the frame, motor, and battery." },  
