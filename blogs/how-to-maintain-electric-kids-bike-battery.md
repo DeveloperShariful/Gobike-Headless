@@ -32,4 +32,4 @@ Batteries love to be used. A bike that sits in the garage for a year is more lik
 
 Need a spare battery for longer adventures?
 
-[**Shop Spare Batteries & Parts →**](https://gobike.au/accessories)
+[**Shop Spare Batteries & Parts →**](https://gobike.au/spare-parts)

@@ -9,10 +9,26 @@ import Breadcrumbs from '../../../components/Breadcrumbs';
 import { productFaqMap } from '../productFaqs';
 import { productVideoMap } from '../productVideos';
 
+// --- নতুন যোগ করা ইন্টারফেস (Media এবং Replies এর জন্য) ---
+interface ReviewMedia { url: string; type: string; }
+interface ReplyEdge {
+  node: { id: string; content: string; date: string; author: { node: { name: string; avatar?: { url: string } } }; };
+}
+
 interface ReviewEdge {
   rating: number;
-  node: { id: string; author: { node: { name: string; }; }; content: string; date: string; };
+  node: { 
+    id: string; 
+    databaseId: number; // নতুন যোগ করা হয়েছে
+    author: { node: { name: string; avatar?: { url: string }; }; }; // avatar যোগ করা হয়েছে
+    content: string; 
+    date: string; 
+    reviewMedia?: ReviewMedia[]; // নতুন যোগ করা হয়েছে
+    replies?: { edges: ReplyEdge[]; }; // নতুন যোগ করা হয়েছে
+  };
 }
+// --------------------------------------------------------
+
 interface ImageNode { sourceUrl: string; }
 interface Attribute { name: string; options: string[]; }
 interface VariationAttribute { name: string; value: string; }
@@ -96,7 +112,24 @@ const GET_PRODUCT_QUERY = gql`
       }
       averageRating
       reviewCount
-      reviews(first: 100) { edges { rating node { id author { node { name } } content date } } }
+      
+      # --- শুধুমাত্র নিচের লাইনটি আপডেট করা হয়েছে (databaseId, reviewMedia, replies যোগ করা হয়েছে) ---
+      reviews(first: 100) { 
+        edges { 
+          rating 
+          node { 
+            id 
+            databaseId 
+            author { node { name avatar { url } } } 
+            content 
+            date 
+            reviewMedia { url type } 
+            replies { edges { node { id content date author { node { name avatar { url } } } } } } 
+          } 
+        } 
+      }
+      # --------------------------------------------------------------------------------------------
+
       related(first: 4) {
         nodes {
           id databaseId name slug image { sourceUrl } onSale averageRating reviewCount

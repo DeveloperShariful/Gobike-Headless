@@ -32,8 +32,13 @@ interface Variation {
   image?: ImageNode;
 }
 
-interface ReviewEdge {
-  rating: number;
+// --- Updated Types for Reviews to fix TypeScript error ---
+interface ReviewMedia {
+  url: string;
+  type: string;
+}
+
+interface ReplyEdge {
   node: {
     id: string;
     author: { node: { name: string; avatar?: { url: string } }; };
@@ -41,6 +46,20 @@ interface ReviewEdge {
     date: string;
   };
 }
+
+interface ReviewEdge {
+  rating: number;
+  node: {
+    id: string;
+    databaseId: number; // Added
+    author: { node: { name: string; avatar?: { url: string } }; };
+    content: string;
+    date: string;
+    reviewMedia?: ReviewMedia[]; // Added
+    replies?: { edges: ReplyEdge[] }; // Added
+  };
+}
+// ---------------------------------------------------------
 
 interface RelatedProduct { id: string; databaseId: number; name: string; slug: string; image?: ImageNode; price?: string; onSale: boolean; }
 

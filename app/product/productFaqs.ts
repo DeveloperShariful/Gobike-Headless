@@ -37,6 +37,7 @@ export const productFaqMap: { [key: string]: FaqItem[] } = {
   '20-inch-electric-bikes-for-sale-ebike-for-kids': [
     { question: "Is the 20-inch model too powerful for beginners?", answer: "It is powerful but manageable. We recommend it for kids with some riding experience. The speed modes allow you to start slow." },
     { question: "What is the battery range?", answer: "The high-capacity battery offers up to 60-90 minutes of intense riding or up to 3 hours of mild use." },
+    { question: "What is the top speed of the GoBike 20?", answer: "It has 3 speed modes: Low (15km/h), Medium (30km/h), and High (55km/h). You can limit the speed for safety." },
     { question: "Can I buy spare batteries?", answer: "Yes, we stock all spare parts including extra batteries, chargers, and tyres here in Australia." },
     { question: "Is the GoBike 20 suitable for actual mountain bike trails?", answer: "Yes, absolutely. With its robust front suspension, all-terrain tires, and durable frame, the GoBike 20 is specifically designed to handle the challenges of moderate off-road and mountain bike trails." },
     { question: "How powerful is the motor for climbing hills?", answer: "The high-torque hub motor provides significant power, making hill climbs much more manageable and fun for young riders. It helps them keep up with older riders and conquer terrain they couldn't on a regular bike." },

@@ -5,13 +5,21 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FaStar } from 'react-icons/fa';
+import { FaStar, FaTimes, FaPlayCircle } from 'react-icons/fa'; // ★ FaTimes এবং FaPlayCircle যোগ করা হয়েছে
 
+// --- Types ---
 interface ReviewSummary {
   review_count: number;
   average_rating: number;
   rating_counts: { rating: number; count: number; }[];
 }
+
+// ★ নতুন সংযোজন: মিডিয়া টাইপ
+interface ReviewMedia {
+  url: string;
+  type: string;
+}
+
 interface Review {
   id: number;
   reviewer: string;
@@ -21,7 +29,9 @@ interface Review {
   product_name: string;
   product_permalink: string;
   product_image?: string;
+  review_media?: ReviewMedia[]; // ★ নতুন সংযোজন: রিভিউয়ের মিডিয়া
 }
+
 interface ReviewsData {
   summary: ReviewSummary;
   reviews: Review[];
@@ -33,12 +43,11 @@ const StarRating = ({ rating, size = 1, alignLeft = false }: { rating: number, s
     const fullStars = Math.floor(rating);
     const emptyStars = totalStars - fullStars;
     return (
-        // .starRating replaced
         <div 
             className={`flex gap-1 text-black mt-[0.1rem] ${alignLeft ? 'justify-start' : 'justify-center'}`} 
             style={{ fontSize: `${size}rem` }}
         >
-            {[...Array(fullStars)].map((_, i) => <FaStar key={`full-${i}`} />)}
+            {[...Array(fullStars)].map((_, i) => <FaStar key={`full-${i}`} color="#ffc107" />)}
             {[...Array(emptyStars)].map((_, i) => <FaStar key={`empty-${i}`} className="text-[#e4e5e9]" />)}
         </div>
     );
@@ -50,6 +59,10 @@ export default function HomePageReviews() {
   const [loading, setLoading] = useState(true);
   const [visibleReviews, setVisibleReviews] = useState(3);
   const [summary, setSummary] = useState<ReviewSummary | null>(null);
+  
+  // ★ নতুন সংযোজন: Lightbox/Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeMedia, setActiveMedia] = useState<ReviewMedia | null>(null);
   
   const sliderRef = useRef<HTMLDivElement>(null);
 
@@ -85,6 +98,19 @@ export default function HomePageReviews() {
       }
   };
 
+  // ★ নতুন সংযোজন: Lightbox Open/Close ফাংশন
+  const openModal = (media: ReviewMedia) => {
+    setActiveMedia(media);
+    setIsModalOpen(true);
+    document.body.style.overflow = 'hidden'; // স্ক্রল বন্ধ করার জন্য
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setActiveMedia(null);
+    document.body.style.overflow = 'auto'; // স্ক্রল আবার চালু করার জন্য
+  };
+
   if (loading) {
     return (
         <section className="pb-12 bg-white">
@@ -104,39 +130,28 @@ export default function HomePageReviews() {
   );
 
   return (
-    // .reviewsSection replaced
     <section className="pb-12 bg-white font-sans">
-      {/* .container replaced */}
       <div className="max-w-[1500px] mx-auto px-4">
         
-        {/* .sectionHeader replaced */}
         <div className="text-center mb-12 mt-4">
-          {/* .sectionTitle replaced */}
           <h2 className="text-[1.7rem] md:text-[2rem] font-extrabold mb-2 tracking-tight text-[#1a1a1a]">
             What our customers are saying about Gobike
           </h2>
         </div>
 
         {summary && summary.review_count > 0 && (
-          // .summaryBox replaced
           <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr_auto] gap-y-8 gap-x-12 items-center p-6 lg:p-10 bg-[#f8f9fa] rounded-[20px] mb-16 border border-[#e7e7e7]">
               
-              {/* .summaryAverage replaced */}
               <div className="text-center pr-0 lg:pr-12 border-b lg:border-b-0 lg:border-r border-[#e0e0e0] pb-8 lg:pb-0">
-                  {/* .averageRatingValue replaced */}
                   <div className="text-[4rem] font-extrabold leading-none text-black">{summary.average_rating.toFixed(1)}</div>
                   <StarRating rating={summary.average_rating} size={1.2} />
-                  {/* .basedOnReviews replaced */}
                   <div className="text-[0.9rem] text-[#555] mt-4">Based on {summary.review_count} reviews</div>
               </div>
               
-              {/* .summaryBreakdown replaced */}
               <div className="flex flex-col gap-3 w-full">
                   {ratingPercentages?.map((percent, index) => (
-                      // .ratingBarRow replaced
                       <div className="flex items-center gap-4 text-[0.9rem] text-[#555]" key={5 - index}>
                           <span className="w-[50px]">{5 - index} star</span>
-                          {/* .ratingBar replaced */}
                           <div className="flex-grow h-2 bg-[#e9ecef] rounded overflow-hidden">
                               <div className="h-full bg-[#f5b327]" style={{ width: `${percent}%` }}></div>
                           </div>
@@ -145,9 +160,7 @@ export default function HomePageReviews() {
                   ))}
               </div>
               
-              {/* .addReviewWrapper replaced */}
               <div className="text-center pl-0 lg:pl-12 border-t lg:border-t-0 lg:border-l border-[#e0e0e0] pt-8 lg:pt-0">
-                  {/* .addReviewButton replaced */}
                   <span className="inline-block bg-[#1a1a1a] text-white border-none py-[0.9rem] px-8 rounded-lg cursor-pointer font-semibold transition-colors duration-200 hover:bg-[#333]">
                     Add a review
                   </span>
@@ -155,9 +168,7 @@ export default function HomePageReviews() {
           </div>
         )}
 
-        {/* .reviewsSliderContainer replaced */}
         <div className="relative">
-            {/* .reviewsGrid replaced */}
             {/* Desktop: Grid layout | Mobile: Horizontal Scroll Snap layout */}
             <div 
                 className="
@@ -170,7 +181,6 @@ export default function HomePageReviews() {
             {reviews.slice(0, visibleReviews).map((review) => {
                 const productSlug = review.product_permalink.split('/').filter(Boolean).pop() || '';
                 return (
-                    // .reviewCard replaced
                     <div 
                         key={review.id} 
                         className="
@@ -178,43 +188,62 @@ export default function HomePageReviews() {
                             max-md:flex-none max-md:w-[90%] max-md:snap-start
                         "
                     >
-                        {/* .reviewCardHeader replaced */}
                         <div className="flex items-center mb-4 gap-3">
-                            {/* .authorAvatar replaced */}
-                            <div className="w-10 h-10 rounded-full bg-[#e9ecef] text-[#333] flex items-center justify-center font-bold text-[1.1rem] flex-shrink-0">
+                            <div className="w-10 h-10 rounded-full bg-[#e9ecef] text-[#333] flex items-center justify-center font-bold text-[1.1rem] flex-shrink-0 relative after:content-['✓'] after:absolute after:-bottom-0.5 after:-right-0.5 after:bg-emerald-500 after:text-white after:w-4 after:h-4 after:rounded-full after:border-2 after:border-white after:flex after:items-center after:justify-center after:text-[8px] after:font-bold">
                                 {review.reviewer.substring(0, 1)}
                             </div>
-                            {/* .authorDetails replaced */}
                             <div className="flex flex-col items-start">
                                 <strong className="font-semibold text-base">{review.reviewer}</strong>
-                                {/* .verifiedBadge replaced */}
-                                <span className="text-[0.8rem] text-[#17a2b8] font-medium">✓ Verified</span>
+                                <span className="text-[0.8rem] text-emerald-500 font-medium">Verified review</span>
                             </div>
                         </div>
 
                         <StarRating rating={review.rating} alignLeft={true} />
                         
-                        {/* .reviewContent replaced */}
                         <div 
                             className="text-[#333] leading-[1.6] text-[0.95rem] mb-4 flex-grow [&>p:last-child]:mb-0"
                             dangerouslySetInnerHTML={{ __html: review.review }}
                         />
 
-                        {/* .reviewProductInfo replaced */}
+                        {/* ★ নতুন সংযোজন: রিভিউয়ের ইমেজ/ভিডিও গ্যালারি (ছোট করে দেখানো) */}
+                        {review.review_media && review.review_media.length > 0 && (
+                            <div className="flex gap-2 mb-4 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-gray-200">
+                                {review.review_media.map((media, idx) => (
+                                    <div 
+                                        key={idx} 
+                                        onClick={() => openModal(media)}
+                                        className="relative w-[70px] h-[70px] flex-shrink-0 cursor-pointer rounded-lg overflow-hidden border border-gray-200 transition-opacity hover:opacity-80"
+                                    >
+                                        {media.type === 'video' ? (
+                                            <>
+                                                <video src={media.url} className="w-full h-full object-cover" />
+                                                <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                                                    <FaPlayCircle className="text-white text-2xl opacity-80" />
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <Image src={media.url} alt="Review Media" fill className="object-cover" sizes="70px" />
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
                         <div className="flex items-center gap-3 text-[0.9rem] text-[#555] mt-auto pt-4 border-t border-[#e9ecef]">
                             {review.product_image && (
                                 <Link href={`/product/${productSlug}`}>
-                                    <Image src={review.product_image} alt={review.product_name} width={40} height={40} className="rounded-md" />
+                                    <div className="relative w-10 h-10 flex-shrink-0">
+                                        <Image src={review.product_image} alt={review.product_name} fill className="rounded-md object-cover" sizes="40px" />
+                                    </div>
                                 </Link>
                             )}
-                            <span>on <Link href={`/product/${productSlug}`} className="text-[#1a1a1a] font-semibold hover:underline">{review.product_name}</Link></span>
+                            <span>on <Link href={`/product/${productSlug}`} className="text-[#1a1a1a] font-semibold hover:underline line-clamp-1">{review.product_name}</Link></span>
                         </div>
                     </div>
                 );
             })}
             </div>
 
-            {/* .reviewsNav replaced */}
             {/* Mobile Navigation Buttons (Hidden on Desktop) */}
             <button 
                 onClick={() => scroll('left')} 
@@ -233,9 +262,7 @@ export default function HomePageReviews() {
         </div>
         
         {reviews.length > visibleReviews && (
-            // .showMoreContainer replaced
             <div className="text-center mt-12">
-                {/* .showMoreButton replaced */}
                 <button 
                     onClick={() => setVisibleReviews(reviews.length)} 
                     className="bg-transparent border border-[#ccc] py-[0.8rem] px-10 rounded-lg cursor-pointer font-semibold text-base text-[#1a1a1a] transition-all duration-200 hover:bg-[#f0f0f0] hover:border-[#aaa]"
@@ -246,6 +273,34 @@ export default function HomePageReviews() {
         )}
 
       </div>
+
+      {/* ★ নতুন সংযোজন: Image/Video Lightbox Modal */}
+      {isModalOpen && activeMedia && (
+        <div 
+            className="fixed inset-0 z-[9999] bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm"
+            onClick={closeModal} // বাইরে ক্লিক করলে মডাল বন্ধ হবে
+        >
+            <button 
+                className="absolute top-6 right-6 text-white text-3xl hover:text-gray-300 transition-colors cursor-pointer z-[10000]"
+                onClick={closeModal}
+                aria-label="Close"
+            >
+                <FaTimes />
+            </button>
+            
+            <div 
+                className="relative max-w-5xl max-h-[90vh] w-full h-full flex items-center justify-center"
+                onClick={(e) => e.stopPropagation()} // ছবির ভেতরে ক্লিক করলে যেন মডাল বন্ধ না হয়
+            >
+                {activeMedia.type === 'video' ? (
+                    <video src={activeMedia.url} controls autoPlay className="max-w-full max-h-[90vh] rounded-lg shadow-2xl outline-none" />
+                ) : (
+                    <img src={activeMedia.url} alt="Expanded Review Media" className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl select-none" />
+                )}
+            </div>
+        </div>
+      )}
+
     </section>
   );
 }
