@@ -6,7 +6,6 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 import { getClient } from '../../lib/apollo-rsc-client';
 import ProductCard from '@/components/ProductCard';
-// PaginationControls এর পাথ আপনার প্রজেক্ট অনুযায়ী ঠিক আছে কিনা দেখে নেবেন
 import PaginationControls from '../shop/PaginationControls'; 
 import Breadcrumbs from '../../components/Breadcrumbs'; 
 
@@ -39,13 +38,10 @@ interface QueryData {
   } | null;
 }
 
-// --- SEO: Dynamic Metadata Function (FIXED FOR PAGINATION) ---
 export async function generateMetadata({ searchParams }: { 
   searchParams: { [key: string]: string | string[] | undefined } 
 }): Promise<Metadata> {
   const resolvedSearchParams = await searchParams;
-  
-  // URL থেকে পেজ নম্বর পড়া
   const pageParam = resolvedSearchParams.page;
   const pageNum = pageParam && !Array.isArray(pageParam) ? parseInt(pageParam, 10) : 1;
 
@@ -53,7 +49,6 @@ export async function generateMetadata({ searchParams }: {
   let description = "Keep the adventure going! Find all genuine GoBike replacement parts, from batteries and chargers to wheels and grips, to maintain and customize your kids electric bike.";
   let canonicalUrl = '/spare-parts';
 
-  // ★★★ Page 2, 3 এর জন্য আলাদা ইউনিক টাইটেল ও ডেসক্রিপশন ★★★
   if (pageNum > 1) {
     title = `Page ${pageNum} - Genuine Spare Parts & Accessories | GoBike Australia`;
     description = `Browse page ${pageNum} of our genuine GoBike spare parts catalog. Find replacement batteries, chargers, tires, and accessories for kids electric bikes in Australia.`;
@@ -128,7 +123,7 @@ async function getSpareParts(
         }
       `,
       variables: { first, after, last, before },
-      context: { fetchOptions: { next: { revalidate: 3600 } } }, // ক্যাশ টাইম একটু কমিয়েছি ফ্রেশনেস সিগন্যালের জন্য
+      context: { fetchOptions: { next: { revalidate: 3600 } } }, 
     });
     if (!data || !data.products) {
         return {
@@ -294,7 +289,7 @@ export default async function SparePartsPage({ searchParams }: {
               Contact Our Team
             </Link>
             <Link 
-              href="/products" 
+              href="/shop" 
               className="px-8 py-3 bg-white text-gray-800 font-semibold rounded-full border border-gray-200 shadow-sm hover:border-black hover:text-black transition-all duration-200"
             >
               Shop All Products

@@ -59,7 +59,6 @@ export async function generateMetadata({ searchParams }: {
   let baseTitle = "Shop All Products";
   let title = `${baseTitle} | GoBike Australia`;
   let description = "Explore our curated selection of high-quality bikes, spare parts, and accessories. From electric childs motorbikes to balancing bikes, find it all at GoBike.";
-  let canonicalUrl = '/shop';
 
   // Category অনুযায়ী Base Title ও URL সেট করা
   if (categorySlug) {
@@ -67,7 +66,6 @@ export async function generateMetadata({ searchParams }: {
     baseTitle = `Shop ${categoryName}`;
     title = `${baseTitle} | GoBike Australia`;
     description = `Discover our collection of ${categoryName}. Top quality and performance guaranteed. Shop genuine australian electric bikes parts and gear.`;
-    canonicalUrl = `/shop?category=${categorySlug}`;
   }
 
   // ★★★ আপনার চাওয়া অনুযায়ী Page 2, 3 এর জন্য সম্পূর্ণ আলাদা টাইটেল ও ডেসক্রিপশন ★★★
@@ -79,11 +77,19 @@ export async function generateMetadata({ searchParams }: {
     } else {
         description = `Continuing on page ${pageNum} of our products catalog. Discover more premium kids electric bikes, balance bikes, and genuine spare parts at GoBike.`;
     }
-    
-    // Canonical URL-এও পেজ নম্বর দিয়ে দেওয়া হলো, যাতে গুগল ডুপ্লিকেট না ভাবে
-    const separator = canonicalUrl.includes('?') ? '&' : '?';
-    canonicalUrl += `${separator}page=${pageNum}`;
   }
+
+  // ★★★ AHREFS FIX: শুধু এই অংশটুকু আপডেট করা হয়েছে ★★★
+  // URLSearchParams ব্যবহার করে হুবহু বাটনের লিংকের মতো Canonical URL তৈরি করা হলো
+  const params = new URLSearchParams();
+  if (typeof resolvedSearchParams.category === 'string') params.set('category', resolvedSearchParams.category);
+  if (typeof resolvedSearchParams.after === 'string') params.set('after', resolvedSearchParams.after);
+  if (typeof resolvedSearchParams.before === 'string') params.set('before', resolvedSearchParams.before);
+  if (typeof resolvedSearchParams.page === 'string') params.set('page', resolvedSearchParams.page);
+
+  const queryString = params.toString();
+  const canonicalUrl = queryString ? `/shop?${queryString}` : '/shop';
+  // ★★★ ফিক্স শেষ ★★★
 
   const currentDate = new Date().toISOString(); 
 
