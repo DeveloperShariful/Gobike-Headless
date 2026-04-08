@@ -16,7 +16,15 @@ export default function robots(): MetadataRoute.Robots {
         '/my-account/',    
         '/search',          
         '/admin/',  
-        '/affiliate-portal/',             
+        '/affiliate-portal/', 
+        '/login/',    
+        '/register',          
+        '/forgot-password/',  
+        '/track-order/', 
+        '/reset-password/', 
+
+
+
       ],
     },
     sitemap: `${baseUrl}/sitemap.xml`,

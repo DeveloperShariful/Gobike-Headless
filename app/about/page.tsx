@@ -148,7 +148,7 @@ export default function AboutPage() {
           <h2 className="text-[32px] font-bold text-[#1a1a1a] mb-5">Our Mission is to Power Adventure, Confidence, and Freedom—One Ride at a Time.</h2>
           {/* .final-cta-button replaced */}
           <Link 
-            href="/products" 
+            href="/shop" 
             className="inline-block bg-[#ffcc00] text-black font-bold px-10 py-4 rounded-full no-underline text-[18px] mt-[30px] transition-transform duration-300 ease-in-out hover:scale-105"
           >
               Explore The Bikes

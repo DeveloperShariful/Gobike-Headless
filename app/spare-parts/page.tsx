@@ -6,7 +6,7 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 import { getClient } from '../../lib/apollo-rsc-client';
 import ProductCard from '@/components/ProductCard';
-import PaginationControls from '../products/PaginationControls';
+import PaginationControls from '../shop/PaginationControls';
 import Breadcrumbs from '../../components/Breadcrumbs'; 
 
 const PRODUCTS_PER_PAGE = 12;
@@ -265,7 +265,7 @@ export default async function SparePartsPage({ searchParams }: {
               Contact Our Team
             </Link>
             <Link 
-              href="/products" 
+              href="/shop" 
               className="px-8 py-3 bg-white text-gray-800 font-bold rounded-full border border-gray-200 shadow-sm hover:shadow-lg hover:border-blue-600 hover:text-blue-600 hover:-translate-y-0.5 transition-all duration-300"
             >
               Shop All Products

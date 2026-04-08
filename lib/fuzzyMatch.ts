@@ -14,7 +14,7 @@ export const getLevenshteinDistance = (a: string, b: string): number => {
 };
 
 const VALID_PATHS = [
-  '/about', '/bikes', '/blog', '/contact', '/faq', '/privacy-policy', '/products', '/refund-and-returns-policy', '/spare-parts', '/terms-and-conditions',
+  '/about', '/bikes', '/blog', '/contact', '/faq', '/privacy-policy', '/shop', '/refund-and-returns-policy', '/spare-parts', '/terms-and-conditions',
   '/product/heavy-duty-kenda-inner-tube-for-gobike-24-inch-bike-tyre',
   '/product/original-kenda-24x2-60-high-performance-tyre-for-gobike-24-electric-bike-all-terrain-grip',
   '/product/genuine-kenda-20-inch-heavy-duty-inner-tube-for-gobike-20-inch-bike-schrader-valve',

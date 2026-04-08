@@ -140,10 +140,10 @@ export default function Footer() {
               <div>
                   <h3 className="text-lg font-bold mb-4 capitalize border-b-2 border-[#1a1a1a] pb-2 inline-block">Quick Links</h3>
                   <ul className="list-none p-0 m-0 space-y-2">
-                      {['/', '/bikes', '/products', '/about', '/blog'].map((path) => (
+                      {['/', '/bikes', '/shop', '/about', '/blog'].map((path) => (
                         <li key={path}>
                             <Link href={path} className="text-[#555] hover:text-black hover:font-bold transition-all">
-                                {path === '/' ? 'Home' : path === '/products' ? 'Spare Parts' : path.substring(1).replace(/^\w/, c => c.toUpperCase())}
+                                {path === '/' ? 'Home' : path === '/shop' ? 'Spare Parts' : path.substring(1).replace(/^\w/, c => c.toUpperCase())}
                             </Link>
                         </li>
                       ))}

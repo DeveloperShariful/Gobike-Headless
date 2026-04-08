@@ -52,7 +52,7 @@ export default function TermsAndConditionsPage() {
         {/* .termsSection replaced (Reusable Styles) */}
         <div className="mb-10">
           <h2 className="text-[26px] font-bold text-[#1a1a1a] mb-5 pb-[10px] border-b-2 border-[#f0f0f0]">1. Definitions</h2>
-          <p><strong className="text-[#1a1a1a]">“GoBike”</strong>, “we”, “us” refers to our company and website, <Link href="https://gobike.au/" className="text-[#007bff] font-semibold no-underline hover:underline">GoBike.au</Link>. <strong className="text-[#1a1a1a]">“User”</strong>, “you” refers to any visitor or customer. <strong className="text-[#1a1a1a]">“Products”</strong> include our entire range of <strong className="text-[#1a1a1a]"><Link href="/bikes" className="text-[#007bff] font-semibold no-underline hover:underline">electric balance bikes</Link></strong> and <Link href="/products" className="text-[#007bff] font-semibold no-underline hover:underline">accessories</Link>.</p>
+          <p><strong className="text-[#1a1a1a]">“GoBike”</strong>, “we”, “us” refers to our company and website, <Link href="https://gobike.au/" className="text-[#007bff] font-semibold no-underline hover:underline">GoBike.au</Link>. <strong className="text-[#1a1a1a]">“User”</strong>, “you” refers to any visitor or customer. <strong className="text-[#1a1a1a]">“Products”</strong> include our entire range of <strong className="text-[#1a1a1a]"><Link href="/bikes" className="text-[#007bff] font-semibold no-underline hover:underline">electric balance bikes</Link></strong> and <Link href="/shop" className="text-[#007bff] font-semibold no-underline hover:underline">accessories</Link>.</p>
         </div>
 
         <div className="mb-10">

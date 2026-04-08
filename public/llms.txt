@@ -7,7 +7,7 @@
 
 ## Main Shopping Categories
 - [Home](https://gobike.au/)
-- [Shop All Products](https://gobike.au/products)
+- [Shop All Products](https://gobike.au/shop)
 - [Electric Bikes](https://gobike.au/bikes)
 - [Spare Parts](https://gobike.au/spare-parts)
 - [Apparel](https://gobike.au/apparel)

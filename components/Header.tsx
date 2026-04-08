@@ -111,7 +111,7 @@ export default function Header() {
           
           {/* Desktop Nav */}
           <nav className="hidden lg:flex gap-6 xl:gap-8 items-center justify-self-center">
-            {['/', '/bikes', '/spare-parts', '/apparel', '/about', '/contact', '/faq', '/blog'].map((path) => (
+            {['/', '/bikes', '/spare-parts', '/apparel', '/shop','/about', '/contact', '/faq', '/blog'].map((path) => (
                 <Link 
                     key={path}
                     href={path} 
@@ -258,7 +258,7 @@ export default function Header() {
           </div>
             
             <nav className="flex flex-col gap-6 flex-grow overflow-y-auto">
-                {['/', '/bikes', '/spare-parts', '/apparel', '/about', '/faq', '/contact', '/blog'].map((path) => (
+                {['/', '/bikes', '/spare-parts', '/apparel', '/shop','/about', '/faq', '/contact', '/blog'].map((path) => (
                     <Link 
                         key={path}
                         href={path} 

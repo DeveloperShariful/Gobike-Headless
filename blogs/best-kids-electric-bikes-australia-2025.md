@@ -15,9 +15,9 @@ In this guide, we break down the top-rated electric bikes for 2025 to help you c
 
 If you are in a hurry, here are our top recommendations based on age and skill level:
 
-*   **Best Overall:** [GoBike Model X - 16 Inch](https://gobike.au/bikes) (Great for ages 5-8)
-*   **Best for Beginners:** [GoBike Balance 12](https://gobike.au/bikes) (Perfect for ages 3-5)
-*   **Best for Advanced Riders:** [GoBike Pro Dirt](https://gobike.au/bikes) (High torque for ages 8+)
+*   **Best Overall:** [GoBike Model X - 16 Inch]https://gobike.au/product/ebike-for-sale-16-inch-gobike-ages-5-9) (Great for ages 5-8)
+*   **Best for Beginners:** [GoBike Balance 12](https://gobike.au/product/ebike-for-kids-12-inch-electric-bike-ages-2-5) (Perfect for ages 3-5)
+*   **Best for Advanced Riders:** [GoBike Pro Dirt](https://gobike.au/product/gobike-24-inch-electric-bike-teens-high-speed-performance-for-ages-13) (High torque for ages 8+)
 
 ---
 

@@ -1,4 +1,4 @@
-// app/products/page.tsx
+// app/shop/page.tsx
 
 import { gql } from '@apollo/client';
 import type { Metadata } from 'next';
@@ -45,41 +45,47 @@ interface QueryData {
   } | null;
 }
 
-// --- METADATA GENERATION (Fixed for SEO & AEO/GEO) ---
+// --- METADATA GENERATION (Fixed for 100% Unique SEO) ---
 export async function generateMetadata({ searchParams }: { 
   searchParams: { [key: string]: string | string[] | undefined } 
 }): Promise<Metadata> {
   const resolvedSearchParams = await searchParams;
   const categorySlug = typeof resolvedSearchParams.category === 'string' ? resolvedSearchParams.category : undefined;
   
-  // Check if we are on a paginated page (Page 2, 3, etc.)
-  const isPaged = !!(resolvedSearchParams.after || resolvedSearchParams.before);
+  // URL থেকে পেজ নম্বর পড়া
+  const pageParam = resolvedSearchParams.page;
+  const pageNum = pageParam && !Array.isArray(pageParam) ? parseInt(pageParam, 10) : 1;
   
-  let title = "Shop All Products | GoBike Australia";
+  let baseTitle = "Shop All Products";
+  let title = `${baseTitle} | GoBike Australia`;
   let description = "Explore our curated selection of high-quality bikes, spare parts, and accessories. From electric childs motorbikes to balancing bikes, find it all at GoBike.";
-  let canonicalUrl = '/products';
+  let canonicalUrl = '/shop';
 
-  // Update Title/Desc based on Category
+  // Category অনুযায়ী Base Title ও URL সেট করা
   if (categorySlug) {
     const categoryName = categorySlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    title = `Shop ${categoryName} | GoBike Australia`;
+    baseTitle = `Shop ${categoryName}`;
+    title = `${baseTitle} | GoBike Australia`;
     description = `Discover our collection of ${categoryName}. Top quality and performance guaranteed. Shop genuine australian electric bikes parts and gear.`;
-    canonicalUrl = `/products?category=${categorySlug}`;
+    canonicalUrl = `/shop?category=${categorySlug}`;
   }
 
-  // Update Title/Desc based on Pagination to avoid Duplicates
-  if (isPaged) {
-    title = `${title} - Page 2+`;
-    description = `${description} Browse more items in our collection on page 2 and beyond.`;
+  // ★★★ আপনার চাওয়া অনুযায়ী Page 2, 3 এর জন্য সম্পূর্ণ আলাদা টাইটেল ও ডেসক্রিপশন ★★★
+  if (pageNum > 1) {
+    title = `Page ${pageNum} - ${baseTitle} | GoBike Australia`;
+    
+    if (categorySlug) {
+        description = `Browse page ${pageNum} of our ${categorySlug.replace(/-/g, ' ')} collection. Find more top-quality electric bikes, parts, and accessories for kids in Australia.`;
+    } else {
+        description = `Continuing on page ${pageNum} of our products catalog. Discover more premium kids electric bikes, balance bikes, and genuine spare parts at GoBike.`;
+    }
+    
+    // Canonical URL-এও পেজ নম্বর দিয়ে দেওয়া হলো, যাতে গুগল ডুপ্লিকেট না ভাবে
+    const separator = canonicalUrl.includes('?') ? '&' : '?';
+    canonicalUrl += `${separator}page=${pageNum}`;
   }
 
-  // Construct Canonical URL accurately
-  if (typeof resolvedSearchParams.after === 'string') {
-     const separator = categorySlug ? '&' : '?';
-     canonicalUrl += `${separator}after=${resolvedSearchParams.after}`;
-  }
-
-  const currentDate = new Date().toISOString(); // ★★★ Freshness Signal
+  const currentDate = new Date().toISOString(); 
 
   return {
     title,
@@ -97,7 +103,7 @@ export async function generateMetadata({ searchParams }: {
       canonical: canonicalUrl,
     },
     robots: {
-      index: !isPaged, 
+      index: true, // সব পেজ ইনডেক্স হবে
       follow: true,
     },
     openGraph: {
@@ -117,8 +123,8 @@ export async function generateMetadata({ searchParams }: {
       type: 'website',
     },
     other: {
-      'article:modified_time': currentDate, // ★★★ ফিক্সড: Ahrefs Missing Date Issue
-      'og:updated_time': currentDate,       // ★★★ TS এরর ছাড়া কাস্টম ট্যাগ
+      'article:modified_time': currentDate, 
+      'og:updated_time': currentDate,       
       'last-modified': currentDate,
     }
   };
@@ -188,12 +194,11 @@ export default async function ProductsPage({ searchParams }: {
   );
 
   const currentCategoryName = categories.find((c: Category) => c.slug === category)?.name || "All Products";
-  const currentUrl = category ? `https://gobike.au/products?category=${category}` : `https://gobike.au/products`;
+  const currentUrl = category ? `https://gobike.au/shop?category=${category}` : `https://gobike.au/shop`;
 
-  // ★★★ AEO/GEO: Breadcrumb Schema ★★★
   const breadcrumbItems = [
     { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': 'https://gobike.au' },
-    { '@type': 'ListItem', 'position': 2, 'name': 'Products', 'item': 'https://gobike.au/products' }
+    { '@type': 'ListItem', 'position': 2, 'name': 'Products', 'item': 'https://gobike.au/shop' }
   ];
   if (category) {
     breadcrumbItems.push({ '@type': 'ListItem', 'position': 3, 'name': currentCategoryName, 'item': currentUrl });
@@ -205,7 +210,6 @@ export default async function ProductsPage({ searchParams }: {
     'itemListElement': breadcrumbItems
   };
 
-  // ★★★ AEO/GEO: CollectionPage + ItemList Schema ★★★
   const collectionSchema = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
@@ -248,14 +252,12 @@ export default async function ProductsPage({ searchParams }: {
 
   return (
     <div>
-      {/* ★★★ Schema Injection ★★★ */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }} />
 
       <Breadcrumbs pageTitle={currentCategoryName} />
       
       <div className="max-w-[1300px] mx-auto px-1.5 font-sans mb-12">
-        {/* Header */}
         <header className="text-center mb-12 bg-gray-50 rounded-lg p-8 md:p-12">
           <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">{currentCategoryName}</h1>
           <p className="text-gray-600 max-w-2xl mx-auto text-lg">Explore our curated selection of high-quality products. Find exactly what you are looking for.</p>
@@ -272,7 +274,7 @@ export default async function ProductsPage({ searchParams }: {
         </main>
         
         <div className="mt-10 flex justify-center">
-            <PaginationControls pageInfo={pageInfo} basePath="/products" />
+            <PaginationControls pageInfo={pageInfo} basePath="/shop" />
         </div>
 
         <section className="bg-white border-t border-gray-100 pt-16 pb-12 mt-16 mb-8 p-4">
@@ -293,26 +295,10 @@ export default async function ProductsPage({ searchParams }: {
             </div>
         </section>
 
-        {/* Internal Links */}
         <div className="flex justify-center gap-4 flex-wrap mt-12 pb-8 border-t border-gray-100 pt-8">
-            <Link 
-                href="/contact" 
-                className="inline-block px-6 py-3 bg-gray-50 text-gray-800 border border-gray-200 rounded-full font-medium transition-all duration-200 hover:bg-black hover:text-white hover:border-black"
-            >
-                Contact Our Team
-            </Link>
-            <Link 
-                href="/bikes" 
-                className="inline-block px-6 py-3 bg-gray-50 text-gray-800 border border-gray-200 rounded-full font-medium transition-all duration-200 hover:bg-black hover:text-white hover:border-black"
-            >
-                Shop All Bikes
-            </Link>
-            <Link 
-                href="/about" 
-                className="inline-block px-6 py-3 bg-gray-50 text-gray-800 border border-gray-200 rounded-full font-medium transition-all duration-200 hover:bg-black hover:text-white hover:border-black"
-            >
-                About Us
-            </Link>
+            <Link href="/contact" className="inline-block px-6 py-3 bg-gray-50 text-gray-800 border border-gray-200 rounded-full font-medium transition-all duration-200 hover:bg-black hover:text-white hover:border-black">Contact Our Team</Link>
+            <Link href="/bikes" className="inline-block px-6 py-3 bg-gray-50 text-gray-800 border border-gray-200 rounded-full font-medium transition-all duration-200 hover:bg-black hover:text-white hover:border-black">Shop All Bikes</Link>
+            <Link href="/about" className="inline-block px-6 py-3 bg-gray-50 text-gray-800 border border-gray-200 rounded-full font-medium transition-all duration-200 hover:bg-black hover:text-white hover:border-black">About Us</Link>
           </div>
       </div>
     </div>

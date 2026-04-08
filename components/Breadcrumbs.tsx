@@ -38,7 +38,7 @@ export default function Breadcrumbs({ pageTitle }: BreadcrumbsProps) {
 
           // ★★★ সমাধান: 'product' সেগমেন্টের জন্য লিঙ্ক পরিবর্তন লজিক অপরিবর্তিত রাখা হয়েছে ★★★
           if (segment === 'product') {
-            href = '/products'; 
+            href = '/shop'; 
           }
           // ---------------------------------------------------------------
 

@@ -1,4 +1,4 @@
-// app/products/PaginationControls.tsx
+// app/shop/PaginationControls.tsx
 'use client';
 
 import Link from 'next/link';
@@ -19,12 +19,13 @@ interface PaginationControlsProps {
 export default function PaginationControls({ pageInfo }: PaginationControlsProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
   const createNextPageUrl = () => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete('before');
     if (pageInfo.endCursor) {
       params.set('after', pageInfo.endCursor);
+      params.set('page', (currentPage + 1).toString()); 
     }
     return `${pathname}?${params.toString()}`;
   };
@@ -34,17 +35,20 @@ export default function PaginationControls({ pageInfo }: PaginationControlsProps
     params.delete('after');
     if (pageInfo.startCursor) {
       params.set('before', pageInfo.startCursor);
+      if (currentPage - 1 > 1) {
+        params.set('page', (currentPage - 1).toString());
+      } else {
+        params.delete('page');
+      }
     }
     return `${pathname}?${params.toString()}`;
   };
 
   return (
-    // .paginationContainer replaced
     <div className="flex justify-center items-center gap-4 mt-10 mb-8">
       {pageInfo.hasPreviousPage ? (
         <Link 
             href={createPrevPageUrl()} 
-            // .button replaced
             className="px-6 py-3 border border-gray-200 bg-white rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
         >
           &larr; Previous

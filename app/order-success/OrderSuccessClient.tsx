@@ -280,7 +280,7 @@ export default function OrderSuccessClient({ orderId, orderKey }: { orderId: str
         {/* Button */}
         {/* .footerAction replaced */}
         <div className="p-8 text-center bg-white border-t border-gray-100">
-          <Link href="/products" className="inline-block bg-black text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 hover:bg-gray-800 hover:-translate-y-0.5 shadow-lg shadow-gray-200">
+          <Link href="/shop" className="inline-block bg-black text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 hover:bg-gray-800 hover:-translate-y-0.5 shadow-lg shadow-gray-200">
             Continue Shopping
           </Link>
         </div>

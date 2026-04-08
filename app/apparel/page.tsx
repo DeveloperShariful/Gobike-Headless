@@ -6,7 +6,7 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 import { getClient } from '../../lib/apollo-rsc-client';
 import ProductCard from '@/components/ProductCard';
-import PaginationControls from '../products/PaginationControls';
+import PaginationControls from '../shop/PaginationControls';
 import Breadcrumbs from '../../components/Breadcrumbs';
 
 const PRODUCTS_PER_PAGE = 12;
