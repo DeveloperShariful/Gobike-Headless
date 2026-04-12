@@ -53,10 +53,9 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
     if (id.includes('klarna')) return <Image src="https://x.klarnacdn.net/payment-method/assets/badges/generic/klarna.svg" alt="Klarna" width={50} height={20} className="h-6 w-auto" />;
     if (id.includes('afterpay')) return <Image src="https://static.afterpay.com/integration/logo-afterpay-colour.svg" alt="Afterpay" width={80} height={20} className="h-6 w-auto" unoptimized />;
     if (id.includes('stripe')) return (
-      <span className="flex items-center gap-1">
-        <Image src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" width={30} height={20} className="h-5 w-5 rounded-[2px] md:h-[25px] md:w-[30px]" />
-        <Image src="https://js.stripe.com/v3/fingerprinted/img/mastercard-4d8844094130711885b5e41b28c9848f.svg" alt="Mastercard" width={30} height={20} className="h-5 w-5 rounded-[2px] md:h-[25px] md:w-[30px]" />
-        <Image src="https://www.americanexpress.com/content/dam/amex/us/merchant/supplies-uplift/product/images/Amex_Bluebox-Logo.png" alt="American Express" width={30} height={20} className="h-5 w-5 rounded-[2px] md:h-[25px] md:w-[30px]" unoptimized />
+      <span className=" items-center ">
+        <Image src="https://gobikes.au/wp-content/uploads/2026/04/Creadit-card-image.webp" alt="Visa" width={150} height={35} className="h-8 w-50 rounded-[2px] md:h-[30px] md:w-[150px]" />
+        
       </span>
     );
     return null;
@@ -137,7 +136,19 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
       <div className="w-full mt-2.5">
         {isPayPalSelected ? (
           <div className="min-h-[150px]">
-            <PayPalPaymentGateway total={total} isPlacingOrder={isPlacingOrder} onPlaceOrder={onPlaceOrder} isShippingSelected={isShippingSelected} />
+            <PayPalPaymentGateway 
+            total={total} 
+            isPlacingOrder={isPlacingOrder}
+            onPlaceOrder={onPlaceOrder}
+            isShippingSelected={isShippingSelected}
+            // নিচের লাইনগুলো যুক্ত করুন:
+            cartItems={cartItems}
+            customerInfo={customerInfo}
+            shippingInfo={shippingInfo}
+            selectedShipping={selectedShipping}
+            shippingRates={shippingRates}
+            appliedCoupons={appliedCoupons}
+             />
           </div>
         ) : (
           selectedPaymentMethod && (
