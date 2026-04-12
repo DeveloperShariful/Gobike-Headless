@@ -2,13 +2,21 @@
 'use client';
 import { FaFacebookF, FaInstagram, FaYoutube, FaTiktok } from 'react-icons/fa';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Script from 'next/script'; // Trustpilot স্ক্রিপ্ট লোড করার জন্য
 
 export default function Footer() {
   const [email, setEmail] = useState('');
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const trustBoxRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).Trustpilot && trustBoxRef.current) {
+      (window as any).Trustpilot.loadFromElement(trustBoxRef.current, true);
+    }
+  }, []);
 
   const handleSubscription = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,10 +43,10 @@ export default function Footer() {
     } catch (error: unknown) {
         setStatus('error');
         let errorMessage = 'Failed to subscribe. Please try again.';
-    if (error instanceof Error) {
-        errorMessage = error.message;
-    }
-    setFeedbackMessage(errorMessage);
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+        setFeedbackMessage(errorMessage);
     
     } finally {
         setTimeout(() => {
@@ -92,8 +100,9 @@ export default function Footer() {
           
           <div className="grid max-w-[1500px] mx-auto gap-x-8 gap-y-10 grid-cols-2 lg:grid-cols-5">
               
-              {/* Logo Column - (Fixed Vertical Alignment) */}
-              <div className="col-span-2 lg:col-span-1 flex justify-center lg:justify-start lg:items-start mb-2 lg:mb-0 border-b lg:border-none pb-1 lg:pb-0 border-[#f0f0f0]">
+              {/* --- Logo & Trustpilot Column --- */}
+              <div className="col-span-2 lg:col-span-1 flex flex-col justify-center items-center lg:justify-start lg:items-start gap-5 mb-2 lg:mb-0 border-b lg:border-none pb-6 lg:pb-0 border-[#f0f0f0]">
+                 
                  <Link href="/">
                   <Image 
                     src="https://gobikes.au/wp-content/uploads/2025/06/GOBIKE-Electric-Bike-for-kids.webp" 
@@ -102,7 +111,24 @@ export default function Footer() {
                     height={430} 
                     className="w-[200px] md:w-[250px] h-auto" 
                   />
-                  </Link>
+                 </Link>
+
+                 {/* Trustpilot Widget Box (আপনার স্ক্রিনশটের রিয়েল ডেটা বসানো হয়েছে) */}
+                 <div
+                    ref={trustBoxRef}
+                    className="trustpilot-widget"
+                    data-locale="en-AU"
+                    data-template-id="56278e9abfbbba0bdcd568bc"
+                    data-businessunit-id="69da0c2911093f0a759595de"
+                    data-style-height="52px"
+                    data-style-width="100%"
+                    data-theme="light"
+                    data-token="2adfbbad-3298-4a8e-bd6f-72911d3d8f4d"
+                  >
+                    <a href="https://au.trustpilot.com/review/gobike.au" target="_blank" rel="noopener noreferrer">
+                      Trustpilot
+                    </a>
+                  </div>
               </div>
 
               {/* Follow Us Column */}
@@ -156,7 +182,6 @@ export default function Footer() {
                   <ul className="list-none p-0 m-0 space-y-2">
                       <li><a href="https://gobikes.au/my-account/" className="text-[#555] hover:text-black hover:font-bold transition-all">Log In/Register</a></li>
                       
-                      {/* Updated Array: Added /track-order and /shipping-policy */}
                       {['/track-order', '/shipping-policy', '/contact', '/faq', '/terms-and-conditions', '/privacy-policy', '/refund-and-returns-policy'].map((path) => (
                         <li key={path}>
                             <Link href={path} className="text-[#555] hover:text-black hover:font-bold transition-all">
@@ -164,7 +189,6 @@ export default function Footer() {
                                   path === '/contact' ? 'Contact Us' : 
                                   path === '/faq' ? 'FAQs' : 
                                   path === '/terms-and-conditions' ? 'Terms & Condition' : 
-                                  // This automatically formats '/track-order' to 'Track Order' and '/shipping-policy' to 'Shipping Policy'
                                   path.substring(1).replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
                                 }
                             </Link>
@@ -173,7 +197,6 @@ export default function Footer() {
                   </ul>
               </div>
               
-
               {/* Our Promise Column */}
               <div>
                   <h3 className="text-lg font-bold mb-4 capitalize border-b-2 border-[#1a1a1a] pb-2 inline-block">Our Promise</h3>
@@ -207,6 +230,11 @@ export default function Footer() {
               </div>
           </div>
       </div>
+      <Script 
+        type="text/javascript" 
+        src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" 
+        strategy="lazyOnload" 
+      />
     </footer>
   );
 }

@@ -68,9 +68,9 @@ export default function Header() {
 
   return (
     <>
-      <header className="bg-white border-b border-[#eaeaea] py-1.5 sticky top-[55px] z-50 transition-[top] duration-300 ease-in-out md:top-[48px]">
+      <header className="bg-white border-b border-[#eaeaea] py-1.3 sticky top-[55px] z-50 transition-[top] duration-300 ease-in-out md:top-[48px] shadow-md">
         
-        <div className="max-w-[1400px] mx-auto px-6 flex lg:grid lg:grid-cols-3 items-center justify-between relative">
+        <div className="max-w-[1400px] mx-auto px-6 flex pb-3 pt-3 lg:grid lg:grid-cols-3 items-center justify-between relative ">
           
           {/* Logo & Mobile Menu Button */}
           <div className="flex flex-1 lg:flex-none items-center justify-start">
@@ -110,12 +110,12 @@ export default function Header() {
           </div>
           
           {/* Desktop Nav */}
-          <nav className="hidden lg:flex gap-6 xl:gap-8 items-center justify-self-center">
+          <nav className="hidden lg:flex gap-6 xl:gap-7 items-center justify-self-center">
             {['/', '/bikes', '/spare-parts', '/apparel', '/shop','/about', '/contact', '/faq', '/blog'].map((path) => (
                 <Link 
                     key={path}
                     href={path} 
-                    className={`no-underline text-[15px] xl:text-[16px] font-medium transition-colors duration-200 ease-in-out hover:text-black hover:font-bold whitespace-nowrap ${pathname === path ? 'text-black font-bold' : 'text-[#353535]'}`}
+                    className={`no-underline text-[15px] xl:text-[18px] font-medium transition-colors duration-200 ease-in-out hover:text-black hover:font-bold whitespace-nowrap ${pathname === path ? 'text-black font-bold' : 'text-[#353535]'}`}
                 >
                     {path === '/' ? 'Home' : path.substring(1).replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                 </Link>

@@ -45,6 +45,8 @@ interface QueryData {
   } | null;
 }
 
+// app/shop/page.tsx
+
 // --- METADATA GENERATION (Fixed for 100% Unique SEO) ---
 export async function generateMetadata({ searchParams }: { 
   searchParams: { [key: string]: string | string[] | undefined } 
@@ -68,7 +70,7 @@ export async function generateMetadata({ searchParams }: {
     description = `Discover our collection of ${categoryName}. Top quality and performance guaranteed. Shop genuine australian electric bikes parts and gear.`;
   }
 
-  // ★★★ আপনার চাওয়া অনুযায়ী Page 2, 3 এর জন্য সম্পূর্ণ আলাদা টাইটেল ও ডেসক্রিপশন ★★★
+  // ★★★ Page 2, 3 এর জন্য আলাদা টাইটেল ও ডেসক্রিপশন ★★★
   if (pageNum > 1) {
     title = `Page ${pageNum} - ${baseTitle} | GoBike Australia`;
     
@@ -79,17 +81,18 @@ export async function generateMetadata({ searchParams }: {
     }
   }
 
-  // ★★★ AHREFS FIX: শুধু এই অংশটুকু আপডেট করা হয়েছে ★★★
-  // URLSearchParams ব্যবহার করে হুবহু বাটনের লিংকের মতো Canonical URL তৈরি করা হলো
-  const params = new URLSearchParams();
-  if (typeof resolvedSearchParams.category === 'string') params.set('category', resolvedSearchParams.category);
-  if (typeof resolvedSearchParams.after === 'string') params.set('after', resolvedSearchParams.after);
-  if (typeof resolvedSearchParams.before === 'string') params.set('before', resolvedSearchParams.before);
-  if (typeof resolvedSearchParams.page === 'string') params.set('page', resolvedSearchParams.page);
+  const canonicalParams = new URLSearchParams();
+  
+  if (categorySlug) {
+    canonicalParams.set('category', categorySlug);
+  }
+  
+  if (pageNum > 1) {
+    canonicalParams.set('page', pageNum.toString());
+  }
 
-  const queryString = params.toString();
+  const queryString = canonicalParams.toString();
   const canonicalUrl = queryString ? `/shop?${queryString}` : '/shop';
-  // ★★★ ফিক্স শেষ ★★★
 
   const currentDate = new Date().toISOString(); 
 
@@ -106,11 +109,15 @@ export async function generateMetadata({ searchParams }: {
       categorySlug ? `${categorySlug} australia` : 'kids ebikes'
     ],
     alternates: {
-      canonical: canonicalUrl,
+      canonical: canonicalUrl, 
     },
     robots: {
-      index: true, // সব পেজ ইনডেক্স হবে
+      index: true, 
       follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+      }
     },
     openGraph: {
       title: title,

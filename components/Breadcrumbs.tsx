@@ -4,7 +4,6 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-// import styles from './Breadcrumbs.module.css'; // CSS Module সরানো হয়েছে
 
 interface BreadcrumbsProps {
   pageTitle?: string;
@@ -21,7 +20,7 @@ export default function Breadcrumbs({ pageTitle }: BreadcrumbsProps) {
   const pathSegments = pathname.split('/').filter(segment => segment);
 
   return (
-    <nav aria-label="Breadcrumb" className="max-w-[1600px] mx-auto mt-2 mb-4 px-1.5 font-sans">
+    <nav aria-label="Breadcrumb" className="max-w-[1300px] mx-auto mt-2 mb-4 px-1.5 font-sans">
       <ol className="flex items-center list-none p-0 m-0 text-[0.9rem] lg:text-[1.2rem] text-black overflow-hidden text-ellipsis whitespace-nowrap">
         <li className="flex items-center">
           <Link 
@@ -36,7 +35,6 @@ export default function Breadcrumbs({ pageTitle }: BreadcrumbsProps) {
           const isLast = index === pathSegments.length - 1;
           let href = '/' + pathSegments.slice(0, index + 1).join('/');
 
-          // ★★★ সমাধান: 'product' সেগমেন্টের জন্য লিঙ্ক পরিবর্তন লজিক অপরিবর্তিত রাখা হয়েছে ★★★
           if (segment === 'product') {
             href = '/shop'; 
           }
