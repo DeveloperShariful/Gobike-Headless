@@ -137,7 +137,18 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
       <div className="w-full mt-2.5">
         {isPayPalSelected ? (
           <div className="min-h-[150px]">
-            <PayPalPaymentGateway total={total} isPlacingOrder={isPlacingOrder} onPlaceOrder={onPlaceOrder} isShippingSelected={isShippingSelected} />
+            <PayPalPaymentGateway
+             total={total}
+             isPlacingOrder={isPlacingOrder} 
+             onPlaceOrder={onPlaceOrder} 
+             isShippingSelected={isShippingSelected} 
+             cartItems={cartItems}
+             customerInfo={customerInfo}
+             shippingInfo={shippingInfo}
+             selectedShipping={selectedShipping}
+             shippingRates={shippingRates}
+             appliedCoupons={appliedCoupons}
+             />
           </div>
         ) : (
           selectedPaymentMethod && (
