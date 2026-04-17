@@ -104,7 +104,8 @@ export default function ContactPageClient() {
                   {/* .contactInfoBox replaced */}
                   <div className="bg-gray-50 rounded-lg p-6 text-sm leading-[1.6] border-l-4 border-blue-600 text-gray-800">
                       <p className="mb-2"><strong>Warehouse Location:</strong> CAMDEN SOUTH NSW. Please note, pickup is available by request only.</p>
-                      <p><strong>Retailer Locations:</strong><br /> NSW – ON TWO WHEELS GLEDSWOOD HILLS – CAMDEN CYCLES – ENGADINE CYCLES AND SCOOTERS – SINGLETON BIKE SHOP<br /> VIC – TBC in 2026.<br />QLD – TBC in 2026</p>
+                      {/* UPDATED LOCATIONS HERE */}
+                      <p><strong>Retailer Locations:</strong><br /> NSW – ON TWO WHEELS GLEDSWOOD HILLS – CAMDEN CYCLES – ENGADINE CYCLES AND SCOOTERS – SINGLETON BIKE SHOP<br /> VIC – OZMINIS MOTORSPORT PAKENHAM<br /> QLD – COOROY MOTORCYCLES</p>
                   </div>
               </div>
 
