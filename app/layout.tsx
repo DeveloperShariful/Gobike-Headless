@@ -1,8 +1,9 @@
-//app/layout.tsx
+// app/layout.tsx
 
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import "./globals.css"; 
+
 import TopBar from "../components/TopBar";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -150,31 +151,29 @@ export default async function RootLayout({
   };
 
   return (
-    <html lang="en-AU">
-      <head>
+    <html lang="en-AU" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
+      >
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
-      </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        suppressHydrationWarning={true}
-      >
+        
         <Suspense>
           <SourceTracker />
         </Suspense>
         <Providers initialUser={user}>
           <CompareProvider>
-          <TopBar />
-          <Header />
-          <main>
-            {children}
-          </main>
-          <FloatingCompareBar />
+            <TopBar />
+            <Header />
+            <main>
+              {children}
+            </main>
+            <FloatingCompareBar />
           </CompareProvider>
           <Footer />
-          
         </Providers>       
         <DelayedScripts />
       </body>
