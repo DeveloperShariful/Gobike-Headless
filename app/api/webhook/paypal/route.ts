@@ -82,7 +82,6 @@ export async function POST(request: Request) {
             console.log(`⏳ [Webhook] Waiting 10 seconds for frontend to finish Order ${wcOrderId}...`);
             await sleep(10000); 
 
-            // চেক করি ফ্রন্টএন্ড অলরেডি ক্যাপচার করে ফেলেছে কি না
             const wcOrder = await wooCommerceRequest<any>(`orders/${wcOrderId}`, "GET");
             if (wcOrder && (wcOrder.status === 'processing' || wcOrder.status === 'completed')) {
                 console.log(`✅ [Webhook] Order ${wcOrderId} already processed by frontend.`);

@@ -38,6 +38,7 @@ interface QueryData {
   } | null;
 }
 
+// --- METADATA GENERATION (Fixed Canonical Issue for Ahrefs) ---
 export async function generateMetadata({ searchParams }: { 
   searchParams: { [key: string]: string | string[] | undefined } 
 }): Promise<Metadata> {
@@ -47,13 +48,28 @@ export async function generateMetadata({ searchParams }: {
 
   let title = "Genuine Spare Parts & Accessories | GoBike Australia";
   let description = "Keep the adventure going! Find all genuine GoBike replacement parts, from batteries and chargers to wheels and grips, to maintain and customize your kids electric bike.";
-  let canonicalUrl = '/spare-parts';
 
   if (pageNum > 1) {
     title = `Page ${pageNum} - Genuine Spare Parts & Accessories | GoBike Australia`;
     description = `Browse page ${pageNum} of our genuine GoBike spare parts catalog. Find replacement batteries, chargers, tires, and accessories for kids electric bikes in Australia.`;
-    canonicalUrl += `?page=${pageNum}`;
   }
+
+  // ★★★ Fixed Canonical Generation ★★★
+  const canonicalParams = new URLSearchParams();
+
+  // Ahrefs এরর সলভ করার জন্য after এবং before প্যারামিটার ক্যানোনিকালে যুক্ত করা হলো
+  const afterParam = typeof resolvedSearchParams.after === 'string' ? resolvedSearchParams.after : undefined;
+  const beforeParam = typeof resolvedSearchParams.before === 'string' ? resolvedSearchParams.before : undefined;
+
+  if (afterParam) canonicalParams.set('after', afterParam);
+  if (beforeParam) canonicalParams.set('before', beforeParam);
+
+  if (pageNum > 1) {
+    canonicalParams.set('page', pageNum.toString());
+  }
+
+  const queryString = canonicalParams.toString();
+  const canonicalUrl = queryString ? `/spare-parts?${queryString}` : '/spare-parts';
 
   const currentDate = new Date().toISOString();
 

@@ -1,14 +1,24 @@
 // app/(auth)/forgot-password/page.tsx
+import type { Metadata } from 'next';
 import ForgotPasswordForm from './ForgotPasswordForm';
 import { revalidatePath } from 'next/cache';
 
-// --- টাইপ ডিফাইন করা --- (অপরিবর্তিত)
+export const metadata: Metadata = {
+  title: 'Forgot Password | GoBike Australia',
+  robots: {
+    index: false,
+    follow: false,
+  },
+  alternates: {
+    canonical: '/forgot-password',
+  }
+};
+
 type ActionState = {
   error?: string;
   success?: boolean;
 };
 
-// --- GraphQL Mutation --- (অপরিবর্তিত)
 const SEND_PASSWORD_RESET_EMAIL_MUTATION = `
 mutation SendPasswordResetEmail($username: String!) {
   sendPasswordResetEmail(
@@ -23,7 +33,6 @@ mutation SendPasswordResetEmail($username: String!) {
 }
 `;
 
-// --- হেল্পার ফাংশন --- (অপরিবর্তিত)
 async function fetchPublicGraphQL(query: string, variables: Record<string, unknown>) {
   const endpoint = process.env.WORDPRESS_GRAPHQL_ENDPOINT;
   if (!endpoint) throw new Error('GraphQL endpoint is not set.');
@@ -50,7 +59,6 @@ async function fetchPublicGraphQL(query: string, variables: Record<string, unkno
   }
 }
 
-// --- Server Action --- (অপরিবর্তিত)
 async function sendResetLinkAction(
   prevState: ActionState,
   formData: FormData
@@ -81,10 +89,8 @@ async function sendResetLinkAction(
   }
 }
 
-// --- মূল পেজ কম্পোনেন্ট ---
 export default function ForgotPasswordPage() {
   return (
-    // ★ কন্টেইনারে Tailwind CSS যোগ করা হয়েছে
     <div className="max-w-[420px] mx-auto my-16 p-10 bg-white border border-[#e0e0e0] rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.05)]">
       <h2 className="text-center text-[2rem] font-bold text-[#333] mb-4">
         Forgot Password?
@@ -92,7 +98,6 @@ export default function ForgotPasswordPage() {
       
       <ForgotPasswordForm sendResetLinkAction={sendResetLinkAction} />
       
-      {/* ★ লিংক সেকশনে Tailwind CSS যোগ করা হয়েছে */}
       <div className="mt-6 text-center text-[0.95rem] text-[#555]">
         <p>
           Remembered your password?{' '}

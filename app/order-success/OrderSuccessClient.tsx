@@ -8,7 +8,6 @@ import Link from 'next/link';
 import { gtmPurchase } from '../../lib/gtm';
 import { klaviyoIdentify, klaviyoTrackPlacedOrder } from '../../lib/klaviyo';
 
-// --- Interfaces (Same as before) ---
 interface OrderItemNode {
   databaseId: number;
   slug: string;
@@ -83,7 +82,6 @@ export default function OrderSuccessClient({ orderId, orderKey }: { orderId: str
 
   useEffect(() => {
     if (order && !trackingFired) {
-      // Tracking Logic (Keeping it same)
        const parsePrice = (p: string | null | undefined) => p ? parseFloat(p.replace(/[^0-9.]/g, '')) : 0;
       
       if (order.billing.email) {
@@ -130,16 +128,14 @@ export default function OrderSuccessClient({ orderId, orderKey }: { orderId: str
   }, [order, trackingFired]);
 
   if (loading) return (
-    // .loadingContainer replaced
     <div className="flex flex-col items-center justify-center min-h-[60vh]">
-        {/* .spinner replaced */}
         <div className="w-12 h-12 border-4 border-gray-200 border-t-black rounded-full animate-spin mb-4"></div>
         <p className="text-gray-600 text-lg">Loading Order Details...</p>
     </div>
   );
   
   if (error) return (
-    // .errorContainer replaced
+
     <div className="max-w-[600px] mx-auto mt-12 p-6 bg-red-50 border border-red-200 text-red-700 rounded-lg text-center">
         <p>Error: {error}</p>
     </div>
@@ -158,34 +154,21 @@ export default function OrderSuccessClient({ orderId, orderKey }: { orderId: str
   );
 
   return (
-    // .mainContainer replaced
     <div className="bg-gray-50 min-h-screen py-12 px-4">
-      {/* .successCard replaced */}
       <div className="max-w-[900px] mx-auto bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
-        
-        {/* Header */}
-        {/* .cardHeader replaced */}
         <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-10 text-center border-b border-gray-100">
-          {/* .iconCircle replaced */}
           <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-green-200">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 text-white">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
           </div>
-          {/* .title replaced */}
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Order Confirmed!</h1>
-          {/* .subtitle replaced */}
           <p className="text-lg text-gray-600 max-w-[600px] mx-auto mb-2">
             Hi {order.billing.firstName}, your order <strong>#{order.databaseId}</strong> has been placed.
           </p>
-          {/* .emailText replaced */}
           {order.billing.email && <p className="text-sm text-gray-500">We sent a confirmation email to <span className="font-semibold text-gray-700">{order.billing.email}</span></p>}
         </div>
-
-        {/* Order Meta Data */}
-        {/* .metaGrid replaced */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 border-b border-gray-100 bg-white">
-           {/* .metaItem replaced */}
            <div className="text-center p-2">
               <span className="block text-xs uppercase tracking-wider text-gray-500 mb-1">Order Number</span>
               <strong className="text-gray-800 text-lg">#{order.databaseId}</strong>
@@ -196,7 +179,6 @@ export default function OrderSuccessClient({ orderId, orderKey }: { orderId: str
            </div>
            <div className="text-center p-2">
               <span className="block text-xs uppercase tracking-wider text-gray-500 mb-1">Total Amount</span>
-              {/* .highlightPrice replaced */}
               <strong className="text-green-600 text-xl font-bold" dangerouslySetInnerHTML={{ __html: order.total }} />
            </div>
            <div className="text-center p-2">
@@ -204,15 +186,9 @@ export default function OrderSuccessClient({ orderId, orderKey }: { orderId: str
               <strong className="text-gray-800 text-lg">{order.paymentMethodTitle}</strong>
            </div>
         </div>
-
-        {/* Product Table */}
-        {/* .tableSection replaced */}
         <div className="p-8">
-          {/* .sectionHeading replaced */}
           <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-100">Items Ordered</h2>
-          {/* .tableResponsive replaced */}
           <div className="overflow-x-auto">
-            {/* .productTable replaced */}
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b border-gray-200">
@@ -226,11 +202,8 @@ export default function OrderSuccessClient({ orderId, orderKey }: { orderId: str
                   const isShipping = item.product.node.name.startsWith('Shipping:');
                   return (
                     <tr key={idx} className="border-b border-gray-100 last:border-0">
-                      {/* .productInfoTd replaced */}
                       <td className="p-4 pl-0">
-                        {/* .productFlex replaced */}
                         <div className="flex items-center gap-4">
-                           {/* .imgWrapper replaced */}
                            <div className="w-[50px] h-[50px] flex-shrink-0 border border-gray-200 rounded-md overflow-hidden bg-gray-50 flex items-center justify-center">
                               {isShipping ? (
                                 <Image src="/Transdirect.jpg" alt="Shipping" width={40} height={40} style={{objectFit:'contain'}}/>
@@ -243,7 +216,6 @@ export default function OrderSuccessClient({ orderId, orderKey }: { orderId: str
                                 />
                               )}
                            </div>
-                           {/* .productName replaced */}
                            <span className="font-medium text-gray-800">{item.product.node.name}</span>
                         </div>
                       </td>
@@ -260,11 +232,7 @@ export default function OrderSuccessClient({ orderId, orderKey }: { orderId: str
             </table>
           </div>
         </div>
-
-        {/* Addresses */}
-        {/* .addressGrid replaced */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8 bg-gray-50 border-t border-gray-100">
-          {/* .addressBox replaced */}
           <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
             <h3 className="text-sm uppercase tracking-wider font-bold text-gray-500 mb-4 border-b border-gray-100 pb-2">Billing Address</h3>
             <address className="not-italic text-gray-600 leading-relaxed text-sm">{formatAddress(order.billing)}</address>
@@ -276,9 +244,6 @@ export default function OrderSuccessClient({ orderId, orderKey }: { orderId: str
             </address>
           </div>
         </div>
-
-        {/* Button */}
-        {/* .footerAction replaced */}
         <div className="p-8 text-center bg-white border-t border-gray-100">
           <Link href="/shop" className="inline-block bg-black text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 hover:bg-gray-800 hover:-translate-y-0.5 shadow-lg shadow-gray-200">
             Continue Shopping

@@ -1,7 +1,8 @@
 // app/(auth)/register/RegisterForm.tsx
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState } from 'react'; // <-- এটি react থেকে আসবে
+import { useFormStatus } from 'react-dom'; // <-- এটি react-dom এই থাকবে
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -23,7 +24,10 @@ function SubmitButton() {
 
 export default function RegisterForm({ registerAction }: { registerAction: (prevState: ActionState, formData: FormData) => Promise<ActionState>; }) {
     const initialState: ActionState = {};
-    const [state, formAction] = useFormState(registerAction, initialState);
+    
+    // <-- এখানে useFormState এর বদলে useActionState ব্যবহার করা হলো
+    const [state, formAction] = useActionState(registerAction, initialState);
+    
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 

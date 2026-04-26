@@ -1,13 +1,12 @@
 // app/order-confirmation/OrderConfirmationClient.tsx
 
-'use client'; // এটি একটি ক্লায়েন্ট কম্পোনেন্ট
+'use client'; 
 
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useCart } from '../../context/CartContext';
 import styles from './OrderConfirmation.module.css';
 
-// ★★★ পরিবর্তন: কম্পোনেন্টের নাম পরিবর্তন করা হয়েছে ★★★
 export default function OrderConfirmationClient() { 
     const router = useRouter();
     const searchParams = useSearchParams();

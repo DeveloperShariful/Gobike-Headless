@@ -45,16 +45,13 @@ interface QueryData {
   } | null;
 }
 
-// app/shop/page.tsx
-
-// --- METADATA GENERATION (Fixed for 100% Unique SEO) ---
+// --- METADATA GENERATION (Fixed Canonical Issue for Ahrefs) ---
 export async function generateMetadata({ searchParams }: { 
   searchParams: { [key: string]: string | string[] | undefined } 
 }): Promise<Metadata> {
   const resolvedSearchParams = await searchParams;
   const categorySlug = typeof resolvedSearchParams.category === 'string' ? resolvedSearchParams.category : undefined;
   
-  // URL থেকে পেজ নম্বর পড়া
   const pageParam = resolvedSearchParams.page;
   const pageNum = pageParam && !Array.isArray(pageParam) ? parseInt(pageParam, 10) : 1;
   
@@ -62,7 +59,6 @@ export async function generateMetadata({ searchParams }: {
   let title = `${baseTitle} | GoBike Australia`;
   let description = "Explore our curated selection of high-quality bikes, spare parts, and accessories. From electric childs motorbikes to balancing bikes, find it all at GoBike.";
 
-  // Category অনুযায়ী Base Title ও URL সেট করা
   if (categorySlug) {
     const categoryName = categorySlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     baseTitle = `Shop ${categoryName}`;
@@ -70,7 +66,6 @@ export async function generateMetadata({ searchParams }: {
     description = `Discover our collection of ${categoryName}. Top quality and performance guaranteed. Shop genuine australian electric bikes parts and gear.`;
   }
 
-  // ★★★ Page 2, 3 এর জন্য আলাদা টাইটেল ও ডেসক্রিপশন ★★★
   if (pageNum > 1) {
     title = `Page ${pageNum} - ${baseTitle} | GoBike Australia`;
     
@@ -81,11 +76,19 @@ export async function generateMetadata({ searchParams }: {
     }
   }
 
+  // ★★★ Fixed Canonical Generation ★★★
   const canonicalParams = new URLSearchParams();
   
   if (categorySlug) {
     canonicalParams.set('category', categorySlug);
   }
+
+  // Ahrefs এরর সলভ করার জন্য after এবং before প্যারামিটার ক্যানোনিকালে যুক্ত করা হলো
+  const afterParam = typeof resolvedSearchParams.after === 'string' ? resolvedSearchParams.after : undefined;
+  const beforeParam = typeof resolvedSearchParams.before === 'string' ? resolvedSearchParams.before : undefined;
+
+  if (afterParam) canonicalParams.set('after', afterParam);
+  if (beforeParam) canonicalParams.set('before', beforeParam);
   
   if (pageNum > 1) {
     canonicalParams.set('page', pageNum.toString());

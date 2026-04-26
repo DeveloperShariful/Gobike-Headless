@@ -1,6 +1,18 @@
 // app/(auth)/register/page.tsx
+import type { Metadata } from 'next';
 import RegisterForm from './RegisterForm';
 import { revalidatePath } from 'next/cache';
+
+export const metadata: Metadata = {
+  title: 'Register | GoBike Australia',
+  robots: {
+    index: false,
+    follow: false,
+  },
+  alternates: {
+    canonical: '/register',
+  }
+};
 
 type ActionState = {
   error?: string;

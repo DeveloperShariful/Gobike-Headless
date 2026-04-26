@@ -1,6 +1,18 @@
 // app/(auth)/reset-password/page.tsx
+import type { Metadata } from 'next';
 import ResetPasswordForm from './ResetPasswordForm';
 import { revalidatePath } from 'next/cache';
+
+export const metadata: Metadata = {
+  title: 'Reset Password | GoBike Australia',
+  robots: {
+    index: false,
+    follow: false,
+  },
+  alternates: {
+    canonical: '/reset-password',
+  }
+};
 
 type ActionState = {
   error?: string;
