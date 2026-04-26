@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: 'Track the shipping status of your GoBike order.',
   robots: {
     index: false,
-    follow: false,
+    follow: true,
   },
   alternates: {
     canonical: '/track-order',

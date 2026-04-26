@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: 'Login to your GoBike Australia account.',
   robots: {
     index: false,
-    follow: false,
+    follow: true,
   },
   alternates: {
     canonical: '/login',

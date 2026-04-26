@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: 'Register | GoBike Australia',
   robots: {
     index: false,
-    follow: false,
+    follow: true,
   },
   alternates: {
     canonical: '/register',

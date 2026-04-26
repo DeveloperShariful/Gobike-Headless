@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: 'Forgot Password | GoBike Australia',
   robots: {
     index: false,
-    follow: false,
+    follow: true,
   },
   alternates: {
     canonical: '/forgot-password',

@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: 'Login or register for the GoBike Affiliate Portal.',
   robots: {
     index: false,
-    follow: false,
+    follow: true,
   },
   alternates: {
     canonical: '/affiliate-portal',
