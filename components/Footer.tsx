@@ -1,6 +1,6 @@
 // components/Footer.tsx
 'use client';
-import { FaFacebookF, FaInstagram, FaYoutube, FaTiktok } from 'react-icons/fa';
+import { FaFacebookF, FaInstagram, FaYoutube, FaTiktok , FaLinkedinIn, FaPinterestP} from 'react-icons/fa';
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
@@ -133,8 +133,8 @@ export default function Footer() {
 
               {/* Follow Us Column */}
               <div>
-                <h3 className="text-lg font-bold mb-4 capitalize border-b-2 border-[#1a1a1a] pb-2 inline-block">Follow Us</h3>
-                <ul className="list-none p-0 m-0 space-y-3">
+                <h3 className="text-lg font-bold mb-4 capitalize border-b-2 border-[#1a1a1a] pb-3 inline-block">Follow Us</h3>
+                <ul className="list-none p-0 m-0 space-y-3 mt-3 md:mt-0">
                     <li>
                       <a href="https://www.facebook.com/Go-Bike-104997195659873" target="_blank" rel="noopener noreferrer" className="text-[#555] flex items-center gap-3 hover:text-black font-medium transition-colors">
                         <FaFacebookF className="w-6 h-6 text-white bg-[#1877F2] rounded-full p-1" />
@@ -159,6 +159,20 @@ export default function Footer() {
                         <span>TikTok</span>
                       </a>
                     </li>
+                    {/* New: LinkedIn Added */}
+                    <li>
+                      <a href="https://www.linkedin.com/company/112710706" target="_blank" rel="noopener noreferrer" className="text-[#555] flex items-center gap-3 hover:text-black font-medium transition-colors">
+                        <FaLinkedinIn className="w-6 h-6 text-white bg-[#0A66C2] rounded-full p-1" />
+                        <span>LinkedIn</span>
+                      </a>
+                    </li>
+                    {/* New: Pinterest Added (Highly Recommended for Aussie Parents) */}
+                    <li>
+                      <a href="#" target="_blank" rel="noopener noreferrer" className="text-[#555] flex items-center gap-3 hover:text-black font-medium transition-colors">
+                        <FaPinterestP className="w-6 h-6 text-white bg-[#E60023] rounded-full p-1" />
+                        <span>Pinterest</span>
+                      </a>
+                    </li>
                 </ul>
               </div>
 
@@ -166,10 +180,10 @@ export default function Footer() {
               <div>
                   <h3 className="text-lg font-bold mb-4 capitalize border-b-2 border-[#1a1a1a] pb-2 inline-block">Quick Links</h3>
                   <ul className="list-none p-0 m-0 space-y-2">
-                      {['/', '/bikes', '/shop', '/about', '/blog'].map((path) => (
+                      {['/', '/bikes', '/spare-parts', '/shop', '/about', '/blog', '/warranty', '/discount'].map((path) => (
                         <li key={path}>
                             <Link href={path} className="text-[#555] hover:text-black hover:font-bold transition-all">
-                                {path === '/' ? 'Home' : path === '/shop' ? 'Spare Parts' : path.substring(1).replace(/^\w/, c => c.toUpperCase())}
+                                {path === '/' ? 'Home' : path === '/spare-parts' ? 'Spare Parts' : path.substring(1).replace(/^\w/, c => c.toUpperCase())}
                             </Link>
                         </li>
                       ))}
