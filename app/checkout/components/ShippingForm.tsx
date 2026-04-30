@@ -162,13 +162,26 @@ export default function ShippingForm({ title, onAddressChange, defaultValues = {
         {/* State & Postcode (Side by Side on Mobile & Desktop) */}
         <div>
           <label className={labelClass}>State *</label>
-          <input name="state" value={formData.state} onChange={handleInputChange} className={inputClass} required />
+          <input 
+            name="state" 
+            value={formData.state} 
+            className={inputClass} 
+            required 
+            readOnly 
+            placeholder="Auto-filled" 
+          />
         </div>
         <div>
           <label className={labelClass}>Postcode *</label>
-          <input name="postcode" value={formData.postcode} onChange={handleInputChange} className={inputClass} required />
+          <input 
+            name="postcode" 
+            value={formData.postcode} 
+            className={inputClass} 
+            required 
+            readOnly 
+            placeholder="Auto-filled" 
+          />
         </div>
-
         {/* Phone: Full Width */}
         <div className="col-span-2">
           <label className={labelClass}>Phone *</label>

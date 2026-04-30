@@ -1,0 +1,395 @@
+// prisma/schema.prisma
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures =["postgresqlExtensions", "fullTextSearchPostgres", "tracing", "relationJoins"]
+  engineType      = "library"
+}
+
+datasource db {
+  provider   = "postgresql" 
+  extensions =[pg_trgm, unaccent, pgvector(map: "vector", schema: "public")]
+}
+
+// ==========================================
+// 2. ENUMS
+// ==========================================
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+}
+
+enum ClaimStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum AddressType {
+  SHIPPING
+  BILLING
+}
+
+enum NotificationChannel {
+  EMAIL
+  SMS
+  PUSH
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+// ==========================================
+// 2. Model User
+// ==========================================
+// <-- ERROR 2 FIXED: এখানে শুধু / ছিল, সেটি // করে দেওয়া হয়েছে
+
+model User {
+  id                    String    @id @default(uuid())
+  name                  String?
+  email                 String    @unique
+  emailVerified         DateTime? 
+  password              String?   
+  phone                 String?   @unique
+  image                 String?   
+
+  //mediaId               String?
+  //media                 Media?    @relation(fields: [mediaId], references: [id])
+
+  role                  Role      @default(SUPER_ADMIN)
+  isActive              Boolean   @default(true)
+  dateOfBirth           DateTime?
+  gender                String?
+  notes                 String?
+  metafields            Json?
+  deletedAt             DateTime?
+  version               Int       @default(1)
+  accounts              Account[]
+  sessions              Session[]
+  createdBy             String?
+  updatedBy             String?
+  auditLogs             AuditLog[]
+  addresses             Address[]
+  paymentMethods        UserPaymentMethod[]
+  abandonedCheckouts    AbandonedCheckout[]
+  
+  // <-- ERROR 3 FIXED: PaymentSession মডেল নিচে নেই, তাই এটি কমেন্ট করা হলো
+  // paymentSessions       PaymentSession[] 
+  
+  activityLogs          ActivityLog[]
+  notifications         Notification[]
+
+  //orders                Order[]
+  //reviews               Review[]
+  //wishlist              Wishlist[]
+  //cart                  Cart?
+  //viewedProducts        RecentlyViewed[]
+  //wallet                Wallet?
+  //subscriptions         Subscription[]
+  //createdTickets        SupportTicket[] @relation("UserCreatedTickets")
+  //assignedTickets       SupportTicket[] @relation("StaffTickets")
+  //affiliateAccount      AffiliateAccount?
+  //referredByAffiliateId String?
+  //referredByAffiliate   AffiliateAccount? @relation("CustomerReferral", fields: [referredByAffiliateId], references:[id], onDelete: SetNull)
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([email])
+  @@index([phone])
+  @@index([role, createdAt(sort: Desc)])
+  @@index([role, isActive])
+  @@index([deletedAt])
+}
+
+model Account {
+  id                 String  @id @default(uuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields:[userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model UserPaymentMethod {
+  id                 String   @id @default(uuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gateway            String
+  type               String
+  gatewayCustomerId  String?
+  paymentMethodId    String
+  fingerprint        String?
+  paypalEmail        String?
+  billingAgreementId String?
+  brand              String?
+  last4              String?
+  expiryMonth        Int?
+  expiryYear         Int?
+  billingDetails     Json?
+  isDefault          Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  //subscriptions      Subscription[]
+
+  @@index([userId])
+}
+
+model Address {
+  id                    String      @id @default(uuid())
+  userId                String
+  user                  User        @relation(fields:[userId], references: [id], onDelete: Cascade)
+  title                 String?
+  type                  AddressType @default(SHIPPING)
+  firstName             String
+  lastName              String
+  company               String?
+  address1              String
+  address2              String?
+  city                  String
+  state                 String?
+  postcode              String
+  country               String
+  phone                 String
+  email                 String?
+  locationType          String?
+  transdirectLocationId String?
+  isResidential         Boolean     @default(true)
+  isDefault             Boolean     @default(false)
+  taxZoneId             String?
+  isVerified            Boolean     @default(false)
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([type])
+}
+
+// ==========================================
+// 2. Model WarrantyClaim
+// ==========================================
+// <-- ERROR 4 FIXED: এখানে শুধু / ছিল, সেটি // করে দেওয়া হয়েছে
+
+model WarrantyClaim {
+  id              String      @id @default(cuid())
+  name            String
+  orderNumber     String
+  shopPurchased   String
+  address         String?     
+  email           String
+  mediaUrl        String?     // ভিডিও বা ইমেজের ক্লাউড লিংক
+  description     String      @db.Text
+  
+  status          ClaimStatus @default(PENDING) 
+  
+  replacementPart String?     
+  trackingNumber  String?     
+  
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+// ==========================================
+// 16. AUDIT & ADVANCED EVENTS
+// ==========================================
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String
+  tableName String
+  recordId  String
+  oldValues Json?
+  newValues Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([tableName, recordId])
+  @@index([userId, createdAt])
+  @@index([createdAt(sort: Desc)])
+}
+
+// ==========================================
+// 13. EMAIL & NOTIFICATION SYSTEM
+// ==========================================
+
+model EmailConfiguration {
+  id                  String   @id @default("email_config")
+  senderName          String   @default("GoBike")
+  senderEmail         String   @default("gobike@gobike.au")
+  smtpHost            String?
+  smtpPort            Int?     @default(587)
+  smtpUser            String?
+  smtpPassword        String?
+  encryption          String?  @default("tls")
+  headerImage         String?
+  mediaId             String?
+  
+  // media               Media?   @relation(fields: [mediaId], references: [id])
+  // Media মডেল নেই, তাই আপাতত কমেন্ট করা হলো
+  
+  footerText          String?  @default("© 2025 GoBike. All rights reserved.")
+  baseColor           String?  @default("#2271b1")
+  backgroundColor     String?  @default("#F7F7F7")
+  bodyBackgroundColor String?  @default("#FFFFFF")
+  isActive            Boolean  @default(true)
+  updatedAt           DateTime @default(now()) @updatedAt
+}
+
+model EmailTemplate {
+  id               String   @id @default(uuid())
+  slug             String   @unique
+  triggerEvent     String?  @unique
+  name             String
+  subject          String
+  heading          String?
+  content          String   @db.Text
+  isEnabled        Boolean  @default(true)
+  recipientType    String   @default("customer")
+  customRecipients String?
+  cc               String[]
+  bcc              String[]
+  attachments      String[]
+  emailType        String   @default("html")
+  fromName         String?
+  fromEmail        String?
+  delay            Int?     @default(0) 
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([slug])
+  @@index([isEnabled])
+}
+
+model NotificationQueue {
+  id           String              @id @default(uuid())
+  channel      NotificationChannel @default(EMAIL)
+  recipient    String
+  subject      String?
+  content      String              @db.Text
+  templateSlug String?
+  metadata     Json?
+  status       NotificationStatus  @default(PENDING)
+  attempts     Int                 @default(0)
+  maxAttempts  Int                 @default(3)
+  scheduledAt  DateTime            @default(now())
+  sentAt       DateTime?
+  error        String?
+  orderId      String?
+  userId       String?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  @@index([status])
+  @@index([scheduledAt])
+  @@index([status, scheduledAt])
+}
+
+model EmailLog {
+  id           String   @id @default(uuid())
+  recipient    String
+  subject      String
+  templateSlug String?
+  status       String
+  errorMessage String?
+  metadata     Json?
+  openedAt     DateTime?
+  orderId      String?
+  userId       String?
+  createdAt    DateTime @default(now())
+
+  @@index([recipient])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+}
+
+model ActivityLog {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action     String
+  entityType String?
+  entityId   String?
+  details    Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([entityType, entityId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references:[id], onDelete: Cascade)
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  link      String?
+  type      String?
+  createdAt DateTime @default(now())
+
+  @@index([userId, isRead])
+  @@index([createdAt(sort: Desc)])
+}
+
+model AbandonedCheckout {
+  id            String    @id @default(uuid())
+  cartToken     String?
+  email         String?
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  items         Json
+  subtotal      Decimal   @db.Decimal(12, 2)
+  currency      String    @default("AUD")
+  recoveryUrl   String
+  isRecovered   Boolean   @default(false)
+  recoveredAt   DateTime?
+  remindersSent Int       @default(0)
+  lastReminder  DateTime?
+  ipAddress     String?
+  userAgent     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([email])
+  @@index([isRecovered])
+  @@index([userId])
+  @@index([createdAt(sort: Desc)])
+}

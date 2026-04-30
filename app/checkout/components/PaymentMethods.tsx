@@ -54,9 +54,10 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
     if (id.includes('afterpay')) return <Image src="https://static.afterpay.com/integration/logo-afterpay-colour.svg" alt="Afterpay" width={80} height={20} className="h-6 w-auto" unoptimized />;
     if (id.includes('stripe')) return (
       <span className="flex items-center gap-1">
-        <Image src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" width={30} height={20} className="h-5 w-5 rounded-[2px] md:h-[25px] md:w-[30px]" />
-        <Image src="https://js.stripe.com/v3/fingerprinted/img/mastercard-4d8844094130711885b5e41b28c9848f.svg" alt="Mastercard" width={30} height={20} className="h-5 w-5 rounded-[2px] md:h-[25px] md:w-[30px]" />
-        <Image src="https://www.americanexpress.com/content/dam/amex/us/merchant/supplies-uplift/product/images/Amex_Bluebox-Logo.png" alt="American Express" width={30} height={20} className="h-5 w-5 rounded-[2px] md:h-[25px] md:w-[30px]" unoptimized />
+        <Image src="https://gobikes.au/wp-content/uploads/2026/05/Credit-Card-Icons.webp" alt="Visa" width={300} height={200} className="h-7 w-auto rounded-[5px] md:h-[28px]" style={{ width: 'auto' }} />
+        {/*<Image src="https://js.stripe.com/v3/fingerprinted/img/mastercard-4d8844094130711885b5e41b28c9848f.svg" alt="Mastercard" width={30} height={20} className="h-5 w-auto rounded-[2px] md:h-[25px]" style={{ width: 'auto' }} />
+        <Image src="https://www.americanexpress.com/content/dam/amex/us/merchant/supplies-uplift/product/images/Amex_Bluebox-Logo.png" alt="American Express" width={30} height={20} className="h-5 w-auto rounded-[2px] md:h-[25px]" style={{ width: 'auto' }} unoptimized />
+        */}
       </span>
     );
     return null;
@@ -99,7 +100,7 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
         {availableGateways.map(gateway => (
           <div key={gateway.id} className="border-b border-[#e0e0e0] last:border-b-0">
             <div 
-                className="flex items-center p-[18px_20px] cursor-pointer bg-[#f9f9f9] transition-colors duration-200 hover:bg-[#f0f0f0]" 
+                className="flex items-center p-[18px_8px] cursor-pointer bg-[#f9f9f9] transition-colors duration-200 hover:bg-[#f0f0f0]" 
                 onClick={() => onPaymentMethodChange(gateway.id)}
             >
               <input type="radio" id={gateway.id} name="payment_method" value={gateway.id} checked={selectedPaymentMethod === gateway.id} readOnly className="w-[18px] h-[18px] mr-[15px] shrink-0 accent-[#ff0000]" />
