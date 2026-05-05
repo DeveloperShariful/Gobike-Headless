@@ -2,28 +2,30 @@
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures =["postgresqlExtensions", "fullTextSearchPostgres", "tracing", "relationJoins"]
+  previewFeatures = ["postgresqlExtensions", "fullTextSearchPostgres", "tracing", "relationJoins"]
   engineType      = "library"
 }
 
 datasource db {
-  provider   = "postgresql" 
-  extensions =[pg_trgm, unaccent, pgvector(map: "vector", schema: "public")]
+  provider   = "postgresql"
+  extensions = [pg_trgm, unaccent, pgvector(map: "vector", schema: "public")]
 }
 
 // ==========================================
-// 2. ENUMS
+// 1. ENUMS
 // ==========================================
 
 enum Role {
   SUPER_ADMIN
   ADMIN
+  CUSTOMER
 }
 
 enum ClaimStatus {
   PENDING
   APPROVED
   REJECTED
+  TRASHED
 }
 
 enum AddressType {
@@ -43,61 +45,67 @@ enum NotificationStatus {
   FAILED
 }
 
+enum ShippingMethodType {
+  FLAT_RATE
+  FREE_SHIPPING
+  LOCAL_PICKUP
+  CARRIER_CALCULATED
+}
+
+enum LogCategory {
+  SYSTEM
+  ACTIVITY
+  EMAIL
+}
+
 // ==========================================
-// 2. Model User
+// 2. USER & AUTH MODELS
 // ==========================================
-// <-- ERROR 2 FIXED: এখানে শুধু / ছিল, সেটি // করে দেওয়া হয়েছে
 
 model User {
-  id                    String    @id @default(uuid())
-  name                  String?
-  email                 String    @unique
-  emailVerified         DateTime? 
-  password              String?   
-  phone                 String?   @unique
-  image                 String?   
+  id            String    @id @default(uuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  password      String?
+  phone         String?   @unique
+  image         String?
 
-  //mediaId               String?
-  //media                 Media?    @relation(fields: [mediaId], references: [id])
-
-  role                  Role      @default(SUPER_ADMIN)
-  isActive              Boolean   @default(true)
-  dateOfBirth           DateTime?
-  gender                String?
-  notes                 String?
-  metafields            Json?
-  deletedAt             DateTime?
-  version               Int       @default(1)
-  accounts              Account[]
-  sessions              Session[]
-  createdBy             String?
-  updatedBy             String?
-  auditLogs             AuditLog[]
-  addresses             Address[]
-  paymentMethods        UserPaymentMethod[]
-  abandonedCheckouts    AbandonedCheckout[]
+  role       Role      @default(SUPER_ADMIN)
+  isActive   Boolean   @default(true)
+  dateOfBirth DateTime?
+  gender     String?
+  notes      String?
   
-  // <-- ERROR 3 FIXED: PaymentSession মডেল নিচে নেই, তাই এটি কমেন্ট করা হলো
-  // paymentSessions       PaymentSession[] 
+  // [JSON Explanation]: স্টোর ইউজারের অতিরিক্ত ডাটা যেমন: preferences, আর্বিটারি কি-ভ্যালু জোড়া এখানে থাকবে।
+  metafields Json?     @default("{}")
   
-  activityLogs          ActivityLog[]
-  notifications         Notification[]
+  deletedAt  DateTime?
+  version    Int       @default(1)
 
-  //orders                Order[]
-  //reviews               Review[]
-  //wishlist              Wishlist[]
-  //cart                  Cart?
-  //viewedProducts        RecentlyViewed[]
-  //wallet                Wallet?
-  //subscriptions         Subscription[]
-  //createdTickets        SupportTicket[] @relation("UserCreatedTickets")
-  //assignedTickets       SupportTicket[] @relation("StaffTickets")
-  //affiliateAccount      AffiliateAccount?
-  //referredByAffiliateId String?
-  //referredByAffiliate   AffiliateAccount? @relation("CustomerReferral", fields: [referredByAffiliateId], references:[id], onDelete: SetNull)
+  accounts       Account[]
+  sessions       Session[]
+  createdBy      String?
+  updatedBy      String?
+  auditLogs      AuditLog[]
+  addresses      Address[]
+  paymentMethods UserPaymentMethod[]
+  activityLogs   ActivityLog[]
+  notifications  Notification[]
+  abandonedCheckouts AbandonedCheckout[]
 
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+  // [FUTURE RELATIONS]: যখন এই মডেলগুলো তৈরি করবেন তখন আনকমেন্ট করবেন।
+  // orders                Order[]
+  // reviews               Review[]
+  // wishlist              Wishlist[]
+  // cart                  Cart?
+  // viewedProducts        RecentlyViewed[]
+  // wallet                Wallet?
+  // subscriptions         Subscription[]
+  // paymentSessions       PaymentSession[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([email])
   @@index([phone])
@@ -107,20 +115,20 @@ model User {
 }
 
 model Account {
-  id                 String  @id @default(uuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
+  id                String  @id @default(uuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
-  user User @relation(fields:[userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@index([userId])
@@ -145,9 +153,9 @@ model VerificationToken {
 }
 
 model UserPaymentMethod {
-  id                 String   @id @default(uuid())
+  id                 String  @id @default(uuid())
   userId             String
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   gateway            String
   type               String
   gatewayCustomerId  String?
@@ -159,12 +167,13 @@ model UserPaymentMethod {
   last4              String?
   expiryMonth        Int?
   expiryYear         Int?
-  billingDetails     Json?
-  isDefault          Boolean  @default(false)
+  
+  // [JSON Explanation]: পেমেন্ট গেটওয়ে থেকে আসা ফুল রেসপন্স বা অতিরিক্ত বিলিং ডিটেইলস এখানে থাকবে।
+  billingDetails     Json?   @default("{}")
+  
+  isDefault          Boolean @default(false)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
-
-  //subscriptions      Subscription[]
 
   @@index([userId])
 }
@@ -172,7 +181,7 @@ model UserPaymentMethod {
 model Address {
   id                    String      @id @default(uuid())
   userId                String
-  user                  User        @relation(fields:[userId], references: [id], onDelete: Cascade)
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   title                 String?
   type                  AddressType @default(SHIPPING)
   firstName             String
@@ -200,32 +209,37 @@ model Address {
 }
 
 // ==========================================
-// 2. Model WarrantyClaim
+// 3. WARRANTY, LOGS & NOTIFICATIONS
 // ==========================================
-// <-- ERROR 4 FIXED: এখানে শুধু / ছিল, সেটি // করে দেওয়া হয়েছে
+
 
 model WarrantyClaim {
   id              String      @id @default(cuid())
+
   name            String
-  orderNumber     String
-  shopPurchased   String
-  address         String?     
   email           String
-  mediaUrl        String?     // ভিডিও বা ইমেজের ক্লাউড লিংক
   description     String      @db.Text
+  mediaUrl        String?
+  shopPurchased   String
+  
+  orderNumber     String
+  orderDate       DateTime?   
+  wpName          String?     
+  wpEmail         String?     
+  phone           String?     
+  address         String?     
+  suburb          String?     
+  state           String?     
+  postcode        String?     
+  country         String?     @default("AU") 
   
   status          ClaimStatus @default(PENDING) 
-  
   replacementPart String?     
   trackingNumber  String?     
   
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 }
-
-// ==========================================
-// 16. AUDIT & ADVANCED EVENTS
-// ==========================================
 
 model AuditLog {
   id        String   @id @default(uuid())
@@ -234,8 +248,11 @@ model AuditLog {
   action    String
   tableName String
   recordId  String
+  
+  // [JSON Explanation]: পরিবর্তনের আগের এবং পরের পূর্ণাঙ্গ ডেটা স্ন্যাপশট এখানে থাকবে।
   oldValues Json?
   newValues Json?
+  
   ipAddress String?
   userAgent String?
   createdAt DateTime @default(now())
@@ -245,80 +262,44 @@ model AuditLog {
   @@index([createdAt(sort: Desc)])
 }
 
-// ==========================================
-// 13. EMAIL & NOTIFICATION SYSTEM
-// ==========================================
+model EventLog {
+  id        String      @id @default(uuid())
+  category  LogCategory @default(ACTIVITY)
+  level     String      @default("info")
+  action    String
+  message   String      @db.Text
+  recipient String?
+  userId    String?
+  
+  // [JSON Explanation]: ইভেন্টের সাথে জড়িত যেকোনো অতিরিক্ত তথ্য (যেমন: ইমেইল টেমপ্লেট আইডি, এরর স্ট্যাক ট্রেস) এখানে থাকবে।
+  context   Json?       @default("{}")
+  
+  entityType String?
+  entityId   String?
+  createdAt  DateTime    @default(now())
+
+  @@index([category])
+  @@index([level])
+  @@index([createdAt(sort: Desc)])
+}
 
 model EmailConfiguration {
-  id                  String   @id @default("email_config")
-  senderName          String   @default("GoBike")
-  senderEmail         String   @default("gobike@gobike.au")
-  smtpHost            String?
-  smtpPort            Int?     @default(587)
-  smtpUser            String?
-  smtpPassword        String?
-  encryption          String?  @default("tls")
-  headerImage         String?
-  mediaId             String?
-  
-  // media               Media?   @relation(fields: [mediaId], references: [id])
-  // Media মডেল নেই, তাই আপাতত কমেন্ট করা হলো
-  
-  footerText          String?  @default("© 2025 GoBike. All rights reserved.")
-  baseColor           String?  @default("#2271b1")
-  backgroundColor     String?  @default("#F7F7F7")
-  bodyBackgroundColor String?  @default("#FFFFFF")
-  isActive            Boolean  @default(true)
-  updatedAt           DateTime @default(now()) @updatedAt
-}
-
-model EmailTemplate {
-  id               String   @id @default(uuid())
-  slug             String   @unique
-  triggerEvent     String?  @unique
-  name             String
-  subject          String
-  heading          String?
-  content          String   @db.Text
-  isEnabled        Boolean  @default(true)
-  recipientType    String   @default("customer")
-  customRecipients String?
-  cc               String[]
-  bcc              String[]
-  attachments      String[]
-  emailType        String   @default("html")
-  fromName         String?
-  fromEmail        String?
-  delay            Int?     @default(0) 
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  @@index([slug])
-  @@index([isEnabled])
-}
-
-model NotificationQueue {
-  id           String              @id @default(uuid())
-  channel      NotificationChannel @default(EMAIL)
-  recipient    String
-  subject      String?
-  content      String              @db.Text
-  templateSlug String?
-  metadata     Json?
-  status       NotificationStatus  @default(PENDING)
-  attempts     Int                 @default(0)
-  maxAttempts  Int                 @default(3)
-  scheduledAt  DateTime            @default(now())
-  sentAt       DateTime?
-  error        String?
-  orderId      String?
-  userId       String?
-  createdAt    DateTime            @default(now())
-  updatedAt    DateTime            @updatedAt
-
-  @@index([status])
-  @@index([scheduledAt])
-  @@index([status, scheduledAt])
+  id          String   @id @default("email_config")
+  senderName  String   @default("GoBike")
+  senderEmail String   @default("gobike@gobike.au")
+  smtpHost    String?
+  smtpPort    Int?     @default(587)
+  smtpUser    String?
+  smtpPassword String?
+  encryption  String?  @default("tls")
+  headerImage String?
+  mediaId     String?
+  footerText  String?  @default("© 2025 GoBike. All rights reserved.")
+  baseColor   String?  @default("#2271b1")
+  backgroundColor String? @default("#F7F7F7")
+  bodyBackgroundColor String? @default("#FFFFFF")
+  isActive    Boolean  @default(true)
+  updatedAt   DateTime @default(now()) @updatedAt
 }
 
 model EmailLog {
@@ -339,6 +320,58 @@ model EmailLog {
   @@index([createdAt(sort: Desc)])
 }
 
+
+model EmailTemplate {
+  id               String   @id @default(uuid())
+  slug             String   @unique
+  triggerEvent     String?  @unique
+  name             String
+  subject          String
+  heading          String?
+  content          String   @db.Text
+  isEnabled        Boolean  @default(true)
+  recipientType    String   @default("customer")
+  customRecipients String?
+  cc               String[]
+  bcc              String[]
+  attachments      String[]
+  emailType        String   @default("html")
+  fromName         String?
+  fromEmail        String?
+  delay            Int?     @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([slug])
+  @@index([isEnabled])
+}
+
+model NotificationQueue {
+  id           String             @id @default(uuid())
+  channel      NotificationChannel @default(EMAIL)
+  recipient    String
+  subject      String?
+  content      String             @db.Text
+  templateSlug String?
+  
+  // [JSON Explanation]: নোটিফিকেশন পাঠানোর সময় ডাইনামিক ভ্যারিয়েবল (যেমন: কাস্টমার নাম, অর্ডার আইডি) এখানে থাকবে।
+  metadata     Json?              @default("{}")
+  
+  status       NotificationStatus @default(PENDING)
+  attempts     Int                @default(0)
+  maxAttempts  Int                @default(3)
+  scheduledAt  DateTime           @default(now())
+  sentAt       DateTime?
+  error        String?
+  orderId      String?
+  userId       String?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  @@index([status])
+  @@index([scheduledAt])
+}
+
 model ActivityLog {
   id         String   @id @default(uuid())
   userId     String
@@ -346,18 +379,20 @@ model ActivityLog {
   action     String
   entityType String?
   entityId   String?
-  details    Json?
+  
+  // [JSON Explanation]: অ্যাক্টিভিটির বিস্তারিত তথ্য যেমন: "পুরানো পাসওয়ার্ড পরিবর্তন" বা "নতুন লগইন লোকেশন"।
+  details    Json?    @default("{}")
+  
   ipAddress  String?
   createdAt  DateTime @default(now())
 
   @@index([userId, createdAt(sort: Desc)])
-  @@index([entityType, entityId])
 }
 
 model Notification {
   id        String   @id @default(uuid())
   userId    String?
-  user      User?    @relation(fields: [userId], references:[id], onDelete: Cascade)
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   title     String
   message   String
   isRead    Boolean  @default(false)
@@ -366,7 +401,6 @@ model Notification {
   createdAt DateTime @default(now())
 
   @@index([userId, isRead])
-  @@index([createdAt(sort: Desc)])
 }
 
 model AbandonedCheckout {
@@ -375,7 +409,10 @@ model AbandonedCheckout {
   email         String?
   userId        String?
   user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  // [JSON Explanation]: চেকআউট ছেড়ে যাওয়ার সময় কার্টে থাকা সব প্রোডাক্টের লিস্ট এখানে অবজেক্ট আকারে থাকবে।
   items         Json
+  
   subtotal      Decimal   @db.Decimal(12, 2)
   currency      String    @default("AUD")
   recoveryUrl   String
@@ -390,6 +427,134 @@ model AbandonedCheckout {
 
   @@index([email])
   @@index([isRecovered])
-  @@index([userId])
-  @@index([createdAt(sort: Desc)])
+}
+
+// ==========================================
+// 4. SHIPPING & LOGISTICS
+// ==========================================
+
+model ShippingProvider {
+  id        String         @id @default(uuid())
+  name      String
+  slug      String         @unique
+  isEnabled Boolean        @default(false)
+  isSandbox Boolean        @default(true)
+  apiKey    String?        @db.Text
+  apiSecret String?        @db.Text
+  email     String?
+  password  String?        @db.Text
+  
+  // [JSON Explanation]: ট্রান্সডিরেক্ট বা অন্য কুরিয়ারের স্পেসিফিক সব সেটিংস (Sender Address, Pickup Time) এখানে থাকবে।
+  settings  Json?          @default("{}")
+
+  rates          ShippingRate[]
+  packagingBoxes PackagingBox[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+}
+
+model PackagingBox {
+  id          String            @id @default(uuid())
+  name        String?
+  code        String?           @unique
+  description String?
+  length      Decimal           @db.Decimal(10, 2)
+  width       Decimal           @db.Decimal(10, 2)
+  height      Decimal           @db.Decimal(10, 2)
+  weight      Decimal?          @db.Decimal(10, 3)
+  maxWeight   Decimal?          @db.Decimal(10, 3)
+  provider    String            @default("GENERAL")
+  isEnabled   Boolean           @default(true)
+  
+  providerId  String?
+  providerRel ShippingProvider? @relation(fields: [providerId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ShippingRate {
+  id         String            @id @default(uuid())
+  zoneId     String
+  zone       ShippingZone      @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  name       String
+  type       ShippingMethodType @default(FLAT_RATE)
+  price      Decimal           @db.Decimal(12, 2)
+  minWeight  Decimal?          @db.Decimal(10, 3)
+  maxWeight  Decimal?          @db.Decimal(10, 3)
+  minPrice   Decimal?          @db.Decimal(12, 2)
+  taxStatus  String            @default("taxable")
+  
+  providerId String?
+  provider   ShippingProvider? @relation(fields: [providerId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ShippingZone {
+  id        String         @id @default(uuid())
+  name      String
+  countries String[]
+  rates     ShippingRate[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+}
+
+model ShippingClass {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model TaxRate {
+  id       String  @id @default(uuid())
+  name     String  @default("GST")
+  rate     Decimal @default(10.0) @db.Decimal(5, 2)
+  country  String? @default("AU")
+  state    String?
+  priority Int     @default(0)
+  compound Boolean @default(false)
+  shipping Boolean @default(true)
+  class    String  @default("STANDARD")
+  isActive Boolean @default(true)
+
+  @@index([isActive])
+}
+
+
+// ==========================================
+// 11. SETTINGS & ADVANCED CONFIGURATIONS
+// ==========================================
+
+model StoreSettings {
+  id             String              @id @default("settings")
+  storeName      String              @default("My Store")
+  storeEmail     String?
+  storePhone     String?
+  currency       String              @default("AUD")
+  currencySymbol String              @default("$")
+  storeAddress   Json?
+  taxSettings    Json?
+  generalConfig  Json?
+  weightUnit     String              @default("kg")
+  dimensionUnit  String              @default("cm")
+  logo           String?
+  favicon        String?
+  // logoMediaId    String?
+  // logoMedia      Media?              @relation("StoreLogo", fields: [logoMediaId], references: [id])
+  // faviconMediaId String?
+  // faviconMedia   Media?              @relation("StoreFavicon", fields: [faviconMediaId], references:[id])
+  socialLinks    Json?
+  smtpConfig     Json?
+  maintenance    Boolean             @default(false)
+  affiliateConfig Json?
+  mlmConfig       Json?
+  updatedAt      DateTime            @default(now()) @updatedAt
 }

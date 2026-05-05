@@ -1,10 +1,10 @@
 //app/providers.tsx
+
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { CartProvider } from "../context/CartContext";
-import ProgressBar from "../components/ProgressBar";
+import ProgressBar from "@/components/ProgressBar";
 import { Toaster } from 'react-hot-toast';
 
 type User = {
@@ -90,15 +90,11 @@ export function Providers({ children, initialUser }: Props) {
 
   return (
     <AuthContext.Provider value={{ user, isLoading, login, logout }}>
-      <CartProvider>
-        <Suspense fallback={null}>
-          <ProgressBar />
-        </Suspense>
-        
-        <Toaster position="top-center" reverseOrder={false} />
-        
-        {children}
-      </CartProvider>
+      <Suspense fallback={null}>
+        <ProgressBar />
+      </Suspense>
+      <Toaster position="top-center" reverseOrder={false} />
+      {children}
     </AuthContext.Provider>
   );
 }

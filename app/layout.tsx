@@ -3,16 +3,11 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css"; 
-import TopBar from "../components/TopBar";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import DelayedScripts from '../components/DelayedScripts';
+import DelayedScripts from '@/components/DelayedScripts';
 import { Providers } from "./providers";
 import { Suspense } from 'react';
 import SourceTracker from '@/components/SourceTracker';
 import { getCurrentUser } from '@/lib/session';
-import { CompareProvider } from "@/context/CompareContext";
-import FloatingCompareBar from "@/components/FloatingCompareBar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -112,42 +107,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await getCurrentUser();
-  const organizationSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'Organization',
-    '@id': 'https://gobike.au/#organization',
-    name: 'GoBike Australia',
-    url: 'https://gobike.au',
-    logo: {
-      '@type': 'ImageObject',
-      url: 'https://gobikes.au/wp-content/uploads/2025/06/cropped-GOBIKE-Electric-Bike-for-kids-1.webp',
-      width: 112,
-      height: 112
-    },
-    description: "Australia's top-rated electric balance bikes for kids aged 2-16.",
-    email: "gobike@gobike.au", 
-    telephone: "+61-426-067-277",
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: '52 Bligh Ave ', 
-      addressLocality: 'Camden south',
-      addressRegion: 'NSW',
-      postalCode: '2570',
-      addressCountry: 'AU'
-    },
-    sameAs: [
-      'https://www.facebook.com/Go-Bike-104997195659873',
-      'https://www.instagram.com/gobikeoz/',
-      'https://www.youtube.com/@Gobike-r7b'
-    ],
-    contactPoint: {
-      '@type': 'ContactPoint',
-      telephone: '+61-426-067-277',
-      contactType: 'customer service',
-      areaServed: 'AU',
-      availableLanguage: 'en-AU'
-    }
-  };
 
   return (
     <html lang="en-AU" suppressHydrationWarning>
@@ -155,25 +114,15 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
-        />
-        
         <Suspense>
           <SourceTracker />
         </Suspense>
+        
+        {/* Main Provider for Auth (Works for both Frontend & Backend) */}
         <Providers initialUser={user}>
-          <CompareProvider>
-            <TopBar />
-            <Header />
-            <main>
-              {children}
-            </main>
-            <FloatingCompareBar />
-          </CompareProvider>
-          <Footer />
+          {children}
         </Providers>       
+        
         <DelayedScripts />
       </body>
     </html>
