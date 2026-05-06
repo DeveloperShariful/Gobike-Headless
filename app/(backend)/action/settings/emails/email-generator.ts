@@ -3,9 +3,10 @@
 import { format } from "date-fns";
 
 interface EmailGeneratorProps {
-  order: any; 
+  order?: any; 
   config: any; 
   template: any; 
+  metadata?: any; 
 }
 
 const getReadablePaymentMethod = (method: string | null) => {
@@ -34,99 +35,201 @@ const safeReplace = (text: string, variables: Record<string, string | number | n
     return result;
 };
 
-export const generateEmailHtml = ({ order, config, template }: EmailGeneratorProps) => {
+export const generateEmailHtml = ({ order, config, template, metadata }: EmailGeneratorProps) => {
   const baseColor = config.baseColor || "#7f54b3"; 
   const bgColor = config.backgroundColor || "#f7f7f7";
   const bodyColor = config.bodyBackgroundColor || "#ffffff";
-  const currency = order.currency || "$";
+  
+  // 🛑 FIX: Bulletproof App URL Fallback to prevent broken relative links in Gmail
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://gobike.au";
+  
+  let variables: any = {};
+  
+  // ==========================================
+  // ✅ 1. WARRANTY CLAIM VARIABLES
+  // ==========================================
+  if (template.triggerEvent.includes("WARRANTY")) {
+      variables = {
+          customer_name: metadata?.customer_name || "Customer",
+          order_number: metadata?.order_number || "N/A",
+          shop_purchased: metadata?.shop_purchased || "GoBike Australia",
+          description: metadata?.description || "No description provided.",
+          replacement_part: metadata?.replacement_part || "Replacement Part",
+          tracking_number: metadata?.tracking_number || "N/A",
+          courier: metadata?.courier || "Courier",
+      };
+  } 
+  // ==========================================
+  // ✅ 2. ORDER VARIABLES (EXISTING)
+  // ==========================================
+  else if (order) {
+      const currency = order.currency || "$";
+      const formatMoney = (amount: number) => {
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount).replace('USD', currency);
+      };
 
-  const formatMoney = (amount: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount).replace('USD', currency);
-  };
+      const paymentMethodName = getReadablePaymentMethod(order.paymentMethod);
+      const billing = order.billingAddress || {};
+      const shipping = order.shippingAddress || {};
 
-  const paymentMethodName = getReadablePaymentMethod(order.paymentMethod);
-  const billing = order.billingAddress || {};
-  const shipping = order.shippingAddress || {};
-
-  const variables = {
-      customer_name: order.user?.name || billing.firstName || "Customer",
-      order_number: order.orderNumber,
-      total_amount: formatMoney(order.total),
-      payment_method: paymentMethodName,
-      tracking_number: order.shippingTrackingNumber || "N/A",
-      courier: order.shippingProvider || "Courier",
-      order_date: format(new Date(order.createdAt), "MMMM do, yyyy"),
-      shipping_address: `${shipping.address1 || ''} ${shipping.city || ''}`,
-      billing_address: `${billing.address1 || ''} ${billing.city || ''}`
-  };
+      variables = {
+          customer_name: order.user?.name || billing.firstName || "Customer",
+          order_number: order.orderNumber,
+          total_amount: formatMoney(order.total),
+          payment_method: paymentMethodName,
+          tracking_number: order.shippingTrackingNumber || "N/A",
+          courier: order.shippingProvider || "Courier",
+          order_date: format(new Date(order.createdAt), "MMMM do, yyyy"),
+          shipping_address: `${shipping.address1 || ''} ${shipping.city || ''}`,
+          billing_address: `${billing.address1 || ''} ${billing.city || ''}`
+      };
+  }
 
   let introText = safeReplace(template.content, variables);
 
-  const productRows = order.items.map((item: any) => `
-    <tr style="border-bottom: 1px solid #eee;">
-      <td style="padding: 12px; font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif; color: #636363;">
-        <div style="font-size: 14px; font-weight: 600; color: #333;">${item.productName}</div>
-        ${item.sku ? `<div style="font-size: 12px; color: #999;">SKU: ${item.sku}</div>` : ''}
-        ${item.variantName ? `<div style="font-size: 12px; color: #999;">Variant: ${item.variantName}</div>` : ''}
-      </td>
-      <td style="padding: 12px; font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif; color: #636363; text-align: center;">
-        ${item.quantity}
-      </td>
-      <td style="padding: 12px; font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif; color: #636363; text-align: right;">
-        ${formatMoney(item.price)}
-      </td>
-    </tr>
-  `).join("");
+  // ==========================================
+  // ✅ HTML BUILDING BLOCK
+  // ==========================================
+  let orderDetailsHtml = "";
 
-  let totalsHtml = `
-    <tr>
-      <td colspan="2" style="padding: 12px; border-top: 1px solid #eee; font-weight: 600; color: #636363;">Subtotal:</td>
-      <td style="padding: 12px; border-top: 1px solid #eee; text-align: right; color: #636363;">${formatMoney(order.subtotal)}</td>
-    </tr>
-    <tr>
-      <td colspan="2" style="padding: 12px; font-weight: 600; color: #636363;">Shipping:</td>
-      <td style="padding: 12px; text-align: right; color: #636363;">${formatMoney(order.shippingTotal)} <br/><span style="font-size: 10px; font-weight: normal;">via ${order.shippingMethod || 'Standard'}</span></td>
-    </tr>
-  `;
+  if (order && !template.triggerEvent.includes("WARRANTY")) {
+      const currency = order.currency || "$";
+      const formatMoney = (amount: number) => {
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount).replace('USD', currency);
+      };
+      
+      const productRows = order.items.map((item: any) => `
+        <tr style="border-bottom: 1px solid #eee;">
+          <td style="padding: 12px; font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif; color: #636363;">
+            <div style="font-size: 14px; font-weight: 600; color: #333;">${item.productName}</div>
+            ${item.sku ? `<div style="font-size: 12px; color: #999;">SKU: ${item.sku}</div>` : ''}
+            ${item.variantName ? `<div style="font-size: 12px; color: #999;">Variant: ${item.variantName}</div>` : ''}
+          </td>
+          <td style="padding: 12px; font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif; color: #636363; text-align: center;">
+            ${item.quantity}
+          </td>
+          <td style="padding: 12px; font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif; color: #636363; text-align: right;">
+            ${formatMoney(item.price)}
+          </td>
+        </tr>
+      `).join("");
 
-  if (order.discountTotal > 0) {
-    totalsHtml += `
-    <tr>
-      <td colspan="2" style="padding: 12px; font-weight: 600; color: #636363;">Discount:</td>
-      <td style="padding: 12px; text-align: right; color: #636363;">-${formatMoney(order.discountTotal)}</td>
-    </tr>`;
+      let totalsHtml = `
+        <tr>
+          <td colspan="2" style="padding: 12px; border-top: 1px solid #eee; font-weight: 600; color: #636363;">Subtotal:</td>
+          <td style="padding: 12px; border-top: 1px solid #eee; text-align: right; color: #636363;">${formatMoney(order.subtotal)}</td>
+        </tr>
+        <tr>
+          <td colspan="2" style="padding: 12px; font-weight: 600; color: #636363;">Shipping:</td>
+          <td style="padding: 12px; text-align: right; color: #636363;">${formatMoney(order.shippingTotal)} <br/><span style="font-size: 10px; font-weight: normal;">via ${order.shippingMethod || 'Standard'}</span></td>
+        </tr>
+      `;
+
+      if (order.discountTotal > 0) {
+        totalsHtml += `
+        <tr>
+          <td colspan="2" style="padding: 12px; font-weight: 600; color: #636363;">Discount:</td>
+          <td style="padding: 12px; text-align: right; color: #636363;">-${formatMoney(order.discountTotal)}</td>
+        </tr>`;
+      }
+
+      if (order.taxTotal > 0) {
+        totalsHtml += `
+        <tr>
+          <td colspan="2" style="padding: 12px; font-weight: 600; color: #636363;">Tax:</td>
+          <td style="padding: 12px; text-align: right; color: #636363;">${formatMoney(order.taxTotal)}</td>
+        </tr>`;
+      }
+
+      if (order.refundedAmount > 0) {
+        totalsHtml += `
+        <tr>
+          <td colspan="2" style="padding: 12px; font-weight: 600; color: #d9534f;">Refunded:</td>
+          <td style="padding: 12px; text-align: right; color: #d9534f;">-${formatMoney(order.refundedAmount)}</td>
+        </tr>`;
+      }
+
+      totalsHtml += `
+        <tr>
+          <td colspan="2" style="padding: 12px; font-weight: 600; color: #636363;">Payment method:</td>
+          <td style="padding: 12px; text-align: right; color: #636363;">${getReadablePaymentMethod(order.paymentMethod)}</td>
+        </tr>
+        <tr>
+          <td colspan="2" style="padding: 12px; font-weight: 700; color: ${baseColor}; font-size: 16px; border-top: 2px solid #eee;">Total:</td>
+          <td style="padding: 12px; text-align: right; font-weight: 700; color: ${baseColor}; font-size: 16px; border-top: 2px solid #eee;">${formatMoney(order.total - (order.refundedAmount || 0))}</td>
+        </tr>
+      `;
+
+      const billing = order.billingAddress || {};
+      const shipping = order.shippingAddress || {};
+
+      orderDetailsHtml = `
+        <h2 style="color: ${baseColor}; font-size: 18px; margin-bottom: 15px;">Order Details</h2>
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #e5e5e5; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th style="text-align: left; padding: 12px; border-bottom: 1px solid #eee; color: #636363;">Product</th>
+                    <th style="text-align: center; padding: 12px; border-bottom: 1px solid #eee; color: #636363;">Quantity</th>
+                    <th style="text-align: right; padding: 12px; border-bottom: 1px solid #eee; color: #636363;">Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${productRows}
+            </tbody>
+            <tfoot>
+                ${totalsHtml}
+            </tfoot>
+        </table>
+
+        <br/><br/>
+        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+                <td valign="top" width="50%" style="padding-right: 10px;">
+                    <h3 style="color: ${baseColor}; font-size: 16px; margin-bottom: 10px;">Billing address</h3>
+                    <div style="border: 1px solid #e5e5e5; padding: 15px; border-radius: 4px; color: #636363; font-size: 13px; line-height: 1.5;">
+                        <strong>${billing.firstName || ""} ${billing.lastName || ""}</strong><br/>
+                        ${billing.address1 || ""}<br/>
+                        ${billing.city || ""}, ${billing.state || ""} ${billing.postcode || ""}<br/>
+                        ${billing.country || ""}<br/>
+                        ${billing.phone || ""}<br/>
+                        ${billing.email || order.user?.email || order.guestEmail || ""}
+                    </div>
+                </td>
+                <td valign="top" width="50%" style="padding-left: 10px;">
+                    <h3 style="color: ${baseColor}; font-size: 16px; margin-bottom: 10px;">Shipping address</h3>
+                    <div style="border: 1px solid #e5e5e5; padding: 15px; border-radius: 4px; color: #636363; font-size: 13px; line-height: 1.5;">
+                        <strong>${shipping.firstName || ""} ${shipping.lastName || ""}</strong><br/>
+                        ${shipping.address1 || ""}<br/>
+                        ${shipping.city || ""}, ${shipping.state || ""} ${shipping.postcode || ""}<br/>
+                        ${shipping.country || ""}
+                    </div>
+                </td>
+            </tr>
+        </table>
+      `;
   }
 
-  if (order.taxTotal > 0) {
-    totalsHtml += `
-    <tr>
-      <td colspan="2" style="padding: 12px; font-weight: 600; color: #636363;">Tax:</td>
-      <td style="padding: 12px; text-align: right; color: #636363;">${formatMoney(order.taxTotal)}</td>
-    </tr>`;
+  let mediaHtml = "";
+  if (template.triggerEvent === "WARRANTY_CLAIM_ADMIN" && metadata?.media_urls) {
+      const links = metadata.media_urls.split(',').map((url: string) => url.trim());
+      mediaHtml = `
+        <h2 style="color: ${baseColor}; font-size: 18px; margin-top: 30px; margin-bottom: 15px; border-top: 1px solid #eee; padding-top: 20px;">Customer Uploaded Media</h2>
+        <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; border: 1px solid #e5e5e5;">
+            <p style="margin-top: 0; font-size: 14px; color: #636363;">The customer has uploaded the following files:</p>
+            <ul style="padding-left: 20px; color: #636363; font-size: 14px;">
+                ${links.map((link: string, i: number) => `
+                  <li style="margin-bottom: 8px;">
+                    <a href="${link}" target="_blank" style="color: ${baseColor}; text-decoration: underline; font-weight: bold;">View File ${i + 1}</a>
+                  </li>
+                `).join('')}
+            </ul>
+        </div>
+      `;
   }
-
-  if (order.refundedAmount > 0) {
-    totalsHtml += `
-    <tr>
-      <td colspan="2" style="padding: 12px; font-weight: 600; color: #d9534f;">Refunded:</td>
-      <td style="padding: 12px; text-align: right; color: #d9534f;">-${formatMoney(order.refundedAmount)}</td>
-    </tr>`;
-  }
-
-  totalsHtml += `
-    <tr>
-      <td colspan="2" style="padding: 12px; font-weight: 600; color: #636363;">Payment method:</td>
-      <td style="padding: 12px; text-align: right; color: #636363;">${paymentMethodName}</td>
-    </tr>
-    <tr>
-      <td colspan="2" style="padding: 12px; font-weight: 700; color: ${baseColor}; font-size: 16px; border-top: 2px solid #eee;">Total:</td>
-      <td style="padding: 12px; text-align: right; font-weight: 700; color: ${baseColor}; font-size: 16px; border-top: 2px solid #eee;">${formatMoney(order.total - (order.refundedAmount || 0))}</td>
-    </tr>
-  `;
 
   let actionButton = "";
   
-  if (template.triggerEvent === "ORDER_SHIPPED" && order.shippingTrackingUrl) {
+  if (template.triggerEvent === "ORDER_SHIPPED" && order?.shippingTrackingUrl) {
     actionButton = `
       <div style="text-align: center; margin: 30px 0;">
         <a href="${order.shippingTrackingUrl}" style="background-color: ${baseColor}; color: #ffffff; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">Track Your Order</a>
@@ -134,11 +237,29 @@ export const generateEmailHtml = ({ order, config, template }: EmailGeneratorPro
     `;
   }
   
-  if (template.triggerEvent === "PAYMENT_FAILED") {
-    const payLink = `${process.env.NEXT_PUBLIC_APP_URL || ''}/checkout/pay/${order.id}`;
+  if (template.triggerEvent === "PAYMENT_FAILED" && order?.id) {
+    const payLink = `${appUrl}/checkout/pay/${order.id}`;
     actionButton = `
       <div style="text-align: center; margin: 30px 0;">
         <a href="${payLink}" style="background-color: #d9534f; color: #ffffff; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">Pay Now</a>
+      </div>
+    `;
+  }
+
+  if (template.triggerEvent === "WARRANTY_PART_SHIPPED" && metadata?.tracking_url) {
+    actionButton = `
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${metadata.tracking_url}" target="_blank" style="background-color: ${baseColor}; color: #ffffff; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">Track Your Package</a>
+      </div>
+    `;
+  }
+
+  // 🛑 FIX Applied Here: Fallback `appUrl` is now used for the dashboard link
+  if (template.triggerEvent === "WARRANTY_CLAIM_ADMIN" && metadata?.claim_id) {
+    const dashboardLink = `${appUrl}/admin/warranty-claims/${metadata.claim_id}`;
+    actionButton = `
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${dashboardLink}" style="background-color: ${baseColor}; color: #ffffff; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">View Claim in Dashboard</a>
       </div>
     `;
   }
@@ -164,9 +285,9 @@ export const generateEmailHtml = ({ order, config, template }: EmailGeneratorPro
                 <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: ${bodyColor}; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
                     <tr>
                         <td style="background-color: ${baseColor}; padding: 30px; text-align: center; color: #ffffff;">
-                            <h1 style="margin: 0; font-size: 24px; font-weight: 300;">${template.heading || "Order Notification"}</h1>
+                            <h1 style="margin: 0; font-size: 24px; font-weight: 300;">${template.heading || "Notification"}</h1>
                             <p style="margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">
-                                Order #${order.orderNumber} • ${format(new Date(order.createdAt), "MMMM do, yyyy")}
+                                ${variables.order_number && variables.order_number !== "N/A" ? `Order #${variables.order_number}` : format(new Date(), "MMMM do, yyyy")}
                             </p>
                         </td>
                     </tr>
@@ -178,50 +299,9 @@ export const generateEmailHtml = ({ order, config, template }: EmailGeneratorPro
                                 ${introText}
                             </div>
 
+                            ${mediaHtml}
                             ${actionButton}
-
-                            <h2 style="color: ${baseColor}; font-size: 18px; margin-bottom: 15px;">Order Details</h2>
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #e5e5e5; border-collapse: collapse;">
-                                <thead>
-                                    <tr>
-                                        <th style="text-align: left; padding: 12px; border-bottom: 1px solid #eee; color: #636363;">Product</th>
-                                        <th style="text-align: center; padding: 12px; border-bottom: 1px solid #eee; color: #636363;">Quantity</th>
-                                        <th style="text-align: right; padding: 12px; border-bottom: 1px solid #eee; color: #636363;">Price</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${productRows}
-                                </tbody>
-                                <tfoot>
-                                    ${totalsHtml}
-                                </tfoot>
-                            </table>
-
-                            <br/><br/>
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                                <tr>
-                                    <td valign="top" width="50%" style="padding-right: 10px;">
-                                        <h3 style="color: ${baseColor}; font-size: 16px; margin-bottom: 10px;">Billing address</h3>
-                                        <div style="border: 1px solid #e5e5e5; padding: 15px; border-radius: 4px; color: #636363; font-size: 13px; line-height: 1.5;">
-                                            <strong>${billing.firstName} ${billing.lastName}</strong><br/>
-                                            ${billing.address1}<br/>
-                                            ${billing.city}, ${billing.state} ${billing.postcode}<br/>
-                                            ${billing.country}<br/>
-                                            ${billing.phone}<br/>
-                                            ${billing.email || order.user?.email || order.guestEmail}
-                                        </div>
-                                    </td>
-                                    <td valign="top" width="50%" style="padding-left: 10px;">
-                                        <h3 style="color: ${baseColor}; font-size: 16px; margin-bottom: 10px;">Shipping address</h3>
-                                        <div style="border: 1px solid #e5e5e5; padding: 15px; border-radius: 4px; color: #636363; font-size: 13px; line-height: 1.5;">
-                                            <strong>${shipping.firstName} ${shipping.lastName}</strong><br/>
-                                            ${shipping.address1}<br/>
-                                            ${shipping.city}, ${shipping.state} ${shipping.postcode}<br/>
-                                            ${shipping.country}
-                                        </div>
-                                    </td>
-                                </tr>
-                            </table>
+                            ${orderDetailsHtml}
 
                         </td>
                     </tr>

@@ -7,6 +7,7 @@ import { updateClaimStatus } from '@/app/(backend)/action/warranty/claim-action'
 import TransdirectClientBox from './TransdirectClientBox';
 import { getClient } from '@/lib/apollo-rsc-client'; 
 import { gql } from '@apollo/client';
+import SubmitStatusButton from './SubmitStatusButton';
 
 // ============================================================================
 // ১. TYPESCRIPT INTERFACES (এরর ফিক্স করার জন্য)
@@ -113,29 +114,50 @@ export default async function SingleClaimPage({ params }: { params: Promise<{ id
         {/* --- LEFT COLUMN --- */}
         <div className="lg:col-span-2 space-y-6">
           
-          <div className="bg-white border border-[#c3c4c7] shadow-sm">
-            <h2 className="px-4 py-3 border-b border-[#c3c4c7] text-[14px] font-semibold text-[#1d2327] bg-[#f6f7f7] flex justify-between items-center">
+          <div className="lg:col-span-2 space-y-6">
+          
+          <div className="bg-white border border-[#c3c4c7] shadow-sm rounded-sm">
+            <h2 className="px-4 py-3 border-b border-[#c3c4c7] text-[13px] sm:text-[14px] font-semibold text-[#1d2327] bg-[#f6f7f7] flex justify-between items-center">
               <span>Submitted Claim Details</span>
-              <span className="font-mono bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-[12px]">Order #{claim.orderNumber}</span>
+              <span className="font-mono bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-[11px] sm:text-[12px]">Order #{claim.orderNumber}</span>
             </h2>
-            <div className="p-4 text-[13px] text-[#3c434a] grid grid-cols-2 gap-4">
-              <div><p className="text-[#8c8f94] mb-1">Name Provided</p><p className="font-semibold">{claim.name}</p></div>
-              <div>
-                <p className="text-[#8c8f94] mb-1">Email Provided</p>
-                <p className={`font-semibold ${emailMismatch ? 'text-orange-600' : 'text-[#2271b1]'}`}>
-                  <a href={`mailto:${claim.email}`}>{claim.email}</a>
-                  {emailMismatch && <span className="ml-2 bg-orange-100 text-orange-800 text-[10px] px-1.5 py-0.5 rounded" title="Doesn't match WP Order">Mismatch</span>}
+            
+            {/* 🛑 FIX: Made Responsive (Stack on mobile, Grid on desktop) */}
+            <div className="p-4 text-[13px] text-[#3c434a] flex flex-col sm:grid sm:grid-cols-2 gap-4 sm:gap-6">
+              
+              <div className="w-full">
+                <p className="text-[#8c8f94] mb-1 font-medium">Name Provided</p>
+                <p className="font-semibold text-[#1d2327] break-words">{claim.name}</p>
+              </div>
+              
+              <div className="w-full">
+                <p className="text-[#8c8f94] mb-1 font-medium">Email Provided</p>
+                <div className={`font-semibold flex flex-wrap items-center gap-2 ${emailMismatch ? 'text-orange-600' : 'text-[#2271b1]'}`}>
+                  <a href={`mailto:${claim.email}`} className="break-all">{claim.email}</a>
+                  {emailMismatch && (
+                    <span className="bg-orange-100 text-orange-800 text-[10px] px-1.5 py-0.5 rounded border border-orange-200 whitespace-nowrap" title="Doesn't match WP Order">
+                      Mismatch
+                    </span>
+                  )}
+                </div>
+              </div>
+              
+              <div className="sm:col-span-2 w-full mt-2 sm:mt-0">
+                <p className="text-[#8c8f94] mb-1 font-medium">Issue Description</p>
+                <p className="leading-relaxed whitespace-pre-wrap p-3 bg-gray-50 border border-gray-200 rounded text-[13px] text-[#3c434a]">
+                  {claim.description}
                 </p>
               </div>
-              <div className="col-span-2"><p className="text-[#8c8f94] mb-1">Issue Description</p><p className="leading-relaxed whitespace-pre-wrap p-3 bg-gray-50 border border-gray-200 rounded">{claim.description}</p></div>
+
             </div>
+          </div>
           </div>
 
           <div className="bg-white border border-[#c3c4c7] shadow-sm">
             <h2 className="px-4 py-3 border-b border-[#c3c4c7] text-[14px] font-semibold text-[#1d2327] bg-[#f6f7f7] flex justify-between items-center">
               <span className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-purple-600" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.97-1.3-3.15-3.61-3.15-2.31 0-3.83 1.25-3.83 3.03 0 1.8 1.4 2.87 3.53 3.32 1.91.41 2.34 1.15 2.34 1.87 0 .53-.39 1.5-2.19 1.5-1.77 0-2.36-.93-2.43-1.84h-1.73c.09 1.93 1.44 3.23 4.14 3.23 2.25 0 3.93-1.18 3.93-3.11-.01-1.83-1.41-2.91-3.56-3.39z"/></svg>
-                Original Order Info (REST API)
+                Original Order Info
               </span>
               {wpOrder ? (
                 <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded text-[11px] font-bold tracking-widest uppercase">{wpOrder.status}</span>
@@ -257,9 +279,7 @@ export default async function SingleClaimPage({ params }: { params: Promise<{ id
                   <option value="REJECTED">Reject Claim</option>
                 </select>
                 <div className="flex justify-end">
-                  <button type="submit" className="bg-[#f6f7f7] border border-[#2271b1] text-[#2271b1] px-4 py-2 text-[13px] font-semibold rounded hover:bg-[#f0f0f1] transition-colors cursor-pointer">
-                    Update Status
-                  </button>
+                  <SubmitStatusButton />
                 </div>
               </form>
             </div>

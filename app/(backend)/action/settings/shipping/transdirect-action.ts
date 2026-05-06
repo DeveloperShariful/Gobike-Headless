@@ -4,15 +4,14 @@
 
 import { db } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
+import { sendNotification } from '@/app/api/email/send-notification'; // ✅ NEW: Email trigger
 
 // ============================================================================
-// FUNCTION 1: GET QUOTES (রেট জানার জন্য)
+// FUNCTION 1: GET QUOTES (রেট জানার জন্য) - No Changes Here
 // ============================================================================
 export async function getTransdirectQuotes(formData: FormData) {
   const claimId = formData.get('claimId') as string;
   const partDataRaw = formData.get('partData') as string;
-  
-  // কোটেশনের জন্য শুধু Suburb এবং Postcode দরকার হয় (Address বা State লাগে না)
   const receiverSuburb = formData.get('suburb') as string;
   const receiverPostcode = formData.get('postcode') as string;
 
@@ -22,8 +21,6 @@ export async function getTransdirectQuotes(formData: FormData) {
 
   try {
     const partData = JSON.parse(partDataRaw);
-    
-    // ডাটাবেস থেকে Settings নিয়ে আসা
     const provider = await db.shippingProvider.findUnique({ where: { slug: 'transdirect' } });
 
     if (!provider || !provider.isEnabled || !provider.apiKey) {
@@ -31,10 +28,8 @@ export async function getTransdirectQuotes(formData: FormData) {
     }
 
     const settings = provider.settings as any;
-
-    // --- হুবহু ওয়ার্ডপ্রেস প্লাগিনের মতো পেলোড ---
     const quotePayload = {
-      declared_value: "0.00", // Warranty replacement is free
+      declared_value: "0.00", 
       items: [
         {
           weight: partData.weight ? parseFloat(partData.weight) : 1.0,
@@ -59,56 +54,34 @@ export async function getTransdirectQuotes(formData: FormData) {
       }
     };
 
-    const api_url = provider.isSandbox 
-      ? 'https://sandbox.transdirect.com.au/api/bookings/v4' 
-      : 'https://www.transdirect.com.au/api/bookings/v4';    
+    const api_url = provider.isSandbox ? 'https://sandbox.transdirect.com.au/api/bookings/v4' : 'https://www.transdirect.com.au/api/bookings/v4';    
 
-    // API কে কল করার জন্য Helper Function (Auto Retry এর জন্য)
     const fetchFromAPI = async () => {
       const response = await fetch(api_url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Api-key': provider.apiKey || '', 
-        },
+        headers: { 'Content-Type': 'application/json', 'Api-key': provider.apiKey || '' },
         body: JSON.stringify(quotePayload),
         cache: 'no-store',
       });
       return await response.json();
     };
 
-    // 1st Attempt
     let data = await fetchFromAPI();
-
-    // Auto-Retry if quotes are too few (TNT/Hunter delays)
     if (data.quotes && Object.keys(data.quotes).length <= 2) {
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
-      data = await fetchFromAPI(); // 2nd Attempt
+      await new Promise(resolve => setTimeout(resolve, 2000)); 
+      data = await fetchFromAPI(); 
     }
 
-    if (data.message && !data.quotes) {
-      throw new Error(data.message);
-    }
+    if (data.message && !data.quotes) throw new Error(data.message);
 
     if (data.quotes && Object.keys(data.quotes).length > 0) {
       const quotesList = Object.entries(data.quotes).map(([courier_key, quote]: any) => {
         let label = courier_key.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
-        let transitTime = 'N/A';
-        
-        if (quote.transit_time) {
-          transitTime = quote.transit_time.replace(/ Business/i, '');
-        }
-
-        return {
-          courier: courier_key,
-          name: label,
-          total: quote.total,
-          transitTime: transitTime
-        };
+        let transitTime = quote.transit_time ? quote.transit_time.replace(/ Business/i, '') : 'N/A';
+        return { courier: courier_key, name: label, total: quote.total, transitTime: transitTime };
       });
       
       quotesList.sort((a, b) => parseFloat(a.total) - parseFloat(b.total));
-
       return { success: true, quotes: quotesList, tempBookingId: data.id };
     }
 
@@ -120,7 +93,7 @@ export async function getTransdirectQuotes(formData: FormData) {
 }
 
 // ============================================================================
-// FUNCTION 2: CONFIRM BOOKING (হুবহু ওয়ার্ডপ্রেস প্লাগিনের লজিক)
+// FUNCTION 2: CONFIRM BOOKING
 // ============================================================================
 export async function confirmTransdirectBooking(formData: FormData) {
   const claimId = formData.get('claimId') as string;
@@ -131,12 +104,9 @@ export async function confirmTransdirectBooking(formData: FormData) {
   const receiverAddress = formData.get('address') as string;
   const receiverSuburb = formData.get('suburb') as string;
   const receiverPostcode = formData.get('postcode') as string;
-  // State যদি ফ্রন্টএন্ড থেকে না আসে, ডিফল্ট NSW ধরবে (টেস্টিংয়ের জন্য)
   const receiverState = formData.get('state') as string || 'NSW'; 
 
-  if (!claimId || !tempBookingId || !selectedCourier) {
-    return { success: false, message: 'Missing required booking data.' };
-  }
+  if (!claimId || !tempBookingId || !selectedCourier) return { success: false, message: 'Missing required booking data.' };
 
   try {
     const provider = await db.shippingProvider.findUnique({ where: { slug: 'transdirect' } });
@@ -144,21 +114,17 @@ export async function confirmTransdirectBooking(formData: FormData) {
 
     if (!claim) throw new Error('Claim not found.');
 
-    // ১. প্লাগিনের মতো API URL (POST /api/orders)
-    const confirmUrl = provider?.isSandbox 
-      ? `https://sandbox.transdirect.com.au/api/orders` 
-      : `https://www.transdirect.com.au/api/orders`;
+    const confirmUrl = provider?.isSandbox ? `https://sandbox.transdirect.com.au/api/orders` : `https://www.transdirect.com.au/api/orders`;
 
-    // ২. হুবহু প্লাগিনের মতো Payload তৈরি
     const confirmPayload = {
-      transdirect_order_id: parseInt(tempBookingId), // Quote থেকে পাওয়া আইডি
-      order_id: claim.orderNumber, // কাস্টমারের অর্ডার নম্বর
+      transdirect_order_id: parseInt(tempBookingId), 
+      order_id: claim.orderNumber, 
       goods_summary: `Warranty Part: ${partName}`,
       goods_dump: partName,
-      imported_from: 'WooCommerce', // API কে বোঝানো হচ্ছে এটা ওয়ার্ডপ্রেস থেকেই আসছে
+      imported_from: 'WooCommerce', 
       purchased_time: new Date().toISOString(),
       sale_price: 0,
-      selected_courier: selectedCourier, // কাস্টমারের সিলেক্ট করা কুরিয়ার
+      selected_courier: selectedCourier, 
       courier_price: 0,
       paid_time: new Date().toISOString(),
       buyer_name: claim.name,
@@ -166,7 +132,7 @@ export async function confirmTransdirectBooking(formData: FormData) {
       delivery: {
         name: claim.name,
         email: claim.email,
-        phone: "0400000000", // ডামি ভ্যালিড অস্ট্রেলিয়ান নম্বর (API রিজেক্ট করবে না)
+        phone: "0400000000", 
         address: receiverAddress || claim.address || "N/A", 
         suburb: receiverSuburb,
         postcode: receiverPostcode,
@@ -176,35 +142,40 @@ export async function confirmTransdirectBooking(formData: FormData) {
     };
 
     const response = await fetch(confirmUrl, {
-      method: 'POST', // প্লাগিনের মতো POST মেথড
-      headers: {
-        'Content-Type': 'application/json',
-        'Api-key': provider?.apiKey || '', 
-      },
+      method: 'POST', 
+      headers: { 'Content-Type': 'application/json', 'Api-key': provider?.apiKey || '' },
       body: JSON.stringify(confirmPayload),
     });
 
     const data = await response.json();
 
-    // ৩. এডভান্সড এরর হ্যান্ডলিং (আসল কারণ বের করা)
     if (!response.ok) {
       let errorMessage = 'Failed to confirm booking.';
-      if (data.error) {
-        // যদি Transdirect নির্দিষ্ট কোনো এরর পাঠায় (যেমন: Address invalid)
-        errorMessage = typeof data.error === 'object' ? JSON.stringify(data.error) : data.error;
-      } else if (data.message) {
-        errorMessage = data.message;
-      }
-      console.error('Transdirect Confirm Error:', data);
+      if (data.error) errorMessage = typeof data.error === 'object' ? JSON.stringify(data.error) : data.error;
+      else if (data.message) errorMessage = data.message;
       throw new Error(errorMessage);
     }
 
-    // ৪. বুকিং সফল হলে ট্র্যাকিং আইডি সেভ করা
     const trackingNumber = data.id ? `TD-${data.id}` : `TD-${Math.floor(Math.random() * 1000000)}`;
+    const trackingUrl = `https://www.transdirect.com.au/track-and-trace/?tracking=${trackingNumber}`;
 
     await db.warrantyClaim.update({
       where: { id: claimId },
       data: { status: 'APPROVED', replacementPart: partName, trackingNumber: trackingNumber },
+    });
+
+    // 🛑 EMAIL TRIGGER: Part Shipped Email
+    await sendNotification({
+        trigger: "WARRANTY_PART_SHIPPED",
+        recipient: claim.email,
+        data: { 
+            customer_name: claim.name, 
+            order_number: claim.orderNumber,
+            replacement_part: partName,
+            tracking_number: trackingNumber,
+            tracking_url: trackingUrl,
+            courier: selectedCourier.replace(/_/g, ' ').toUpperCase()
+        }
     });
 
     revalidatePath(`/admin/warranty-claims/${claimId}`);

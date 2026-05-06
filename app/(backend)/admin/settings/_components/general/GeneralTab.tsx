@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { updateGeneralSettings } from '@/app/(backend)/action/settings/general/general'; 
+import { updateGeneralSettings } from '@/app/(backend)/action/settings/general/general';
 
 // 🛑 types.ts থেকে রিয়েল টাইপ ইম্পোর্ট করা হলো
 import { GeneralSettingsData } from '../types';
@@ -84,19 +84,22 @@ export default function GeneralTab({ initialData }: { initialData: GeneralSettin
     }
   };
 
-  // 🛑 Inline Classes
+  // 🛑 Responsive Classes
   const headingClass = "text-[18px] font-semibold text-[#1d2327] mb-2 pt-6";
   const descClass = "block text-[#646970] text-[13px] font-normal mt-1";
-  const tableClass = "w-full text-left text-[14px] text-[#3c434a] mb-8";
-  const btnClass = "bg-[#2271b1] border border-[#2271b1] text-white px-4 py-[5px] text-[13px] font-semibold rounded-[3px] shadow-[0_1px_0_#2271b1] hover:bg-[#135e96] hover:border-[#135e96] focus:outline-none transition-colors cursor-pointer disabled:opacity-50";
+  
+  // 🔥 FIX: টেবিল ক্লাস রেসপন্সিভ করা হয়েছে (মোবাইলে ব্লক, পিসিতে টেবিল)
+  const tableClass = "w-full text-left text-[14px] text-[#3c434a] mb-8 block sm:table";
+  
+  const btnClass = "bg-[#2271b1] border border-[#2271b1] text-white px-4 py-[5px] text-[13px] font-semibold rounded-[3px] shadow-[0_1px_0_#2271b1] hover:bg-[#135e96] hover:border-[#135e96] focus:outline-none transition-colors cursor-pointer disabled:opacity-50 w-full sm:w-auto";
 
   return (
-    <form onSubmit={handleSave} className="pb-10">
+    <form onSubmit={handleSave} className="pb-10 w-full overflow-hidden">
       
       <h2 className={headingClass}>Store Address</h2>
       <p className={`${descClass} mb-4`}>This is where your business is located. Tax rates and shipping rates will use this address.</p>
       <table className={tableClass}>
-        <tbody>
+        <tbody className="block sm:table-row-group">
           <StoreInfo data={data} handleChange={handleChange} />
           <StoreAddress data={data} updateNestedData={updateNestedData} />
         </tbody>
@@ -104,14 +107,14 @@ export default function GeneralTab({ initialData }: { initialData: GeneralSettin
 
       <h2 className={headingClass}>General options</h2>
       <table className={tableClass}>
-        <tbody>
+        <tbody className="block sm:table-row-group">
           <GeneralOptions data={data} updateNestedData={updateNestedData} />
         </tbody>
       </table>
 
       <h2 className={headingClass}>Taxes & Coupons</h2>
       <table className={tableClass}>
-        <tbody>
+        <tbody className="block sm:table-row-group">
           <TaxAndCoupons data={data} updateNestedData={updateNestedData} />
         </tbody>
       </table>
@@ -119,21 +122,21 @@ export default function GeneralTab({ initialData }: { initialData: GeneralSettin
       <h2 className={headingClass}>Currency options</h2>
       <p className={`${descClass} mb-4`}>The following options affect how prices are displayed on the frontend.</p>
       <table className={tableClass}>
-        <tbody>
+        <tbody className="block sm:table-row-group">
           <CurrencyOptions data={data} updateNestedData={updateNestedData} />
         </tbody>
       </table>
 
       <h2 className={headingClass}>Measurements & Maintenance</h2>
       <table className={tableClass}>
-        <tbody>
+        <tbody className="block sm:table-row-group">
           <MeasurementMaintenance data={data} handleChange={handleChange} updateNestedData={updateNestedData} />
         </tbody>
       </table>
 
       <h2 className={headingClass}>Social Links</h2>
       <table className={tableClass}>
-        <tbody>
+        <tbody className="block sm:table-row-group">
           <SocialLinks data={data} updateNestedData={updateNestedData} />
         </tbody>
       </table>

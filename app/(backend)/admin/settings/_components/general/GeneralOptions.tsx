@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { X, Check } from "lucide-react";
 import { getAllCountries } from "@/app/(backend)/action/settings/general/location-helpers";
-import { ComponentProps } from "../types"; // রিয়েল টাইপ ইম্পোর্ট
+import { ComponentProps } from "../types"; 
 
 export default function GeneralOptions({ data, updateNestedData }: Omit<ComponentProps, 'handleChange'>) {
     const allCountries = getAllCountries();
@@ -44,17 +44,18 @@ export default function GeneralOptions({ data, updateNestedData }: Omit<Componen
         toggleCountry(type, code);
     };
 
-    const thClass = "py-[20px] pr-[20px] font-semibold w-full sm:w-[250px] align-top text-left text-[#1d2327] text-[14px]";
-    const tdClass = "py-[15px] px-[10px] align-top text-[#3c434a]";
+    // 🛑 Responsive Classes
+    const thClass = "py-[15px] sm:py-[20px] pr-[20px] font-semibold w-full sm:w-[250px] align-top text-left text-[#1d2327] text-[14px] block sm:table-cell";
+    const tdClass = "py-[10px] sm:py-[15px] px-[10px] align-top text-[#3c434a] block sm:table-cell";
+    
     const selectClass = "w-full max-w-[400px] border border-[#8c8f94] rounded-[3px] px-3 py-1.5 text-[14px] text-[#2c3338] shadow-[inset_0_1px_2px_rgba(0,0,0,0.07)] focus:border-[#2271b1] focus:shadow-[0_0_0_1px_#2271b1] outline-none transition-shadow bg-white";
     const inputClass = "w-full max-w-[400px] border border-[#8c8f94] rounded-[3px] px-3 py-1.5 text-[14px] text-[#2c3338] shadow-[inset_0_1px_2px_rgba(0,0,0,0.07)] focus:border-[#2271b1] focus:shadow-[0_0_0_1px_#2271b1] outline-none transition-shadow bg-white";
-    const checkboxClass = "w-4 h-4 rounded-[3px] border-[#8c8f94] text-[#2271b1] focus:ring-[#2271b1] shadow-[inset_0_1px_2px_rgba(0,0,0,0.07)] mt-1 cursor-pointer";
+    const checkboxClass = "w-4 h-4 rounded-[3px] border-[#8c8f94] text-[#2271b1] focus:ring-[#2271b1] shadow-[inset_0_1px_2px_rgba(0,0,0,0.07)] mt-1 cursor-pointer shrink-0";
     const descClass = "block text-[#646970] text-[13px] font-normal mt-1";
 
     return (
         <>
-            {/* 1. SELLING LOCATIONS */}
-            <tr className="border-b border-[#f0f0f1]">
+            <tr className="border-b border-[#c3c4c7] sm:border-[#f0f0f1] block sm:table-row">
                 <th className={thClass}>Selling location(s)</th>
                 <td className={tdClass}>
                     <select 
@@ -71,7 +72,7 @@ export default function GeneralOptions({ data, updateNestedData }: Omit<Componen
             </tr>
 
             {(data.generalConfig.sellingLocation === 'specific' || data.generalConfig.sellingLocation === 'all_except') && (
-                <tr className="border-b border-[#f0f0f1]">
+                <tr className="border-b border-[#c3c4c7] sm:border-[#f0f0f1] block sm:table-row">
                     <th className={thClass}>
                         {data.generalConfig.sellingLocation === 'specific' ? 'Sell to specific countries' : 'Exclude countries'}
                     </th>
@@ -111,8 +112,7 @@ export default function GeneralOptions({ data, updateNestedData }: Omit<Componen
                 </tr>
             )}
 
-            {/* 2. SHIPPING LOCATIONS */}
-            <tr className="border-b border-[#f0f0f1]">
+            <tr className="border-b border-[#c3c4c7] sm:border-[#f0f0f1] block sm:table-row">
                 <th className={thClass}>Shipping location(s)</th>
                 <td className={tdClass}>
                     <select 
@@ -130,7 +130,7 @@ export default function GeneralOptions({ data, updateNestedData }: Omit<Componen
             </tr>
 
             {data.generalConfig.shippingLocation === 'specific' && (
-                <tr className="border-b border-[#f0f0f1]">
+                <tr className="border-b border-[#c3c4c7] sm:border-[#f0f0f1] block sm:table-row">
                     <th className={thClass}>Ship to specific countries</th>
                     <td className={tdClass}>
                         <div className="relative max-w-[400px]" ref={shipWrapperRef}>
@@ -168,8 +168,7 @@ export default function GeneralOptions({ data, updateNestedData }: Omit<Componen
                 </tr>
             )}
 
-            {/* 3. DEFAULT CUSTOMER LOCATION */}
-            <tr className="border-b border-[#f0f0f1]">
+            <tr className="border-b border-[#c3c4c7] sm:border-[#f0f0f1] block sm:table-row">
                 <th className={thClass}>Default customer location</th>
                 <td className={tdClass}>
                     <select 
@@ -186,24 +185,26 @@ export default function GeneralOptions({ data, updateNestedData }: Omit<Componen
                 </td>
             </tr>
 
-            {/* 4. ENABLE REVIEWS & GUEST CHECKOUT */}
-            <tr className="border-b border-[#f0f0f1]">
+            <tr className="border-b border-[#c3c4c7] sm:border-[#f0f0f1] block sm:table-row">
                 <th className={thClass}>Enable Reviews</th>
                 <td className={tdClass}>
                     <label className="flex items-start gap-2 cursor-pointer mt-1">
                         <input 
                             type="checkbox" 
                             name="enable_reviews"
-                            value="true" // For formData match
+                            value="true" 
                             checked={data.generalConfig.enableReviews} 
                             onChange={(e) => updateNestedData('generalConfig', 'enableReviews', e.target.checked)} 
                             className={checkboxClass}
                         />
-                        <span>Enable product reviews <br/><span className={descClass}>Allow customers to leave reviews on products.</span></span>
+                        <div>
+                            <span className="text-[14px]">Enable product reviews</span>
+                            <span className={descClass}>Allow customers to leave reviews on products.</span>
+                        </div>
                     </label>
                 </td>
             </tr>
-            <tr>
+            <tr className="block sm:table-row border-b border-[#c3c4c7] sm:border-transparent">
                 <th className={thClass}>Guest Checkout</th>
                 <td className={tdClass}>
                     <label className="flex items-start gap-2 cursor-pointer mt-1">
@@ -215,7 +216,10 @@ export default function GeneralOptions({ data, updateNestedData }: Omit<Componen
                             onChange={(e) => updateNestedData('generalConfig', 'enableGuestCheckout', e.target.checked)} 
                             className={checkboxClass}
                         />
-                        <span>Enable guest checkout <br/><span className={descClass}>Allow customers to place orders without an account.</span></span>
+                        <div>
+                            <span className="text-[14px]">Enable guest checkout</span>
+                            <span className={descClass}>Allow customers to place orders without an account.</span>
+                        </div>
                     </label>
                 </td>
             </tr>

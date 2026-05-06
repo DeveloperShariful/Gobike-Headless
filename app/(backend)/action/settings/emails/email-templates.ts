@@ -4,7 +4,6 @@
 
 import { db } from "@/lib/prisma";
 
-// ✅ UPDATED: Added all Enterprise Affiliate Triggers
 const DEFAULT_TEMPLATES = [
     // --- ORDER & PAYMENT (EXISTING) ---
     { slug: 'order_pending', name: 'Order Pending', triggerEvent: 'ORDER_PENDING', recipientType: 'customer', subject: 'Your Order #{order_number} is Pending', content: '<p>Thanks for your order. We have received it.</p>' },
@@ -33,7 +32,7 @@ const DEFAULT_TEMPLATES = [
     { slug: 'admin_returned', name: 'Admin: Item Returned', triggerEvent: 'ADMIN_FULFILLMENT_RETURNED', recipientType: 'admin', subject: '[Admin] Return Received #{order_number}', content: '<p>A shipment has been returned.</p>' },
     { slug: 'admin_payment_failed', name: 'Admin: Payment Failed', triggerEvent: 'ADMIN_PAYMENT_FAILED', recipientType: 'admin', subject: '[Admin] Payment Failed for Order #{order_number}', content: '<p>Payment failed for order #{order_number}. Customer: {customer_name}</p>' },
 
-    // --- AFFILIATE SYSTEM (NEW ENTERPRISE TRIGGERS) ---
+    // --- AFFILIATE SYSTEM (EXISTING) ---
     { slug: 'affiliate_welcome', name: 'Affiliate Welcome', triggerEvent: 'AFFILIATE_WELCOME', recipientType: 'customer', subject: 'Welcome to the Affiliate Program', content: '<p>Hi {affiliate_name}, thanks for joining! Your application is currently under review.</p>' },
     { slug: 'affiliate_approved', name: 'Affiliate Approved', triggerEvent: 'AFFILIATE_APPROVED', recipientType: 'customer', subject: 'You are Approved!', content: '<p>Congrats {affiliate_name}! You can now start promoting and earning commissions.</p>' },
     { slug: 'affiliate_rejected', name: 'Affiliate Rejected', triggerEvent: 'AFFILIATE_REJECTED', recipientType: 'customer', subject: 'Affiliate Application Update', content: '<p>Hi {affiliate_name}, unfortunately, your application was not approved. Reason: {rejection_reason}</p>' },
@@ -45,7 +44,17 @@ const DEFAULT_TEMPLATES = [
     { slug: 'tier_upgraded', name: 'Tier Upgraded', triggerEvent: 'TIER_UPGRADED', recipientType: 'customer', subject: 'Level Up! You are now {tier_name}', content: '<p>Congratulations! You have been upgraded to the {tier_name} tier. You will now enjoy higher commission rates!</p>' },
     { slug: 'kyc_verified', name: 'KYC Verified', triggerEvent: 'KYC_VERIFIED', recipientType: 'customer', subject: 'Identity Verification Successful', content: '<p>Hi {affiliate_name}, your document ({document_type}) has been verified successfully. You are now eligible for payouts.</p>' },
     { slug: 'kyc_rejected', name: 'KYC Rejected', triggerEvent: 'KYC_REJECTED', recipientType: 'customer', subject: 'Action Required: Identity Verification Failed', content: '<p>Hi {affiliate_name}, your document ({document_type}) was rejected. <br/><strong>Reason:</strong> {rejection_reason}<br/>Please upload a valid document again.</p>' },
-    { slug: 'fraud_alert', name: 'Admin: Fraud Alert', triggerEvent: 'FRAUD_ALERT_ADMIN', recipientType: 'admin', subject: '[Alert] Suspicious Affiliate Activity', content: '<p>Affiliate {affiliate_name} has been flagged for {fraud_reason}. Risk Score: {risk_score}</p>' }
+    { slug: 'fraud_alert', name: 'Admin: Fraud Alert', triggerEvent: 'FRAUD_ALERT_ADMIN', recipientType: 'admin', subject: '[Alert] Suspicious Affiliate Activity', content: '<p>Affiliate {affiliate_name} has been flagged for {fraud_reason}. Risk Score: {risk_score}</p>' },
+
+    // --- WARRANTY CLAIMS (UPDATED) ---
+    { slug: 'warranty_claim_customer', name: 'Warranty Claim Received', triggerEvent: 'WARRANTY_CLAIM_CUSTOMER', recipientType: 'customer', subject: 'Warranty Claim Received - Order #{order_number}', content: '<p>Hi {customer_name},</p><p>Thanks for reaching out to us. We have successfully received your warranty claim for order #{order_number}.</p><p>Our technical team is reviewing your video and description. We will get back to you within 24-48 hours with an update or a tracking number for your replacement parts.</p><p><strong>Your Issue Description:</strong><br/>{description}</p>' },
+    { slug: 'warranty_claim_admin', name: 'Admin: New Warranty Claim', triggerEvent: 'WARRANTY_CLAIM_ADMIN', recipientType: 'admin', subject: '[Admin] New Warranty Claim for Order #{order_number}', content: '<p>A new warranty claim has been submitted by {customer_name}.</p><p><strong>Order Number:</strong> #{order_number}<br/><strong>Shop:</strong> {shop_purchased}</p><p><strong>Customer Description:</strong><br/>{description}</p>' },
+    { slug: 'warranty_approved', name: 'Warranty Claim Approved', triggerEvent: 'WARRANTY_CLAIM_APPROVED', recipientType: 'customer', subject: 'Great news! Your Warranty Claim is Approved - Order #{order_number}', content: '<p>Hi {customer_name},</p><p>Good news! Your warranty claim for order #{order_number} has been approved.</p><p>We are now preparing your replacement part: <strong>{replacement_part}</strong>. You will receive another email with tracking details once it has been shipped.</p>' },
+    { slug: 'warranty_rejected', name: 'Warranty Claim Rejected', triggerEvent: 'WARRANTY_CLAIM_REJECTED', recipientType: 'customer', subject: 'Update on your Warranty Claim - Order #{order_number}', content: '<p>Hi {customer_name},</p><p>We have reviewed your warranty claim for order #{order_number}. Unfortunately, your claim has been declined at this moment.</p><p>If you have any questions or need further assistance, please reply to this email.</p>' },
+    { slug: 'warranty_shipped', name: 'Warranty Part Shipped', triggerEvent: 'WARRANTY_PART_SHIPPED', recipientType: 'customer', subject: 'Your Replacement Part is on the way! Tracking: {tracking_number}', content: '<p>Hi {customer_name},</p><p>Your replacement part (<strong>{replacement_part}</strong>) for order #{order_number} has been shipped via {courier}.</p><p><strong>Tracking Number:</strong> {tracking_number}</p><p>Please note that tracking might take 12-24 hours to update on the courier website.</p>' },
+    
+    // 🛑 NEW: Admin Email when Booking is created
+    { slug: 'admin_warranty_shipped', name: 'Admin: Part Shipped', triggerEvent: 'ADMIN_WARRANTY_SHIPPED', recipientType: 'admin', subject: '[Admin] Replacement Part Shipped for Order #{order_number}', content: '<p>A replacement part (<strong>{replacement_part}</strong>) has been shipped for Warranty Claim #{order_number}.</p><p><strong>Courier:</strong> {courier}<br/><strong>Tracking Number:</strong> {tracking_number}</p>' }
 ];
 
 export async function getEmailTemplates() {
@@ -62,7 +71,7 @@ export async function syncEmailTemplates() {
         for (const tmpl of DEFAULT_TEMPLATES) {
             await db.emailTemplate.upsert({
                 where: { triggerEvent: tmpl.triggerEvent },
-                update: {}, // Don't overwrite if exists, users might have edited content
+                update: {}, 
                 create: {
                     slug: tmpl.slug,
                     name: tmpl.name,
@@ -75,12 +84,9 @@ export async function syncEmailTemplates() {
                 }
             });
         }
-
         const templates = await db.emailTemplate.findMany({ orderBy: { name: 'asc' } });
         return { success: true, data: templates };
-
     } catch (error) {
-        console.error("Sync Error:", error);
         return { success: false, error: "Failed to sync templates" };
     }
 }
@@ -103,7 +109,6 @@ export async function updateEmailTemplate(formData: FormData) {
           where: { id },
           data: { subject, heading, content, isEnabled, cc, bcc }
         });
-    
         return { success: true, message: "Template updated" };
       } catch (error) { 
         return { success: false, error: "Update failed" }; 

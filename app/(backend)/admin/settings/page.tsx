@@ -138,7 +138,7 @@ export default async function GlobalSettingsPage() {
 
   return (
     <div className="w-full">
-      <div className="mb-6 px-4 sm:px-0 pt-4">
+      <div className="mb-4 sm:mb-6 px-2 sm:px-4 pt-4">
         <h1 className="text-[23px] font-normal text-[#1d2327]">Settings</h1>
       </div>
 

@@ -25,6 +25,8 @@ const nextConfig = {
       { protocol: 'https', hostname: 'i.ytimg.com', pathname: '/**' },
       { protocol: 'https', hostname: 'x.klarnacdn.net', pathname: '/**' },
       { protocol: 'https', hostname: 'static.afterpay.com', pathname: '/**' },
+      { protocol: 'https', hostname: '**.public.blob.vercel-storage.com', },
+      { protocol: 'http', hostname: 'localhost',}
     ],
   },
 };

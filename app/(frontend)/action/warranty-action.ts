@@ -1,7 +1,9 @@
 //app/(frontend)/action/warranty-action.ts
+
 'use server';
 
 import { db } from '@/lib/prisma';
+import { sendNotification } from '@/app/api/email/send-notification'; // 🛑 NEW: Email trigger import
 
 type ClaimData = {
   name: string;
@@ -35,10 +37,8 @@ export async function submitWarrantyClaim(data: ClaimData) {
       const ck = process.env.WC_CONSUMER_KEY;
       const cs = process.env.WC_CONSUMER_SECRET;
 
-      // Basic Auth Header তৈরি করা হচ্ছে
       const authHeader = 'Basic ' + Buffer.from(`${ck}:${cs}`).toString('base64');
 
-      // সরাসরি অর্ডার আইডি দিয়ে কল করা হচ্ছে
       const res = await fetch(`${wpUrl}/wp-json/wc/v3/orders/${cleanOrderNumber}`, {
         method: 'GET',
         headers: {
@@ -53,7 +53,6 @@ export async function submitWarrantyClaim(data: ClaimData) {
         const orderEmail = orderData.billing?.email?.toLowerCase() || '';
         const inputEmail = data.email.toLowerCase();
 
-        // ইমেইল ম্যাচ করলে ডেটাগুলো ভেরিয়েবলে সেভ করা
         if (orderEmail === inputEmail) {
           wpPhone = orderData.billing?.phone || '';
           
@@ -77,7 +76,7 @@ export async function submitWarrantyClaim(data: ClaimData) {
     }
 
     // ডাটাবেসে সেভ
-    await db.warrantyClaim.create({
+    const newClaim = await db.warrantyClaim.create({
       data: {
         name: data.name,
         orderNumber: cleanOrderNumber,
@@ -94,6 +93,39 @@ export async function submitWarrantyClaim(data: ClaimData) {
         country: 'AU'
       },
     });
+
+    // =================================================================
+    // 🛑 EMAIL NOTIFICATION LOGIC (Background Process)
+    // =================================================================
+    try {
+        // 1. Send Email to Customer
+        await sendNotification({
+            trigger: "WARRANTY_CLAIM_CUSTOMER",
+            recipient: data.email,
+            data: { 
+                customer_name: data.name, 
+                order_number: cleanOrderNumber,
+                description: data.description
+            }
+        });
+
+        // 2. Send Email to Admin
+        await sendNotification({
+            trigger: "WARRANTY_CLAIM_ADMIN",
+            recipient: "", // Empty string means it will auto-send to Admin Email
+            data: { 
+                customer_name: data.name, 
+                order_number: cleanOrderNumber,
+                shop_purchased: data.shopPurchased,
+                description: data.description,
+                media_urls: data.mediaUrl, // Video/Image links
+                claim_id: newClaim.id // To show dashboard link in email
+            }
+        });
+    } catch (emailError) {
+        // We log the error but don't fail the claim submission
+        console.error("Failed to queue warranty emails:", emailError);
+    }
 
     return { success: true, message: 'Claim submitted successfully!' };
 

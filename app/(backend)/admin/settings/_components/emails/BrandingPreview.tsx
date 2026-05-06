@@ -2,6 +2,8 @@
 
 "use client";
 
+import Image from 'next/image';
+
 interface BrandingPreviewProps {
   logo?: string | null;
   baseColor: string;
@@ -12,15 +14,15 @@ interface BrandingPreviewProps {
 
 export default function BrandingPreview({ logo, baseColor, bgColor, bodyColor, footerText }: BrandingPreviewProps) {
   return (
-    <div className="sticky top-6 border border-[#c3c4c7] bg-white rounded-sm shadow-sm overflow-hidden">
+    <div className="border border-[#c3c4c7] bg-white rounded-sm shadow-sm overflow-hidden xl:sticky xl:top-6">
       <div className="bg-[#f0f0f1] px-4 py-3 border-b border-[#c3c4c7]">
         <h3 className="text-[13px] font-semibold text-[#1d2327] uppercase">Live Email Preview</h3>
       </div>
       
-      <div className="p-4">
+      <div className="p-4 overflow-x-auto">
         {/* Email Container (Simulating the Email HTML) */}
         <div 
-            className="border border-slate-200 rounded-sm overflow-hidden text-[13px]"
+            className="border border-slate-200 rounded-sm overflow-hidden text-[13px] min-w-[280px]"
             style={{ backgroundColor: bgColor || "#f7f7f7", padding: "20px" }}
         >
             {/* Email Body */}
@@ -29,9 +31,18 @@ export default function BrandingPreview({ logo, baseColor, bgColor, bodyColor, f
                 style={{ backgroundColor: bodyColor || "#ffffff" }}
             >
                 {/* Header / Logo */}
-                <div className="p-4 text-center border-b border-slate-100 min-h-[60px] flex items-center justify-center bg-white">
+                <div className="p-4 text-center border-b border-slate-100 min-h-[60px] flex items-center justify-center bg-white relative">
+                    {/* 🛑 FIX: Used Next.js Image component for secure external rendering */}
                     {logo ? (
-                        <img src={logo} alt="Logo" className="max-h-[40px] max-w-full object-contain" />
+                        <div className="relative w-full h-[40px]">
+                            <Image 
+                                src={logo} 
+                                alt="Store Logo" 
+                                fill
+                                sizes="(max-width: 300px) 100vw, 300px"
+                                className="object-contain" 
+                            />
+                        </div>
                     ) : (
                         <span className="font-bold text-slate-300">STORE LOGO</span>
                     )}
@@ -50,7 +61,7 @@ export default function BrandingPreview({ logo, baseColor, bgColor, bodyColor, f
                     {/* Primary Button */}
                     <div className="py-3 text-center mt-2">
                         <span 
-                            className="inline-block text-white px-4 py-2 rounded-[3px] text-[12px] font-bold cursor-pointer"
+                            className="inline-block text-white px-4 py-2 rounded-[3px] text-[12px] font-bold cursor-pointer transition-opacity hover:opacity-90"
                             style={{ backgroundColor: baseColor || "#2271b1" }}
                         >
                             View Order

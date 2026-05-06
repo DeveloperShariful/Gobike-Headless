@@ -6,15 +6,16 @@ import { ComponentProps } from "../types";
 export default function StoreAddress({ data, updateNestedData }: Omit<ComponentProps, 'handleChange'>) {
     const locations = getCountryStateOptions();
 
-    // Inline Classes
-    const thClass = "py-[20px] pr-[20px] font-semibold w-full sm:w-[250px] align-top text-left text-[#1d2327] text-[14px]";
-    const tdClass = "py-[15px] px-[10px] align-top text-[#3c434a]";
+    // 🛑 Responsive Classes
+    const thClass = "py-[15px] sm:py-[20px] pr-[20px] font-semibold w-full sm:w-[250px] align-top text-left text-[#1d2327] text-[14px] block sm:table-cell";
+    const tdClass = "py-[10px] sm:py-[15px] px-[10px] align-top text-[#3c434a] block sm:table-cell";
+    
     const inputClass = "w-full max-w-[400px] border border-[#8c8f94] rounded-[3px] px-3 py-1.5 text-[14px] text-[#2c3338] shadow-[inset_0_1px_2px_rgba(0,0,0,0.07)] focus:border-[#2271b1] focus:shadow-[0_0_0_1px_#2271b1] outline-none transition-shadow bg-white";
     const selectClass = "w-full max-w-[400px] border border-[#8c8f94] rounded-[3px] px-3 py-1.5 text-[14px] text-[#2c3338] shadow-[inset_0_1px_2px_rgba(0,0,0,0.07)] focus:border-[#2271b1] focus:shadow-[0_0_0_1px_#2271b1] outline-none transition-shadow bg-white";
 
     return (
         <>
-            <tr className="border-b border-[#f0f0f1]">
+            <tr className="border-b border-[#c3c4c7] sm:border-[#f0f0f1] block sm:table-row">
                 <th className={thClass}>Address line 1</th>
                 <td className={tdClass}>
                     <input 
@@ -25,7 +26,7 @@ export default function StoreAddress({ data, updateNestedData }: Omit<ComponentP
                     />
                 </td>
             </tr>
-            <tr className="border-b border-[#f0f0f1]">
+            <tr className="border-b border-[#c3c4c7] sm:border-[#f0f0f1] block sm:table-row">
                 <th className={thClass}>Address line 2</th>
                 <td className={tdClass}>
                     <input 
@@ -36,7 +37,7 @@ export default function StoreAddress({ data, updateNestedData }: Omit<ComponentP
                     />
                 </td>
             </tr>
-            <tr className="border-b border-[#f0f0f1]">
+            <tr className="border-b border-[#c3c4c7] sm:border-[#f0f0f1] block sm:table-row">
                 <th className={thClass}>City</th>
                 <td className={tdClass}>
                     <input 
@@ -47,7 +48,7 @@ export default function StoreAddress({ data, updateNestedData }: Omit<ComponentP
                     />
                 </td>
             </tr>
-            <tr className="border-b border-[#f0f0f1]">
+            <tr className="border-b border-[#c3c4c7] sm:border-[#f0f0f1] block sm:table-row">
                 <th className={thClass}>Country / State</th>
                 <td className={tdClass}>
                     <select 
@@ -63,7 +64,7 @@ export default function StoreAddress({ data, updateNestedData }: Omit<ComponentP
                     </select>
                 </td>
             </tr>
-            <tr>
+            <tr className="block sm:table-row border-b border-[#c3c4c7] sm:border-transparent">
                 <th className={thClass}>Postcode / ZIP</th>
                 <td className={tdClass}>
                     <input 
