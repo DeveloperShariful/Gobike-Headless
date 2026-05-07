@@ -22,7 +22,7 @@ export default async function AdminDashboardPage() {
   });
 
   return (
-    <div className="max-w-[1200px]">
+    <div className="max-w-full">
       
       {/* Page Header (WordPress Style) */}
       <div className="mb-6">
@@ -78,7 +78,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Quick Activity Box (WordPress Metabox Style) */}
-      <div className="bg-white border border-[#c3c4c7] shadow-sm max-w-2xl">
+      <div className="bg-white border border-[#c3c4c7] shadow-sm max-w-5xl">
         <h2 className="px-4 py-2 border-b border-[#c3c4c7] text-[14px] font-semibold text-[#1d2327] bg-[#f6f7f7]">
           Recent Activity
         </h2>

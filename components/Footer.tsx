@@ -1,10 +1,14 @@
 // components/Footer.tsx
+// components/Footer.tsx
 'use client';
 import { FaFacebookF, FaInstagram, FaYoutube, FaTiktok , FaLinkedinIn, FaPinterestP} from 'react-icons/fa';
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import Script from 'next/script'; // Trustpilot স্ক্রিপ্ট লোড করার জন্য
+import Script from 'next/script'; 
+
+// 🛑 NEW: Server Action Import
+import { subscribeNewsletter } from '@/app/(frontend)/action/subscribe-action';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
@@ -18,36 +22,31 @@ export default function Footer() {
     }
   }, []);
 
+  // 🛑 FIX: Use Server Action instead of API fetch
   const handleSubscription = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus('loading');
     setFeedbackMessage('Subscribing...');
 
     try {
-        const response = await fetch('/api/subscribe', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: email })
-        });
-        
-        const result = await response.json();
+        const formData = new FormData();
+        formData.append('email', email);
 
-        if (!response.ok) {
-            throw new Error(result.message || 'An error occurred.');
+        // Call the server action directly
+        const result = await subscribeNewsletter(formData);
+
+        if (result.success) {
+            setStatus('success');
+            setFeedbackMessage(result.message);
+            setEmail(''); // Clear input
+        } else {
+            setStatus('error');
+            setFeedbackMessage(result.message);
         }
-
-        setStatus('success');
-        setFeedbackMessage(result.message);
-        setEmail('');
 
     } catch (error: unknown) {
         setStatus('error');
-        let errorMessage = 'Failed to subscribe. Please try again.';
-        if (error instanceof Error) {
-            errorMessage = error.message;
-        }
-        setFeedbackMessage(errorMessage);
-    
+        setFeedbackMessage('Failed to subscribe. Please try again.');
     } finally {
         setTimeout(() => {
             setFeedbackMessage('');
@@ -77,12 +76,18 @@ export default function Footer() {
                         onChange={(e) => setEmail(e.target.value)} 
                         required 
                         className="flex-grow border-none p-3 text-base outline-none w-full" 
+                        disabled={status === 'loading'}
                       />
                       <button 
                         type="submit" 
-                        className="bg-black text-white border-none py-2 px-4 text-sm md:text-base font-semibold cursor-pointer flex items-center gap-2 whitespace-nowrap"
+                        disabled={status === 'loading'}
+                        className="bg-black text-white border-none py-2 px-4 text-sm md:text-base font-semibold cursor-pointer flex items-center gap-2 whitespace-nowrap disabled:opacity-70"
                       >
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                          {status === 'loading' ? (
+                            <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                          ) : (
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                          )}
                           <span>Sign Up</span>
                       </button>
                   </form>
@@ -113,7 +118,7 @@ export default function Footer() {
                   />
                  </Link>
 
-                 {/* Trustpilot Widget Box (আপনার স্ক্রিনশটের রিয়েল ডেটা বসানো হয়েছে) */}
+                 {/* Trustpilot Widget Box */}
                  <div
                     ref={trustBoxRef}
                     className="trustpilot-widget"
@@ -159,14 +164,12 @@ export default function Footer() {
                         <span>TikTok</span>
                       </a>
                     </li>
-                    {/* New: LinkedIn Added */}
                     <li>
                       <a href="https://www.linkedin.com/company/112710706" target="_blank" rel="noopener noreferrer" className="text-[#555] flex items-center gap-3 hover:text-black font-medium transition-colors">
                         <FaLinkedinIn className="w-6 h-6 text-white bg-[#0A66C2] rounded-full p-1" />
                         <span>LinkedIn</span>
                       </a>
                     </li>
-                    {/* New: Pinterest Added (Highly Recommended for Aussie Parents) */}
                     <li>
                       <a href="#" target="_blank" rel="noopener noreferrer" className="text-[#555] flex items-center gap-3 hover:text-black font-medium transition-colors">
                         <FaPinterestP className="w-6 h-6 text-white bg-[#E60023] rounded-full p-1" />

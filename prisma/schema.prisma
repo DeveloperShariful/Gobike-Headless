@@ -19,6 +19,7 @@ enum Role {
   SUPER_ADMIN
   ADMIN
   CUSTOMER
+  SUBSCRIBER
 }
 
 enum ClaimStatus {

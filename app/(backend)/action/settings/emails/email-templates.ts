@@ -31,7 +31,7 @@ const DEFAULT_TEMPLATES = [
     { slug: 'admin_refunded', name: 'Admin: Order Refunded', triggerEvent: 'ADMIN_PAYMENT_REFUNDED', recipientType: 'admin', subject: '[Admin] Refund Issued #{order_number}', content: '<p>A refund was issued for this order.</p>' },
     { slug: 'admin_returned', name: 'Admin: Item Returned', triggerEvent: 'ADMIN_FULFILLMENT_RETURNED', recipientType: 'admin', subject: '[Admin] Return Received #{order_number}', content: '<p>A shipment has been returned.</p>' },
     { slug: 'admin_payment_failed', name: 'Admin: Payment Failed', triggerEvent: 'ADMIN_PAYMENT_FAILED', recipientType: 'admin', subject: '[Admin] Payment Failed for Order #{order_number}', content: '<p>Payment failed for order #{order_number}. Customer: {customer_name}</p>' },
-
+    
     // --- AFFILIATE SYSTEM (EXISTING) ---
     { slug: 'affiliate_welcome', name: 'Affiliate Welcome', triggerEvent: 'AFFILIATE_WELCOME', recipientType: 'customer', subject: 'Welcome to the Affiliate Program', content: '<p>Hi {affiliate_name}, thanks for joining! Your application is currently under review.</p>' },
     { slug: 'affiliate_approved', name: 'Affiliate Approved', triggerEvent: 'AFFILIATE_APPROVED', recipientType: 'customer', subject: 'You are Approved!', content: '<p>Congrats {affiliate_name}! You can now start promoting and earning commissions.</p>' },
@@ -54,7 +54,12 @@ const DEFAULT_TEMPLATES = [
     { slug: 'warranty_shipped', name: 'Warranty Part Shipped', triggerEvent: 'WARRANTY_PART_SHIPPED', recipientType: 'customer', subject: 'Your Replacement Part is on the way! Tracking: {tracking_number}', content: '<p>Hi {customer_name},</p><p>Your replacement part (<strong>{replacement_part}</strong>) for order #{order_number} has been shipped via {courier}.</p><p><strong>Tracking Number:</strong> {tracking_number}</p><p>Please note that tracking might take 12-24 hours to update on the courier website.</p>' },
     
     // 🛑 NEW: Admin Email when Booking is created
-    { slug: 'admin_warranty_shipped', name: 'Admin: Part Shipped', triggerEvent: 'ADMIN_WARRANTY_SHIPPED', recipientType: 'admin', subject: '[Admin] Replacement Part Shipped for Order #{order_number}', content: '<p>A replacement part (<strong>{replacement_part}</strong>) has been shipped for Warranty Claim #{order_number}.</p><p><strong>Courier:</strong> {courier}<br/><strong>Tracking Number:</strong> {tracking_number}</p>' }
+    { slug: 'admin_warranty_shipped', name: 'Admin: Part Shipped', triggerEvent: 'ADMIN_WARRANTY_SHIPPED', recipientType: 'admin', subject: '[Admin] Replacement Part Shipped for Order #{order_number}', content: '<p>A replacement part (<strong>{replacement_part}</strong>) has been shipped for Warranty Claim #{order_number}.</p><p><strong>Courier:</strong> {courier}<br/><strong>Tracking Number:</strong> {tracking_number}</p>' },
+    // --- AUTH & ACCOUNTS (EXISTING) ---
+    { slug: 'password_reset', name: 'Password Reset', triggerEvent: 'PASSWORD_RESET', recipientType: 'customer', subject: 'Password Reset Request for your Account', content: '<p>Hi {customer_name},</p><p>Someone has requested a password reset for your account.</p><p>If this was a mistake, just ignore this email and nothing will happen.</p><p>To reset your password, visit the following address:</p>' },
+
+    // 🛑 NEW: NEWSLETTER SUBSCRIPTION
+    { slug: 'newsletter_subscription', name: 'Newsletter Welcome', triggerEvent: 'NEWSLETTER_SUBSCRIPTION', recipientType: 'customer', subject: 'Welcome to Our Newsletter! 🎉', content: '<p>Hi there,</p><p>Thank you for subscribing to our newsletter! We are thrilled to have you on board.</p><p>From now on, you will be the first to know about our latest products, exclusive discounts, and exciting news.</p><p>As a welcome gift, use the code <strong>WELCOME10</strong> to get 10% off your first purchase!</p><p>Happy Riding!</p>' }
 ];
 
 export async function getEmailTemplates() {

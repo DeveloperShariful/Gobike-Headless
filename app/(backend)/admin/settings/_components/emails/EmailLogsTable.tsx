@@ -5,7 +5,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
-import { EmailLog } from "../types";
+import { EmailLog } from "../../../../types";
 import { deleteEmailLogs, cleanupOldLogs } from "@/app/(backend)/action/settings/emails/delete-logs";
 
 interface Props {

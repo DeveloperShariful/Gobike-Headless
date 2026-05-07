@@ -40,7 +40,6 @@ export const generateEmailHtml = ({ order, config, template, metadata }: EmailGe
   const bgColor = config.backgroundColor || "#f7f7f7";
   const bodyColor = config.bodyBackgroundColor || "#ffffff";
   
-  // 🛑 FIX: Bulletproof App URL Fallback to prevent broken relative links in Gmail
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://gobike.au";
   
   let variables: any = {};
@@ -60,7 +59,24 @@ export const generateEmailHtml = ({ order, config, template, metadata }: EmailGe
       };
   } 
   // ==========================================
-  // ✅ 2. ORDER VARIABLES (EXISTING)
+  // ✅ 2. PASSWORD RESET VARIABLES
+  // ==========================================
+  else if (template.triggerEvent === "PASSWORD_RESET") {
+      variables = {
+          customer_name: metadata?.customer_name || "Customer",
+          reset_link: metadata?.reset_link || `${appUrl}/reset-password`,
+      };
+  }
+  // ==========================================
+  // 🛑 3. NEW: NEWSLETTER SUBSCRIPTION VARIABLES
+  // ==========================================
+  else if (template.triggerEvent === "NEWSLETTER_SUBSCRIPTION") {
+      variables = {
+          customer_name: metadata?.customer_name || "Subscriber",
+      };
+  }
+  // ==========================================
+  // ✅ 4. ORDER VARIABLES (EXISTING)
   // ==========================================
   else if (order) {
       const currency = order.currency || "$";
@@ -92,7 +108,7 @@ export const generateEmailHtml = ({ order, config, template, metadata }: EmailGe
   // ==========================================
   let orderDetailsHtml = "";
 
-  if (order && !template.triggerEvent.includes("WARRANTY")) {
+  if (order && !template.triggerEvent.includes("WARRANTY") && template.triggerEvent !== "PASSWORD_RESET" && template.triggerEvent !== "NEWSLETTER_SUBSCRIPTION") {
       const currency = order.currency || "$";
       const formatMoney = (amount: number) => {
         return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount).replace('USD', currency);
@@ -254,12 +270,32 @@ export const generateEmailHtml = ({ order, config, template, metadata }: EmailGe
     `;
   }
 
-  // 🛑 FIX Applied Here: Fallback `appUrl` is now used for the dashboard link
   if (template.triggerEvent === "WARRANTY_CLAIM_ADMIN" && metadata?.claim_id) {
     const dashboardLink = `${appUrl}/admin/warranty-claims/${metadata.claim_id}`;
     actionButton = `
       <div style="text-align: center; margin: 30px 0;">
         <a href="${dashboardLink}" style="background-color: ${baseColor}; color: #ffffff; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">View Claim in Dashboard</a>
+      </div>
+    `;
+  }
+
+  if (template.triggerEvent === "PASSWORD_RESET" && metadata?.reset_link) {
+    actionButton = `
+      <div style="text-align: center; margin: 40px 0;">
+        <a href="${metadata.reset_link}" style="background-color: ${baseColor}; color: #ffffff; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block; font-size: 16px;">Click Here to Reset Password</a>
+      </div>
+      <p style="text-align: center; font-size: 12px; color: #999; margin-top: 20px;">If the button doesn't work, copy and paste this link into your browser:<br/><a href="${metadata.reset_link}" style="color: ${baseColor};">${metadata.reset_link}</a></p>
+    `;
+    
+    introText = introText.replace(`<a href="${metadata.reset_link}">${metadata.reset_link}</a>`, "");
+    introText = introText.replace(`{reset_link}`, "");
+  }
+
+  // 🛑 NEW: Action Button for Newsletter (Optional but nice to have)
+  if (template.triggerEvent === "NEWSLETTER_SUBSCRIPTION") {
+    actionButton = `
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${appUrl}/shop" style="background-color: ${baseColor}; color: #ffffff; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">Shop Now</a>
       </div>
     `;
   }

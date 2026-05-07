@@ -7,7 +7,7 @@ import GeneralTab from './general/GeneralTab';
 import ShippingTab from './shipping/ShippingTab';
 import EmailsTab from './emails/EmailsTab';
 
-import { GeneralSettingsData, ShippingProvider, EmailConfiguration, EmailTemplate, EmailLog } from './types';
+import { GeneralSettingsData, ShippingProvider, EmailConfiguration, EmailTemplate, EmailLog } from '../../../types';
 
 export interface EmailPageData {
   config: EmailConfiguration | null;

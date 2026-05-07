@@ -2,7 +2,7 @@
 import { db } from '@/lib/prisma';
 import { Prisma } from '@prisma/client'; // 🛑 Prisma-এর রিয়েল টাইপ
 import SettingsClient, { EmailPageData } from './_components/SettingsClient';
-import { ShippingProvider, GeneralSettingsData, EmailLog, EmailConfiguration, EmailTemplate } from './_components/types';
+import { ShippingProvider, GeneralSettingsData, EmailLog, EmailConfiguration, EmailTemplate } from '../../types';
 
 import { getEmailConfiguration } from '@/app/(backend)/action/settings/emails/email-config';
 import { getEmailTemplates } from '@/app/(backend)/action/settings/emails/email-templates';

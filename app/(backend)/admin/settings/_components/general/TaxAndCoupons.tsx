@@ -1,6 +1,6 @@
 //app/(backend)/admin/settings/_components/general/TaxAndCoupons.tsx
 
-import { ComponentProps } from "../types";
+import { ComponentProps } from "../../../../types";
 
 export default function TaxAndCoupons({ data, updateNestedData }: Omit<ComponentProps, 'handleChange'>) {
     

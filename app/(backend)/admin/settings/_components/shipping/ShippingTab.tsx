@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { saveShippingProviderSettings } from '@/app/(backend)/action/settings/shipping/shipping';
-import { ShippingProvider } from '../types';
+import { ShippingProvider } from '../../../../types';
 
 export default function ShippingTab({ initialShipping }: { initialShipping: ShippingProvider | null }) {
   const [loading, setLoading] = useState<boolean>(false);

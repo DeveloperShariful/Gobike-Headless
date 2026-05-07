@@ -1,7 +1,7 @@
 //app/(backend)/admin/settings/_components/general/SocialLinks.tsx
 
 import { FaFacebook as Facebook, FaInstagram as Instagram, FaTwitter as Twitter, FaYoutube as Youtube, FaLinkedin as Linkedin } from "react-icons/fa";
-import { ComponentProps } from "../types";
+import { ComponentProps } from "../../../../types";
 
 export default function SocialLinks({ data, updateNestedData }: Omit<ComponentProps, 'handleChange'>) {
     const socialPlatforms = [

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getAllCurrencies } from "@/app/(backend)/action/settings/general/location-helpers";
-import { ComponentProps } from "../types"; 
+import { ComponentProps } from "../../../../types"; 
 
 export default function CurrencyOptions({ data, updateNestedData }: Omit<ComponentProps, 'handleChange'>) {
     const [currencies, setCurrencies] = useState<{code: string, symbol: string, label: string}[]>([]);

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { X, Check } from "lucide-react";
 import { getAllCountries } from "@/app/(backend)/action/settings/general/location-helpers";
-import { ComponentProps } from "../types"; 
+import { ComponentProps } from "../../../../types"; 
 
 export default function GeneralOptions({ data, updateNestedData }: Omit<ComponentProps, 'handleChange'>) {
     const allCountries = getAllCountries();

@@ -1,6 +1,6 @@
 //app/(backend)/admin/settings/_components/general/StoreInfo.tsx
 
-import { ComponentProps } from "../types";
+import { ComponentProps } from "../../../../types";
 
 export default function StoreInfo({ data, handleChange }: Omit<ComponentProps, 'updateNestedData'>) {
   

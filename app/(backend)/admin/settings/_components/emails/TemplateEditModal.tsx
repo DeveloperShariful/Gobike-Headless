@@ -5,7 +5,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { updateEmailTemplate } from "@/app/(backend)/action/settings/emails/email-templates";
-import { EmailTemplate } from "../types";
+import { EmailTemplate } from "../../../../types";
 import RichTextEditor from "./RichTextEditor"; 
 
 interface Props {

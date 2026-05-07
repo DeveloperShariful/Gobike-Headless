@@ -10,7 +10,7 @@ import { sendTestEmail } from "@/app/(backend)/action/settings/emails/send-test-
 // 🛑 NEW: Vercel Blob Upload ইম্পোর্ট করা হলো
 import { upload } from '@vercel/blob/client';
 
-import { EmailConfiguration } from "../types";
+import { EmailConfiguration } from "../../../../types";
 import BrandingPreview from "./BrandingPreview"; 
 
 interface Props {

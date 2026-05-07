@@ -1,11 +1,7 @@
-//app/(backend)/admin/settings/_components/types.ts
+//app/(backend)/types.ts
 
 // ========================================================================
 // 1. ORIGINAL TYPES (No changes made, only missing fields added for safety)
-// ========================================================================
-
-// ========================================================================
-// 1. GENERAL SETTINGS UI TYPES 
 // ========================================================================
 
 export interface GeneralSettingsData {
@@ -29,6 +25,8 @@ export interface GeneralSettingsData {
         defaultCustomerLocation: string; // 'shop_base', 'no_address', 'geoip'
         enableCoupons: boolean;
         calcCouponsSequentially: boolean;
+        
+        // Added missing fields used in components
         enableReviews: boolean;
         enableGuestCheckout: boolean;
     };
@@ -46,6 +44,7 @@ export interface GeneralSettingsData {
         numDecimals: number | string;
     };
 
+    // Added missing root fields used in Settings UI
     weightUnit: string;
     dimensionUnit: string;
     maintenance: boolean;
@@ -61,6 +60,7 @@ export interface GeneralSettingsData {
 export interface ComponentProps {
     data: GeneralSettingsData;
     handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
+    // updated to allow 'maintenance' directly
     updateNestedData: (section: keyof GeneralSettingsData | 'maintenance', field: string, value: unknown) => void;
 }
 
@@ -68,6 +68,9 @@ export interface ComponentProps {
 // ========================================================================
 // 2. PRISMA SCHEMA TYPES (Direct DB Mappings)
 // ========================================================================
+
+// 🛑 UPDATED: Added SUBSCRIBER role for Newsletter signups
+export type Role = 'SUPER_ADMIN' | 'ADMIN' | 'CUSTOMER' | 'SUBSCRIBER';
 
 // ENUMS
 export type AddressType = 'SHIPPING' | 'BILLING';
@@ -145,7 +148,6 @@ export interface EmailTemplate {
     updatedAt: Date | string;
 }
 
-// ✅ NEWLY ADDED: Email Log Model for your Email Table
 export interface EmailLog {
     id: string;
     recipient: string;
@@ -165,8 +167,8 @@ export interface AbandonedCheckout {
     cartToken?: string | null;
     email?: string | null;
     userId?: string | null;
-    items: Record<string, unknown> | unknown[]; 
-    subtotal: number | string; 
+    items: Record<string, unknown> | unknown[]; // JSON mapped
+    subtotal: number | string; // Decimal
     currency: string;
     recoveryUrl: string;
     isRecovered: boolean;
@@ -178,6 +180,7 @@ export interface AbandonedCheckout {
     createdAt: Date | string;
     updatedAt: Date | string;
 }
+
 
 // ---------------------------------------------------------
 // SHIPPING & LOGISTICS MODELS
@@ -193,7 +196,7 @@ export interface ShippingProvider {
     apiSecret?: string | null;
     email?: string | null;
     password?: string | null;
-    settings?: Record<string, unknown> | null; 
+    settings?: Record<string, unknown> | null; // JSON mapped
     createdAt: Date | string;
     updatedAt: Date | string;
 }
@@ -261,7 +264,7 @@ export interface TaxRate {
 }
 
 // ---------------------------------------------------------
-// STORE SETTINGS MODEL
+// STORE SETTINGS MODEL (Direct DB Schema Mapping)
 // ---------------------------------------------------------
 
 export interface StoreSettings {
@@ -271,17 +274,17 @@ export interface StoreSettings {
     storePhone?: string | null;
     currency: string;
     currencySymbol: string;
-    storeAddress?: Record<string, unknown> | null; 
-    taxSettings?: Record<string, unknown> | null;  
-    generalConfig?: Record<string, unknown> | null; 
+    storeAddress?: Record<string, unknown> | null; // JSON mapping
+    taxSettings?: Record<string, unknown> | null;  // JSON mapping
+    generalConfig?: Record<string, unknown> | null; // JSON mapping
     weightUnit: string;
     dimensionUnit: string;
     logo?: string | null;
     favicon?: string | null;
-    socialLinks?: Record<string, unknown> | null;  
-    smtpConfig?: Record<string, unknown> | null;   
+    socialLinks?: Record<string, unknown> | null;  // JSON mapping
+    smtpConfig?: Record<string, unknown> | null;   // JSON mapping
     maintenance: boolean;
-    affiliateConfig?: Record<string, unknown> | null; 
-    mlmConfig?: Record<string, unknown> | null;       
+    affiliateConfig?: Record<string, unknown> | null; // JSON mapping
+    mlmConfig?: Record<string, unknown> | null;       // JSON mapping
     updatedAt: Date | string;
 }

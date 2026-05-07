@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import { updateGeneralSettings } from '@/app/(backend)/action/settings/general/general';
 
 // 🛑 types.ts থেকে রিয়েল টাইপ ইম্পোর্ট করা হলো
-import { GeneralSettingsData } from '../types';
+import { GeneralSettingsData } from '../../../../types';
 
 import StoreInfo from './StoreInfo';
 import StoreAddress from './StoreAddress';
