@@ -67,7 +67,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
   }));
 
   return (
-    <div className="w-full px-1 sm:px-4 pb-10 pt-4 overflow-x-hidden">
+    <div className="w-full pb-10 pt-1 overflow-x-hidden">
       
       <div className="flex items-center gap-3 mb-3 pl-2 sm:pl-0">
         <h1 className="text-[23px] font-normal text-[#1d2327] leading-none">Users</h1>

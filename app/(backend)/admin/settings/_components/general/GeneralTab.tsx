@@ -94,7 +94,7 @@ export default function GeneralTab({ initialData }: { initialData: GeneralSettin
   const btnClass = "bg-[#2271b1] border border-[#2271b1] text-white px-4 py-[5px] text-[13px] font-semibold rounded-[3px] shadow-[0_1px_0_#2271b1] hover:bg-[#135e96] hover:border-[#135e96] focus:outline-none transition-colors cursor-pointer disabled:opacity-50 w-full sm:w-auto";
 
   return (
-    <form onSubmit={handleSave} className="pb-10 w-full overflow-hidden">
+    <form onSubmit={handleSave} className=" w-full overflow-hidden">
       
       <h2 className={headingClass}>Store Address</h2>
       <p className={`${descClass} mb-4`}>This is where your business is located. Tax rates and shipping rates will use this address.</p>
