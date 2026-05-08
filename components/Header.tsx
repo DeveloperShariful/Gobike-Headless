@@ -53,7 +53,7 @@ const navItems: NavItem[] = [
     subItems: [
       { path: '/electric-bike-parts/battery', label: 'Electric Bike Batteries' },
       { path: '/electric-bike-parts/tyre-tube', label: 'Electric Bike Tyres and Tube' },
-      //{ path: '/spare-parts/motors-components', label: 'Electric Bike Motors & Components' },
+
     ]
   },
   { path: '/apparel', label: 'Apparel' },

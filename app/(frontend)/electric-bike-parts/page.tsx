@@ -1,4 +1,4 @@
-// app/spare-parts/page.tsx
+// app/electric-bike-parts/page.tsx
 
 import { gql } from '@apollo/client';
 import Link from 'next/link';
@@ -69,7 +69,7 @@ export async function generateMetadata({ searchParams }: {
   }
 
   const queryString = canonicalParams.toString();
-  const canonicalUrl = queryString ? `/spare-parts?${queryString}` : '/spare-parts';
+  const canonicalUrl = queryString ? `/electric-bike-parts?${queryString}` : '/electric-bike-parts';
 
   const currentDate = new Date().toISOString();
 
@@ -251,8 +251,8 @@ export default async function SparePartsPage({ searchParams }: {
           )}
           
           <div className="mt-10 flex justify-center">
-            {/* এখানে basePath="/spare-parts" দেওয়া হয়েছে যাতে পেজিনেশন ঠিকমতো কাজ করে */}
-            <PaginationControls pageInfo={pageInfo} basePath="/spare-parts" />
+
+            <PaginationControls pageInfo={pageInfo} basePath="/electric-bike-parts" />
           </div>
         </main>
 

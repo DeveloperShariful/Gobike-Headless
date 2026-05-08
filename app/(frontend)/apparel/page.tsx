@@ -266,7 +266,7 @@ export default async function ApparelPage({ searchParams }: {
               Shop Electric Bikes
             </Link>
             <Link 
-              href="/spare-parts" 
+              href="/electric-bike-parts" 
               className="px-8 py-3 bg-white text-gray-800 font-bold rounded-full border border-gray-200 shadow-sm hover:shadow-lg hover:border-blue-600 hover:text-blue-600 hover:-translate-y-0.5 transition-all duration-300"
             >
               Shop Spare Parts

@@ -7,7 +7,6 @@ import { gql } from '@apollo/client';
 import client from '@/lib/apolloClient';
 import ProductCard from '@/components/ProductCard';
 
-// --- টাইপ ইন্টারফেস (অপরিবর্তিত) ---
 interface Product {
   id: string;
   databaseId: number;
@@ -26,7 +25,7 @@ interface QueryData {
     nodes: Product[];
   } | null;
 }
-// --- GraphQL কোয়েরি (অপরিবর্তিত) ---
+
 const GET_CROSS_SELL_PRODUCTS_QUERY = gql`
   query GetCrossSellProducts {
     products(where: { categoryIn: ["spare-parts"] }, first: 4) {

@@ -156,7 +156,7 @@ export default function DiscountClient() {
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Genuine Spare Parts</h3>
               <p className="text-gray-600 text-sm leading-relaxed mb-4">Need to maintain your ride? Get 5% off our entire range of <strong>genuine spare parts</strong>. This includes replacement lithium-ion batteries, Kenda dirt tires, Star Union brake pads, and more.</p>
-              <Link href="/spare-parts" className="text-green-600 font-bold hover:underline text-sm">Shop Parts →</Link>
+              <Link href="/electric-bike-parts" className="text-green-600 font-bold hover:underline text-sm">Shop Parts →</Link>
             </div>
 
             <div className="bg-gray-50 p-8 rounded-3xl border border-gray-100 text-center hover:-translate-y-1 transition-transform">

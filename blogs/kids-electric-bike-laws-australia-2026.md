@@ -74,7 +74,7 @@ With so many e-bikes on the market, it can be hard to know what's actually legal
 4.  **Pedal-assist only** — Bikes that operate on throttle alone above 6 km/h are classified as motor vehicles.
 5.  **Age suitability** — If you're in Queensland, your child must be 16+ to ride on public paths.
 
-The NSW Government has specifically asked parents to double-check compliance before purchasing, because some devices marketed as e-bikes are technically illegal electric motorbikes. To keep your bike in top shape and compliant, always use genuine [spare parts](/spare-parts).
+The NSW Government has specifically asked parents to double-check compliance before purchasing, because some devices marketed as e-bikes are technically illegal electric motorbikes. To keep your bike in top shape and compliant, always use genuine [spare parts](/electric-bike-parts).
 
 ### What About GoBike?
 
