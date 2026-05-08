@@ -295,7 +295,7 @@ export default function Header() {
 
       {/* MOBILE MENU */}
       <div 
-        className={`fixed top-0 left-0 w-[350px] h-[95vh] bg-white z-[1001] transition-transform duration-300 ease-in-out flex flex-col p-6 shadow-[5px_0_15px_rgba(0,0,0,0.1)] ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed top-0 left-0 w-[350px] h-[100dvh] bg-white z-[1001] transition-transform duration-300 ease-in-out flex flex-col p-6 shadow-[5px_0_15px_rgba(0,0,0,0.1)] ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
           <div className="flex justify-between items-center mb-8 border-b border-[#f0f0f0] pb-4">
              <button 
