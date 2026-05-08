@@ -44,9 +44,7 @@ export async function sendTestEmail(recipientEmail: string) {
     const baseColor = config.baseColor || "#2271b1";
 
     await transporter.sendMail({
-      // ✅ HERE IS THE TRICK:
-      // মেইল যাবে: "GoBike <sharifulislam78009@gmail.com>"
-      // হুবহু তোমার প্লাগিনের মতো
+      
       from: `"${senderName}" <${actualSender}>`, 
       
       // কাস্টমার রিপ্লাই দিলে যাবে: gobike@gobike.au তে

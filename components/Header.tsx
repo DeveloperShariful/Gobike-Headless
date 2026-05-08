@@ -1,5 +1,7 @@
 // components/Header.tsx
 
+// components/Header.tsx
+
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -18,8 +20,53 @@ import {
   IoLogOutOutline, 
   IoTrendingUpOutline, 
   IoPersonCircleOutline, 
-  IoSpeedometerOutline 
+  IoSpeedometerOutline,
+  IoChevronDown, 
+  IoChevronUp   
 } from "react-icons/io5";
+
+
+type SubNavItem = {
+  path: string;
+  label: string;
+  tag?: string; 
+};
+
+type NavItem = {
+  path: string;
+  label: string;
+  subItems?: SubNavItem[]; 
+};
+
+
+const navItems: NavItem[] = [
+  { path: '/', label: 'Home' },
+  { 
+    path: '/bikes', 
+    label: 'Bikes',
+    subItems: [
+      { path: '/product/ebike-for-kids-12-inch-electric-bike-ages-2-5', label: '12" Electric Bike', tag: 'Ages 2-4' },
+      { path: '/product/ebike-for-sale-16-inch-gobike-ages-5-9', label: '16" Electric Bike', tag: 'Ages 4-6' },
+      { path: '/product/20-inch-electric-bikes-for-sale-ebike-for-kids', label: '20" Electric Bike', tag: 'Ages 6-9' },
+      { path: '/product/gobike-24-inch-electric-bike-teens-high-speed-performance-for-ages-13', label: '24" Electric Bike', tag: 'Ages 9-12' },
+    ]
+  },
+  { 
+    path: '/electric-bike-parts', 
+    label: 'Spare Parts',
+    subItems: [
+      { path: '/electric-bike-parts/battery', label: 'Electric Bike Batteries' },
+      { path: '/electric-bike-parts/tyre-tube', label: 'Electric Bike Tyres and Tube' },
+      //{ path: '/spare-parts/motors-components', label: 'Electric Bike Motors & Components' },
+    ]
+  },
+  { path: '/apparel', label: 'Apparel' },
+  { path: '/shop', label: 'Shop' },
+  { path: '/about', label: 'About' },
+  { path: '/contact', label: 'Contact' },
+  { path: '/faq', label: 'FAQ' },
+  { path: '/blog', label: 'Blog' },
+];
 
 export default function Header() {
   const { cartItems, isMiniCartOpen, openMiniCart, closeMiniCart } = useCart();
@@ -30,13 +77,10 @@ export default function Header() {
   // ড্রপডাউন স্টেট
   const [isAuthDropdownOpen, setIsAuthDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  
+  const [openMobileMenus, setOpenMobileMenus] = useState<Record<string, boolean>>({});
   const pathname = usePathname();
   const router = useRouter();
-
   const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
-
-  // Affiliate Status Check (Case Insensitive)
   const status = user?.affiliateStatus ? user.affiliateStatus.toLowerCase() : '';
   const isAffiliate = status === 'active' || status === 'pending' || status === 'approved';
 
@@ -46,7 +90,6 @@ export default function Header() {
     setIsAuthDropdownOpen(false);
   }
 
-  // ড্রপডাউনের বাইরে ক্লিক হ্যান্ডেল করা
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -66,13 +109,16 @@ export default function Header() {
     closeAllOverlays();
   };
 
+  const toggleMobileMenu = (path: string) => {
+    setOpenMobileMenus(prev => ({ ...prev, [path]: !prev[path] }));
+  };
+
   return (
     <>
       <header className="bg-white border-b border-[#eaeaea] py-1.3 sticky top-[55px] z-50 transition-[top] duration-300 ease-in-out md:top-[48px] shadow-md">
         
         <div className="max-w-[1400px] mx-auto px-6 flex pb-3 pt-3 lg:grid lg:grid-cols-3 items-center justify-between relative ">
           
-          {/* Logo & Mobile Menu Button */}
           <div className="flex flex-1 lg:flex-none items-center justify-start">
             <button 
                 onClick={() => setIsMenuOpen(true)} 
@@ -95,7 +141,6 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Mobile Logo Center */}
           <div className="block lg:hidden absolute left-1/2 -translate-x-1/2">
             <Link href="/" className="flex items-center no-underline">
                <Image 
@@ -109,16 +154,34 @@ export default function Header() {
             </Link>
           </div>
           
-          {/* Desktop Nav */}
           <nav className="hidden lg:flex gap-6 xl:gap-7 items-center justify-self-center">
-            {['/', '/bikes', '/spare-parts', '/apparel', '/shop','/about', '/contact', '/faq', '/blog'].map((path) => (
+            {navItems.map((item) => (
+              <div key={item.path} className="relative group">
                 <Link 
-                    key={path}
-                    href={path} 
-                    className={`no-underline text-[15px] xl:text-[18px] font-medium transition-colors duration-200 ease-in-out hover:text-black hover:font-bold whitespace-nowrap ${pathname === path ? 'text-black font-bold' : 'text-[#353535]'}`}
+                    href={item.path} 
+                    className={`no-underline text-[15px] xl:text-[18px] font-medium transition-colors duration-200 ease-in-out flex items-center gap-1 hover:text-black hover:font-bold whitespace-nowrap ${pathname === item.path || (pathname.startsWith(item.path) && item.path !== '/') ? 'text-black font-bold' : 'text-[#353535]'}`}
                 >
-                    {path === '/' ? 'Home' : path.substring(1).replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    {item.label}
+                    {item.subItems && <IoChevronDown size={14} className="mt-0.5 group-hover:rotate-180 transition-transform duration-200" />}
                 </Link>
+
+                {item.subItems && (
+                  <div className="absolute left-0 top-full pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                    <div className="bg-white border border-[#eaeaea] shadow-[0_10px_20px_rgba(0,0,0,0.05)] rounded-md py-2 px-1 flex flex-col min-w-[220px]">
+                      {item.subItems.map((subItem) => (
+                        <Link 
+                          key={subItem.path} 
+                          href={subItem.path}
+                          className="flex items-center justify-between px-4 py-2.5 text-sm text-[#353535] hover:bg-[#f8f9fa] hover:text-black hover:font-semibold rounded transition-colors no-underline whitespace-nowrap"
+                        >
+                          <span>{subItem.label}</span>
+                          {subItem.tag && <span className="text-xs text-gray-400 font-normal ml-6">{subItem.tag}</span>}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             ))}
           </nav>
 
@@ -133,7 +196,6 @@ export default function Header() {
               <span className="text-sm font-medium">Search</span>
             </button>
             
-            {/* ★★★ DYNAMIC AUTH DROPDOWN (Desktop) ★★★ */}
             <div className="relative" ref={dropdownRef}>
                 <button 
                     onClick={toggleDropdown}
@@ -141,14 +203,12 @@ export default function Header() {
                     aria-label="Account"
                 >
                   <IoPersonOutline size={24} />
-                  {/* লগইন থাকলে 'My Account' দেখাবে, না থাকলে শুধু আইকন */}
                   {user && <span>My Account</span>}
                 </button>
 
                 {isAuthDropdownOpen && (
                     <div className="absolute right-0 top-full mt-2 w-60 bg-white border border-[#e0e0e0] rounded-lg shadow-lg z-50 overflow-hidden animate-fadeIn">
-                        
-                        {/* CASE 1: NOT LOGGED IN */}
+
                         {!user && (
                             <>
                                 <Link 
@@ -176,7 +236,6 @@ export default function Header() {
                             </>
                         )}
 
-                        {/* CASE 2: LOGGED IN */}
                         {user && (
                             <>
                                 <div className="px-4 py-3 bg-gray-50 border-b border-[#f0f0f0]">
@@ -193,7 +252,6 @@ export default function Header() {
                                     My Account
                                 </Link>
 
-                                {/* ★★★ শুধু অ্যাফিলিয়েট হলে এই অপশন আসবে ★★★ */}
                                 {isAffiliate && (
                                     <Link 
                                         href="/affiliate/dashboard" 
@@ -256,22 +314,52 @@ export default function Header() {
                 <IoClose size={28} />
             </button>
           </div>
-            
-            <nav className="flex flex-col gap-6 flex-grow overflow-y-auto">
-                {['/', '/bikes', '/spare-parts', '/apparel', '/shop','/about', '/faq', '/contact', '/blog'].map((path) => (
-                    <Link 
-                        key={path}
-                        href={path} 
-                        className={`text-[1.2rem] font-medium text-[#333] no-underline flex items-center gap-3 bg-transparent border-b border-[#ececec] w-full text-left cursor-pointer p-0 hover:text-black hover:font-bold ${pathname === path ? 'text-black font-bold' : ''}`}
-                        onClick={closeAllOverlays}
-                    >
-                        {path === '/' ? 'Home' : path === '/contact' ? 'Contact us' : path.substring(1).replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                    </Link>
+            <nav className="flex flex-col gap-2 flex-grow overflow-y-auto">
+                {navItems.map((item) => (
+                    <div key={item.path} className="w-full">
+                        <div className="flex items-center justify-between border-b border-[#ececec]">
+                            <Link 
+                                href={item.path} 
+                                className={`text-[1.2rem] font-medium no-underline flex items-center gap-3 bg-transparent w-full text-left cursor-pointer py-3 hover:text-black hover:font-bold ${pathname === item.path ? 'text-black font-bold' : 'text-[#333]'}`}
+                                onClick={() => !item.subItems && closeAllOverlays()}
+                            >
+                                {item.label === 'Contact' ? 'Contact us' : item.label}
+                            </Link>
+                            
+                            {item.subItems && (
+                                <button 
+                                  onClick={() => toggleMobileMenu(item.path)}
+                                  className="p-3 text-[#333] cursor-pointer"
+                                  aria-label="Toggle Submenu"
+                                >
+                                  {openMobileMenus[item.path] ? <IoChevronUp size={20} /> : <IoChevronDown size={20} />}
+                                </button>
+                            )}
+                        </div>
+
+                        {item.subItems && (
+                           <div className={`overflow-hidden transition-all duration-300 ease-in-out ${openMobileMenus[item.path] ? 'max-h-[500px] opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
+                             <div className="flex flex-col pl-6 border-l-2 border-[#f0f0f0] ml-2 mb-2">
+                               {item.subItems.map((subItem) => (
+                                 <Link 
+                                   key={subItem.path} 
+                                   href={subItem.path} 
+                                   className="py-2.5 text-[1.05rem] text-[#555] no-underline hover:text-black hover:font-semibold flex justify-between pr-4"
+                                   onClick={closeAllOverlays}
+                                 >
+                                   <span>{subItem.label}</span>
+                                   {subItem.tag && <span className="text-[0.85rem] text-gray-400">{subItem.tag}</span>}
+                                 </Link>
+                               ))}
+                             </div>
+                           </div>
+                        )}
+                    </div>
                 ))}
             </nav>
           
           <div className="border-t border-[#f0f0f0] pt-4 mt-6">
-            {/* ★★★ Mobile Auth Links (Dynamic) ★★★ */}
+
             {user ? (
                 <>
                  <Link 
