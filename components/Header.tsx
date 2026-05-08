@@ -1,7 +1,5 @@
 // components/Header.tsx
 
-// components/Header.tsx
-
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -25,7 +23,6 @@ import {
   IoChevronUp   
 } from "react-icons/io5";
 
-
 type SubNavItem = {
   path: string;
   label: string;
@@ -37,7 +34,6 @@ type NavItem = {
   label: string;
   subItems?: SubNavItem[]; 
 };
-
 
 const navItems: NavItem[] = [
   { path: '/', label: 'Home' },
@@ -74,7 +70,6 @@ export default function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
-  // ড্রপডাউন স্টেট
   const [isAuthDropdownOpen, setIsAuthDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [openMobileMenus, setOpenMobileMenus] = useState<Record<string, boolean>>({});
@@ -113,8 +108,33 @@ export default function Header() {
     setOpenMobileMenus(prev => ({ ...prev, [path]: !prev[path] }));
   };
 
+  // ★★★ SEO ENHANCEMENT 1: Organization Schema (Brand Logo & Details) ★★★
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "GoBike Australia",
+    "url": "https://gobikes.au",
+    "logo": "https://gobikes.au/wp-content/uploads/2025/06/GOBIKE-Electric-Bike-for-kids-1.webp"
+  };
+
+  // ★★★ SEO ENHANCEMENT 2: Site Navigation Schema (For Google Sitelinks) ★★★
+  const siteNavigationSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": navItems.map((item, index) => ({
+      "@type": "SiteNavigationElement",
+      "position": index + 1,
+      "name": item.label,
+      "url": `https://gobikes.au${item.path}`
+    }))
+  };
+
   return (
     <>
+      {/* Injecting SEO Schema into the DOM safely */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(siteNavigationSchema) }} />
+
       <header className="bg-white border-b border-[#eaeaea] py-1.3 sticky top-[55px] z-50 transition-[top] duration-300 ease-in-out md:top-[48px] shadow-md">
         
         <div className="max-w-[1400px] mx-auto px-6 flex pb-3 pt-3 lg:grid lg:grid-cols-3 items-center justify-between relative ">
@@ -123,15 +143,16 @@ export default function Header() {
             <button 
                 onClick={() => setIsMenuOpen(true)} 
                 className="flex lg:hidden bg-transparent border-none cursor-pointer p-2 text-[#333] items-center mr-2"
-                aria-label="Menu"
+                aria-label="Open Mobile Menu"
+                aria-expanded={isMenuOpen} // SEO Accessibility
             >
                 <IoMenu size={35} />
             </button>
             <div className="hidden lg:block">
-              <Link href="/" className="flex items-center no-underline">
+              <Link href="/" className="flex items-center no-underline" aria-label="GoBike Home">
                   <Image 
                     src="https://gobikes.au/wp-content/uploads/2025/06/GOBIKE-Electric-Bike-for-kids-1.webp" 
-                    alt="GoBike Logo" 
+                    alt="GoBike Australia Logo" 
                     width={1846} 
                     height={417} 
                     priority 
@@ -142,10 +163,10 @@ export default function Header() {
           </div>
 
           <div className="block lg:hidden absolute left-1/2 -translate-x-1/2">
-            <Link href="/" className="flex items-center no-underline">
+            <Link href="/" className="flex items-center no-underline" aria-label="GoBike Home">
                <Image 
                 src="https://gobikes.au/wp-content/uploads/2025/06/GOBIKE-Electric-Bike-for-kids-1.webp" 
-                alt="GoBike Logo" 
+                alt="GoBike Australia Logo" 
                 width={1846} 
                 height={417} 
                 priority 
@@ -154,15 +175,17 @@ export default function Header() {
             </Link>
           </div>
           
-          <nav className="hidden lg:flex gap-6 xl:gap-7 items-center justify-self-center">
+          {/* Main Desktop Navigation */}
+          <nav className="hidden lg:flex gap-6 xl:gap-7 items-center justify-self-center" aria-label="Main Navigation">
             {navItems.map((item) => (
               <div key={item.path} className="relative group">
                 <Link 
                     href={item.path} 
                     className={`no-underline text-[15px] xl:text-[18px] font-medium transition-colors duration-200 ease-in-out flex items-center gap-1 hover:text-black hover:font-bold whitespace-nowrap ${pathname === item.path || (pathname.startsWith(item.path) && item.path !== '/') ? 'text-black font-bold' : 'text-[#353535]'}`}
+                    aria-haspopup={item.subItems ? "true" : "false"} // SEO Accessibility
                 >
                     {item.label}
-                    {item.subItems && <IoChevronDown size={14} className="mt-0.5 group-hover:rotate-180 transition-transform duration-200" />}
+                    {item.subItems && <IoChevronDown size={14} className="mt-0.5 group-hover:rotate-180 transition-transform duration-200" aria-hidden="true" />}
                 </Link>
 
                 {item.subItems && (
@@ -190,9 +213,9 @@ export default function Header() {
             <button 
                 className="hidden lg:flex items-center gap-2 bg-transparent border-b border-[#d8d8d8] cursor-pointer px-2 pb-0.5 text-[#333] hover:border-black transition-colors" 
                 onClick={() => setIsSearchOpen(true)} 
-                aria-label="search bar"
+                aria-label="Open Search Bar"
             >
-              <IoSearch size={22} />
+              <IoSearch size={22} aria-hidden="true" />
               <span className="text-sm font-medium">Search</span>
             </button>
             
@@ -200,9 +223,11 @@ export default function Header() {
                 <button 
                     onClick={toggleDropdown}
                     className="hidden lg:flex bg-transparent border-none cursor-pointer p-2 text-[#333] items-center gap-2 hover:text-black transition-colors font-medium text-sm whitespace-nowrap"
-                    aria-label="Account"
+                    aria-label="My Account Menu"
+                    aria-haspopup="true" // SEO Accessibility
+                    aria-expanded={isAuthDropdownOpen} // SEO Accessibility
                 >
-                  <IoPersonOutline size={24} />
+                  <IoPersonOutline size={24} aria-hidden="true" />
                   {user && <span>My Account</span>}
                 </button>
 
@@ -280,9 +305,9 @@ export default function Header() {
             <button 
                 className="bg-transparent border-none cursor-pointer relative text-[#333] p-2 hover:text-black transition-colors" 
                 onClick={openMiniCart} 
-                aria-label="MiniCart" 
+                aria-label="Open Shopping Cart" 
             >
-              <span className="text-[26px]">🛒</span>
+              <span className="text-[26px]" aria-hidden="true">🛒</span>
               {totalItems > 0 && (
                 <span className="absolute top-0 right-0 bg-black text-white rounded-full h-5 w-5 flex items-center justify-center text-[10px] font-bold">
                     {totalItems}
@@ -296,25 +321,28 @@ export default function Header() {
       {/* MOBILE MENU */}
       <div 
         className={`fixed top-0 left-0 w-[350px] h-[100dvh] bg-white z-[1001] transition-transform duration-300 ease-in-out flex flex-col p-6 shadow-[5px_0_15px_rgba(0,0,0,0.1)] ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        role="dialog" // SEO Accessibility
+        aria-modal="true" // SEO Accessibility
       >
           <div className="flex justify-between items-center mb-8 border-b border-[#f0f0f0] pb-4">
              <button 
                 className="flex items-center gap-3 w-full bg-transparent border-none border-b border-[#e0e0e0] p-3 mr-4 text-[1.1rem] font-medium text-[#333] cursor-pointer text-left" 
                 onClick={() => setIsSearchOpen(true) } 
-                aria-label="SearchBar"
+                aria-label="Search Products"
              >
-              <IoSearch size={22} />
+              <IoSearch size={22} aria-hidden="true" />
               <span>Search products</span>
             </button>
             <button 
                 className="bg-transparent border-none cursor-pointer text-[#333] flex items-center p-2" 
                 onClick={() => setIsMenuOpen(false)} 
-                aria-label="Close Menu"
+                aria-label="Close Mobile Menu"
             >
-                <IoClose size={28} />
+                <IoClose size={28} aria-hidden="true" />
             </button>
           </div>
-            <nav className="flex flex-col gap-2 flex-grow overflow-y-auto">
+            
+            <nav className="flex flex-col gap-2 flex-grow overflow-y-auto" aria-label="Mobile Navigation">
                 {navItems.map((item) => (
                     <div key={item.path} className="w-full">
                         <div className="flex items-center justify-between border-b border-[#ececec]">
@@ -330,15 +358,20 @@ export default function Header() {
                                 <button 
                                   onClick={() => toggleMobileMenu(item.path)}
                                   className="p-3 text-[#333] cursor-pointer"
-                                  aria-label="Toggle Submenu"
+                                  aria-label={`Toggle ${item.label} Submenu`}
+                                  aria-expanded={!!openMobileMenus[item.path]} // SEO Accessibility
+                                  aria-controls={`mobile-submenu-${item.label.replace(/\s+/g, '-').toLowerCase()}`} // SEO Accessibility
                                 >
-                                  {openMobileMenus[item.path] ? <IoChevronUp size={20} /> : <IoChevronDown size={20} />}
+                                  {openMobileMenus[item.path] ? <IoChevronUp size={20} aria-hidden="true" /> : <IoChevronDown size={20} aria-hidden="true" />}
                                 </button>
                             )}
                         </div>
 
                         {item.subItems && (
-                           <div className={`overflow-hidden transition-all duration-300 ease-in-out ${openMobileMenus[item.path] ? 'max-h-[500px] opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
+                           <div 
+                              id={`mobile-submenu-${item.label.replace(/\s+/g, '-').toLowerCase()}`} // SEO Accessibility match
+                              className={`overflow-hidden transition-all duration-300 ease-in-out ${openMobileMenus[item.path] ? 'max-h-[500px] opacity-100 mt-2' : 'max-h-0 opacity-0'}`}
+                           >
                              <div className="flex flex-col pl-6 border-l-2 border-[#f0f0f0] ml-2 mb-2">
                                {item.subItems.map((subItem) => (
                                  <Link 
@@ -367,7 +400,7 @@ export default function Header() {
                     className="text-[1.2rem] font-medium text-[#333] no-underline flex items-center gap-3 bg-transparent border-b border-[#ececec] w-full text-left cursor-pointer p-0 hover:text-black hover:font-bold mb-4"
                     onClick={closeAllOverlays}
                  >
-                    <IoPersonOutline />
+                    <IoPersonOutline aria-hidden="true" />
                     <span>My Account</span>
                  </Link>
                  
@@ -377,7 +410,7 @@ export default function Header() {
                         className="text-[1.2rem] font-medium text-blue-600 no-underline flex items-center gap-3 bg-transparent border-b border-[#ececec] w-full text-left cursor-pointer p-0 hover:text-blue-800 hover:font-bold mb-4"
                         onClick={closeAllOverlays}
                     >
-                        <IoSpeedometerOutline />
+                        <IoSpeedometerOutline aria-hidden="true" />
                         <span>Affiliate Dashboard</span>
                     </Link>
                  )}
@@ -386,7 +419,7 @@ export default function Header() {
                     onClick={handleLogout}
                     className="text-[1.2rem] font-medium text-red-600 flex items-center gap-3 w-full text-left p-0 mt-2"
                  >
-                    <IoLogOutOutline />
+                    <IoLogOutOutline aria-hidden="true" />
                     <span>Logout</span>
                  </button>
                 </>
@@ -397,7 +430,7 @@ export default function Header() {
                         className="text-[1.2rem] font-medium text-[#333] no-underline flex items-center gap-3 bg-transparent border-b border-[#ececec] w-full text-left cursor-pointer p-0 hover:text-black hover:font-bold"
                         onClick={closeAllOverlays}
                     >
-                        <IoPersonCircleOutline />
+                        <IoPersonCircleOutline aria-hidden="true" />
                         <span>Login / Register</span>
                     </Link>
                      <Link 
@@ -405,7 +438,7 @@ export default function Header() {
                         className="text-[1.2rem] font-medium text-[#333] no-underline flex items-center gap-3 bg-transparent border-b border-[#ececec] w-full text-left cursor-pointer p-0 hover:text-black hover:font-bold"
                         onClick={closeAllOverlays}
                     >
-                        <IoTrendingUpOutline />
+                        <IoTrendingUpOutline aria-hidden="true" />
                         <span>Affiliate Portal</span>
                     </Link>
                 </div>
@@ -417,7 +450,7 @@ export default function Header() {
         <div 
             className="fixed top-0 left-0 w-full h-full bg-black/50 z-[1000]" 
             onClick={() => setIsMenuOpen(false)} 
-            aria-label="Close"
+            aria-label="Close Overlay"
         ></div>
       )}
       

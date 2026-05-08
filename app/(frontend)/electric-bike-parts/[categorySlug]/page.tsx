@@ -4,7 +4,6 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { Metadata } from 'next';
 
-// ★ আপডেট করা ইম্পোর্ট পাথগুলো ★
 import Breadcrumbs from '@/components/Breadcrumbs'; 
 import ProductsGrid from '@/components/ProductsGrid'; 
 import CategorySeoContent from './_components/CategorySeoContent'; 
@@ -27,6 +26,8 @@ async function getCategoryData(slug: string) {
           name
           slug
           __typename
+          averageRating
+          reviewCount
           image { sourceUrl altText }
           ... on SimpleProduct { price regularPrice salePrice onSale }
           ... on VariableProduct { price regularPrice salePrice onSale }
@@ -39,7 +40,8 @@ async function getCategoryData(slug: string) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query, variables: { slug: slug, catString: slug } }),
-    cache: 'no-store', 
+    // ★★★ SEO UPDATE 1: Caching (ISR) - পেজ এখন রকেটের বেগে লোড হবে ★★★
+    next: { revalidate: 3600 }, 
   });
 
   const json = await res.json();
@@ -49,21 +51,59 @@ async function getCategoryData(slug: string) {
   };
 }
 
+// ★★★ ADVANCED METADATA GENERATION ★★★
 export async function generateMetadata({ params }: { params: Promise<{ categorySlug: string }> }): Promise<Metadata> {
   const resolvedParams = await params;
-  const data = await getCategoryData(resolvedParams.categorySlug);
+  const categorySlug = resolvedParams.categorySlug;
+  const data = await getCategoryData(categorySlug);
   
   if (!data || !data.categoryInfo) return { title: 'Category Not Found | GoBike' };
 
-  const categoryName = data.categoryInfo.name;
-  const plainTextDesc = data.categoryInfo.description ? data.categoryInfo.description.replace(/<[^>]+>/g, '').substring(0, 160) : `Buy the best ${categoryName} for your kids electric bike at GoBike.`;
+  const seoData = seoContentMap[categorySlug];
+  const h1Title = seoData?.h1 || data.categoryInfo.name;
+  const plainTextDesc = data.categoryInfo.description ? data.categoryInfo.description.replace(/<[^>]+>/g, '').substring(0, 160) : `Shop the best ${h1Title} for kids electric bikes at GoBike Australia.`;
+
+  const canonicalUrl = `/electric-bike-parts/${categorySlug}`;
+  const currentDate = new Date().toISOString(); 
+  const ogImageUrl = data.categoryInfo.image?.sourceUrl || 'https://gobikes.au/wp-content/uploads/default-gobike-share.jpg';
 
   return {
-    title: `${categoryName} | Electric Bike Spare Parts | GoBike`,
+    title: `${h1Title} | GoBike Australia`,
     description: plainTextDesc,
+    keywords: seoData?.keywords || [], 
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+    openGraph: {
+      title: `${h1Title} | GoBike Australia`,
+      description: plainTextDesc,
+      url: `https://gobikes.au${canonicalUrl}`,
+      siteName: 'GoBike Australia',
+      images: [{ url: ogImageUrl }],
+      locale: 'en_AU',
+      type: 'website',
+    },
+    // ★★★ SEO UPDATE 2: Twitter Card - সোশ্যাল মিডিয়ায় শেয়ারের জন্য ★★★
+    twitter: {
+      card: 'summary_large_image',
+      title: `${h1Title} | GoBike Australia`,
+      description: plainTextDesc,
+      images: [ogImageUrl],
+    },
+    other: {
+      'article:modified_time': currentDate, 
+      'og:updated_time': currentDate,       
+      'last-modified': currentDate,
+    }
   };
 }
 
+
+// --- MAIN PAGE COMPONENT ---
 export default async function ElectricBikePartsCategoryPage({
   params,
 }: {
@@ -76,17 +116,90 @@ export default async function ElectricBikePartsCategoryPage({
 
   if (!data || !data.categoryInfo) notFound();
 
-  const categoryName = data.categoryInfo.name;
+  const seoData = seoContentMap[categorySlug];
+  const categoryName = seoData?.h1 || data.categoryInfo.name;
   const categoryImage = data.categoryInfo.image;
   const products = data.filteredProducts; 
-  
-  const seoData = seoContentMap[categorySlug];
 
+  // ★★★ JSON-LD SCHEMA INJECTION ★★★
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    'itemListElement': [
+      { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': 'https://gobikes.au' },
+      { '@type': 'ListItem', 'position': 2, 'name': 'Electric Bike Parts', 'item': 'https://gobikes.au/electric-bike-parts' },
+      { '@type': 'ListItem', 'position': 3, 'name': categoryName, 'item': `https://gobikes.au/electric-bike-parts/${categorySlug}` }
+    ]
+  };
+
+  const collectionSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    'name': categoryName,
+    'description': `Browse our collection of ${categoryName}.`,
+    'url': `https://gobikes.au/electric-bike-parts/${categorySlug}`,
+    'dateModified': new Date().toISOString(),
+    'mainEntity': {
+      '@type': 'ItemList',
+      'numberOfItems': products.length,
+      'itemListElement': products.map((product: any, index: number) => ({
+        '@type': 'ListItem',
+        'position': index + 1,
+        'item': {
+          '@type': 'Product',
+          'name': product.name,
+          'url': `https://gobikes.au/product/${product.slug}`,
+          'image': product.image?.sourceUrl,
+          'sku': product.databaseId.toString(),
+          'brand': { '@type': 'Brand', 'name': 'GoBike' },
+          ...(product.reviewCount && product.reviewCount > 0 && {
+            'aggregateRating': {
+              '@type': 'AggregateRating',
+              'ratingValue': product.averageRating || 5,
+              'reviewCount': product.reviewCount
+            }
+          }),
+          'offers': {
+            '@type': 'Offer',
+            'priceCurrency': 'AUD',
+            'price': product.salePrice ? product.salePrice.replace(/[^0-9.]+/g, "") : product.regularPrice?.replace(/[^0-9.]+/g, ""),
+            'availability': 'https://schema.org/InStock',
+            'url': `https://gobikes.au/product/${product.slug}`,
+          }
+        }
+      }))
+    }
+  };
+
+  // ★★★ SEO UPDATE 3: FAQ Schema (Rich Snippets এর জন্য) ★★★
+  let faqSchema = null;
+  if (seoData?.faqs && seoData.faqs.length > 0) {
+    faqSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      'mainEntity': seoData.faqs.map((faq: any) => ({
+        '@type': 'Question',
+        'name': faq.q,
+        'acceptedAnswer': {
+          '@type': 'Answer',
+          'text': faq.a
+        }
+      }))
+    };
+  }
+
+  // ★★★ SEO UPDATE 4: Semantic HTML (<main>, <header>, <section>) ★★★
   return (
-    <div className="w-full bg-[#f8f9fa]">
-      
-      {/* 1. ABOVE THE FOLD */}
-      <div className="bg-white border-b border-gray-100">
+    <main className="w-full bg-[#f8f9fa]">
+      {/* Script Tags for Technical SEO */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }} />
+      {faqSchema && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      )}
+
+      {/* 1. ABOVE THE FOLD (Header) */}
+      <header className="bg-white border-b border-gray-100">
         <div className="max-w-[1400px] mx-auto px-6 py-8 md:py-12">
           <Breadcrumbs pageTitle={categoryName} />
           
@@ -125,10 +238,10 @@ export default async function ElectricBikePartsCategoryPage({
             )}
           </div>
         </div>
-      </div>
+      </header>
 
-      {/* 2. PRODUCT GRID */}
-      <div className="max-w-[1400px] mx-auto px-6 py-12 md:py-16">
+      {/* 2. PRODUCT GRID (Section) */}
+      <section className="max-w-[1400px] mx-auto px-6 py-12 md:py-16">
         <div className="mb-10 flex items-center justify-between border-b border-gray-200 pb-4">
             <h2 className="text-2xl font-bold text-gray-900">Available {categoryName}</h2>
             <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-semibold">{products.length} Products</span>
@@ -141,11 +254,13 @@ export default async function ElectricBikePartsCategoryPage({
              <p className="text-gray-500 text-xl font-medium">No products found in this category.</p>
           </div>
         )}
-      </div>
+      </section>
 
-      {/* 3. SEO CONTENT (New Premium Design) */}
-      <CategorySeoContent seoData={seoData} />
+      {/* 3. SEO CONTENT (Article / Section) */}
+      <article>
+        <CategorySeoContent seoData={seoData} />
+      </article>
 
-    </div>
+    </main>
   );
 }
