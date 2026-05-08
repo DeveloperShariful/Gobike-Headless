@@ -41,10 +41,10 @@ const navItems: NavItem[] = [
     path: '/bikes', 
     label: 'Bikes',
     subItems: [
-      { path: '/product/ebike-for-kids-12-inch-electric-bike-ages-2-5', label: '12" Electric Bike', tag: 'Ages 2-4' },
-      { path: '/product/ebike-for-sale-16-inch-gobike-ages-5-9', label: '16" Electric Bike', tag: 'Ages 4-6' },
-      { path: '/product/20-inch-electric-bikes-for-sale-ebike-for-kids', label: '20" Electric Bike', tag: 'Ages 6-9' },
-      { path: '/product/gobike-24-inch-electric-bike-teens-high-speed-performance-for-ages-13', label: '24" Electric Bike', tag: 'Ages 9-12' },
+      { path: '/product/ebike-for-kids-12-inch-electric-bike-ages-2-5', label: '12" Electric Bike', tag: 'Ages 2-5' },
+      { path: '/product/ebike-for-sale-16-inch-gobike-ages-5-9', label: '16" Electric Bike', tag: 'Ages 5-9' },
+      { path: '/product/20-inch-electric-bikes-for-sale-ebike-for-kids', label: '20" Electric Bike', tag: 'Ages 9-16' },
+      { path: '/product/gobike-24-inch-electric-bike-teens-high-speed-performance-for-ages-13', label: '24" Electric Bike', tag: 'Ages 13+' },
     ]
   },
   { 
