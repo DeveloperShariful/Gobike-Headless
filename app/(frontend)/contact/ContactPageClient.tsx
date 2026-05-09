@@ -6,6 +6,8 @@ import { useState, FormEvent, ChangeEvent } from 'react';
 import toast from 'react-hot-toast';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import Link from 'next/link';
+// 🛑 NEW: Import the server action
+import { submitContactForm } from '@/app/(frontend)/action/contact-action';
 
 export default function ContactPageClient() {
   const [formData, setFormData] = useState({
@@ -21,39 +23,30 @@ export default function ContactPageClient() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleFormSubmit = async (e: FormEvent) => {
+  // 🛑 FIX: Using Server Action instead of API Route
+  const handleFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus('loading');
-    toast.loading('Sending your message...');
+    toast.loading('Sending your message...', { id: 'contact' });
 
     try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
+      const data = new FormData(e.currentTarget);
+      const result = await submitContactForm(data);
 
-      const result = await response.json();
-      toast.dismiss();
-
-      if (response.ok) {
+      if (result.success) {
         setStatus('success');
-        toast.success(result.message || 'Message sent successfully!');
+        toast.success(result.message, { id: 'contact' });
         setFormData({ name: '', email: '', phone: '', message: '' });
       } else {
-        throw new Error(result.message || 'An unknown error occurred.');
+        throw new Error(result.message);
       }
-    } catch (error: unknown) {
-      toast.dismiss();
+    } catch (error: any) {
       setStatus('error');
-      let errorMessage = 'An error occurred while sending the message.';
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      toast.error(errorMessage);
+      toast.error(error.message || 'An error occurred.', { id: 'contact' });
     }
   };
 
+  // ... (Your exact same UI code continues here, nothing changes below)
   return (
     <div className="bg-white min-h-screen pb-12 font-sans text-gray-900">
       <Breadcrumbs pageTitle="Contact Us" />

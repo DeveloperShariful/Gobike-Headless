@@ -1,13 +1,11 @@
 // components/Footer.tsx
-// components/Footer.tsx
+
 'use client';
 import { FaFacebookF, FaInstagram, FaYoutube, FaTiktok , FaLinkedinIn, FaPinterestP} from 'react-icons/fa';
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Script from 'next/script'; 
-
-// 🛑 NEW: Server Action Import
 import { subscribeNewsletter } from '@/app/(frontend)/action/subscribe-action';
 
 export default function Footer() {
@@ -22,7 +20,6 @@ export default function Footer() {
     }
   }, []);
 
-  // 🛑 FIX: Use Server Action instead of API fetch
   const handleSubscription = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus('loading');
