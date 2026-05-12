@@ -118,7 +118,7 @@ export async function confirmTransdirectBooking(formData: FormData) {
 
     const confirmPayload = {
       transdirect_order_id: parseInt(tempBookingId), 
-      order_id: claim.orderNumber, 
+      order_id: `${claim.orderNumber}W`,
       goods_summary: `Warranty Part: ${partName}`,
       goods_dump: partName,
       imported_from: 'WooCommerce', 

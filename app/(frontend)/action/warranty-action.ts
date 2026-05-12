@@ -1,9 +1,9 @@
-//app/(frontend)/action/warranty-action.ts
+// app/(frontend)/action/warranty-action.ts
 
 'use server';
 
 import { db } from '@/lib/prisma';
-import { sendNotification } from '@/app/api/email/send-notification'; // 🛑 NEW: Email trigger import
+import { sendNotification } from '@/app/api/email/send-notification'; 
 
 type ClaimData = {
   name: string;
@@ -75,7 +75,6 @@ export async function submitWarrantyClaim(data: ClaimData) {
       console.error("WooCommerce REST API error during claim submission:", error);
     }
 
-    // ডাটাবেসে সেভ
     const newClaim = await db.warrantyClaim.create({
       data: {
         name: data.name,
@@ -112,18 +111,18 @@ export async function submitWarrantyClaim(data: ClaimData) {
         // 2. Send Email to Admin
         await sendNotification({
             trigger: "WARRANTY_CLAIM_ADMIN",
-            recipient: "", // Empty string means it will auto-send to Admin Email
+            recipient: "", 
+            replyTo: data.email, 
             data: { 
                 customer_name: data.name, 
                 order_number: cleanOrderNumber,
                 shop_purchased: data.shopPurchased,
                 description: data.description,
-                media_urls: data.mediaUrl, // Video/Image links
-                claim_id: newClaim.id // To show dashboard link in email
+                media_urls: data.mediaUrl,
+                claim_id: newClaim.id 
             }
         });
     } catch (emailError) {
-        // We log the error but don't fail the claim submission
         console.error("Failed to queue warranty emails:", emailError);
     }
 

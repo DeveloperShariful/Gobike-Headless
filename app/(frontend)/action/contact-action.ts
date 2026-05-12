@@ -1,4 +1,4 @@
-//app/(frontend)/action/contact-action.ts
+// app/(frontend)/action/contact-action.ts
 
 'use server';
 
@@ -17,9 +17,11 @@ export async function submitContactForm(formData: FormData) {
   try {
     const formattedMessage = message.replace(/\n/g, '<br>');
 
+    // ১. অ্যাডমিনকে ইমেইল পাঠানো হচ্ছে (replyTo যুক্ত করা হলো)
     await sendNotification({
       trigger: "CONTACT_FORM_SUBMISSION",
       recipient: "", 
+      replyTo: email, // <<< FIX: কাস্টমারের ইমেইলটি Reply-To হিসেবে পাঠানো হচ্ছে >>>
       data: {
         customer_name: name,
         customer_email: email,
@@ -28,6 +30,7 @@ export async function submitContactForm(formData: FormData) {
       }
     });
 
+    // ২. কাস্টমারকে অটো-রিপ্লাই পাঠানো হচ্ছে
     await sendNotification({
       trigger: "CONTACT_FORM_CUSTOMER",
       recipient: email, 

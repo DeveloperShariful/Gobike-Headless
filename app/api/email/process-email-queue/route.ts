@@ -1,4 +1,4 @@
-//app/api/email/process-email-queue/route.ts
+// app/api/email/process-email-queue/route.ts
 
 import { NextResponse } from "next/server";
 import { db } from "@/lib/prisma";
@@ -66,6 +66,9 @@ export async function GET(req: Request) {
         let htmlBody = "";
         let subject = template.subject;
         const meta = item.metadata as any;
+        
+        // <<< FIX: হিডেন replyTo বের করে আনা হচ্ছে >>>
+        const customReplyTo = meta?._replyTo;
 
         // 🛑 ১. যদি orderId থাকে, তাহলে অর্ডারের ডেটা দিয়ে ইমেইল জেনারেট করবে
        /* if (item.orderId) {
@@ -88,16 +91,21 @@ export async function GET(req: Request) {
            htmlBody = generateEmailHtml({ config, template, metadata: meta });
            if (meta) {
              Object.keys(meta).forEach(key => {
-                const regex = new RegExp(`{${key}}`, "g");
-                subject = subject.replace(regex, meta[key]);
+                // <<< FIX: হিডেন _replyTo ফিল্ড সাবজেক্টে রিপ্লেস করা থেকে বিরত রাখা হচ্ছে >>>
+                if (key !== '_replyTo') {
+                    const regex = new RegExp(`{${key}}`, "g");
+                    subject = subject.replace(regex, meta[key]);
+                }
              });
            }
         }
 
         // ইমেইল সেন্ড করা হচ্ছে
         await transporter.sendMail({
-          from: `"${config.senderName}" <${config.smtpUser || config.senderEmail}>`,
-          replyTo: config.senderEmail,
+          // <<< FIX: From অ্যাড্রেসটি Gmail এর ইউজারনেমের বদলে স্টোরের ইমেইল করা হলো >>>
+          from: `"${config.senderName}" <${config.senderEmail}>`,
+          // <<< FIX: ডাইনামিক Reply-To বসানো হলো >>>
+          replyTo: customReplyTo || config.senderEmail,
           to: item.recipient,
           subject: subject,
           html: htmlBody,

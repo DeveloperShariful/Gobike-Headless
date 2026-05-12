@@ -11,6 +11,7 @@ interface NotificationPayload {
   data?: any;           
   orderId?: string;     
   userId?: string;     
+  replyTo?: string; // <<< নতুন অপশন যুক্ত করা হলো >>>
 }
 
 export async function sendNotification({ 
@@ -19,7 +20,8 @@ export async function sendNotification({
   channel = "EMAIL", 
   data, 
   orderId, 
-  userId 
+  userId,
+  replyTo // <<< রিসিভ করা হলো >>>
 }: NotificationPayload) {
   try {
     if (channel === "SMS") {
@@ -61,7 +63,6 @@ export async function sendNotification({
             select: { senderEmail: true }
         });
         
-        // 1. ইমেইলগুলোকে ছোট হাতের (lowercase) করে একটি Set-এ রাখা হচ্ছে
         const adminEmails = new Set<string>();
 
         if (settings?.storeEmail && settings.storeEmail.trim() !== '') {
@@ -71,14 +72,12 @@ export async function sendNotification({
             adminEmails.add(emailConfig.senderEmail.trim().toLowerCase());
         }
 
-        // 2. Set থেকে Array তে রূপান্তর করে কমা দিয়ে যুক্ত করা হচ্ছে
         const uniqueEmails = Array.from(adminEmails);
         
         if (uniqueEmails.length === 0) {
             return { success: false, error: "No admin email configured" };
         }
 
-        // 3. যদি একই ইমেইল হয়, তবে Array-তে শুধু একটাই থাকবে। 
         finalRecipient = uniqueEmails.join(", ");
     }
 
@@ -93,13 +92,13 @@ export async function sendNotification({
         attempts: 0,
         orderId: orderId || null,
         userId: userId || null,
-        metadata: data || {}, 
+        // <<< FIX: metadata এর ভেতরে হিডেনভাবে replyTo সেভ করা হচ্ছে >>>
+        metadata: { ...(data || {}), _replyTo: replyTo || null }, 
       }
     });
 
-    /// ব্যাকগ্রাউন্ডে কিউ প্রসেসরকে কল করা হচ্ছে
+    // ব্যাকগ্রাউন্ডে কিউ প্রসেসরকে কল করা হচ্ছে
     try {
-        // 🛑 FIX: Automatically switch between Localhost and Production
         const isLocal = process.env.NODE_ENV === 'development';
         const fallbackUrl = isLocal ? "http://localhost:3000" : "https://gobike.au";
         const appUrl = process.env.NEXT_PUBLIC_APP_URL || fallbackUrl;
