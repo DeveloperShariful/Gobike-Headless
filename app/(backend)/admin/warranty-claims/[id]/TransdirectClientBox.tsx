@@ -16,7 +16,8 @@ export default function TransdirectClientBox({
   customerAddress,
   customerSuburb, 
   customerPostcode, 
-  customerState 
+  customerState,
+  customerPhone // ✅ NEW PROP
 }: { 
   claimId: string, 
   status: string, 
@@ -26,25 +27,27 @@ export default function TransdirectClientBox({
   customerAddress: string | null,
   customerSuburb: string | null, 
   customerPostcode: string | null, 
-  customerState: string | null 
+  customerState: string | null,
+  customerPhone: string | null // ✅ NEW PROP TYPE
 }) {
   
   const [isOpen, setIsOpen] = useState(false);
   const [selectedPart, setSelectedPart] = useState<any | null>(null);
   
-  // Professional Address States
+  // Professional Address & Phone States
   const [address, setAddress] = useState(customerAddress || '');
   const [suburb, setSuburb] = useState(customerSuburb || '');
   const [postcode, setPostcode] = useState(customerPostcode || '');
   const [state, setState] = useState(customerState || 'NSW');
+  const [phone, setPhone] = useState(customerPhone || ''); // ✅ NEW STATE
 
-  // --- NEW: Props থেকে আসা ভ্যালুগুলো যদি পরে চেঞ্জ হয়, তবে State আপডেট করে নেওয়া ---
   useEffect(() => {
     if (customerAddress) setAddress(customerAddress);
     if (customerSuburb) setSuburb(customerSuburb);
     if (customerPostcode) setPostcode(customerPostcode);
     if (customerState) setState(customerState);
-  }, [customerAddress, customerSuburb, customerPostcode, customerState]);
+    if (customerPhone) setPhone(customerPhone); // ✅ NEW SYNC
+  }, [customerAddress, customerSuburb, customerPostcode, customerState, customerPhone]);
 
   // --- Auto Suggestion States ---
   const [searchInput, setSearchInput] = useState(''); 
@@ -164,7 +167,7 @@ export default function TransdirectClientBox({
   // --- FINAL BOOKING LOGIC ---
   const handleConfirmBooking = async () => {
     if (!selectedCourier || !tempBookingId) return toast.error("Please select a courier.");
-    if (!address || !suburb || !postcode) return toast.error("Receiver address is incomplete.");
+    if (!address || !suburb || !postcode || !phone) return toast.error("Receiver address or phone is incomplete."); // ✅ Validation
 
     setLoadingBooking(true);
     const formData = new FormData();
@@ -176,6 +179,7 @@ export default function TransdirectClientBox({
     formData.append('address', address);
     formData.append('suburb', suburb);
     formData.append('postcode', postcode);
+    formData.append('phone', phone); // ✅ NEW: Sent to backend
 
     const result = await confirmTransdirectBooking(formData);
     
@@ -210,7 +214,7 @@ export default function TransdirectClientBox({
             
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
               <div className="flex justify-between items-center mb-3 border-b border-gray-200 pb-2">
-                <label className="font-bold text-[#1d2327]">1. Verify Receiver Address</label>
+                <label className="font-bold text-[#1d2327]">1. Verify Receiver Details</label>
                 <button type="button" onClick={handleRefreshQuotes} className="text-[#2271b1] hover:underline text-[12px] flex items-center gap-1">
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                   Refresh Quotes
@@ -218,9 +222,15 @@ export default function TransdirectClientBox({
               </div>
               
               <div className="grid grid-cols-12 gap-3 relative">
-                <div className="col-span-12">
+                <div className="col-span-12 md:col-span-6">
                   <span className="text-[11px] text-gray-500 block mb-1">Street Address</span>
                   <input type="text" value={address} onChange={e=>setAddress(e.target.value)} className="w-full border border-[#8c8f94] rounded px-2.5 py-1.5 outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1]" placeholder="e.g. 52 Bligh Ave" />
+                </div>
+
+                {/* ✅ NEW: Phone Number Input */}
+                <div className="col-span-12 md:col-span-6">
+                  <span className="text-[11px] text-gray-500 block mb-1">Phone Number</span>
+                  <input type="text" required value={phone} onChange={e=>setPhone(e.target.value)} className="w-full border border-[#8c8f94] rounded px-2.5 py-1.5 outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1]" placeholder="e.g. 0412345678" />
                 </div>
                 
                 <div className="col-span-12 md:col-span-6 relative" ref={suggestionRef}>

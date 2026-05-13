@@ -4,10 +4,10 @@
 
 import { db } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
-import { sendNotification } from '@/app/api/email/send-notification'; // ✅ NEW: Email trigger
+import { sendNotification } from '@/app/api/email/send-notification'; 
 
 // ============================================================================
-// FUNCTION 1: GET QUOTES (রেট জানার জন্য) - No Changes Here
+// FUNCTION 1: GET QUOTES - No Changes Here
 // ============================================================================
 export async function getTransdirectQuotes(formData: FormData) {
   const claimId = formData.get('claimId') as string;
@@ -105,6 +105,7 @@ export async function confirmTransdirectBooking(formData: FormData) {
   const receiverSuburb = formData.get('suburb') as string;
   const receiverPostcode = formData.get('postcode') as string;
   const receiverState = formData.get('state') as string || 'NSW'; 
+  const receiverPhone = formData.get('phone') as string || '0000000000'; // ✅ NEW: Get phone from form data
 
   if (!claimId || !tempBookingId || !selectedCourier) return { success: false, message: 'Missing required booking data.' };
 
@@ -132,7 +133,7 @@ export async function confirmTransdirectBooking(formData: FormData) {
       delivery: {
         name: claim.name,
         email: claim.email,
-        phone: "0400000000", 
+        phone: receiverPhone, // ✅ NEW: Used real dynamic phone number here
         address: receiverAddress || claim.address || "N/A", 
         suburb: receiverSuburb,
         postcode: receiverPostcode,

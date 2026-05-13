@@ -10,7 +10,7 @@ import { gql } from '@apollo/client';
 import SubmitStatusButton from './SubmitStatusButton';
 
 // ============================================================================
-// ১. TYPESCRIPT INTERFACES (এরর ফিক্স করার জন্য)
+// ১. TYPESCRIPT INTERFACES
 // ============================================================================
 interface SparePartNode {
   id: string;
@@ -23,7 +23,6 @@ interface SparePartNode {
   image?: { sourceUrl: string };
 }
 
-// এই ইন্টারফেসটি অ্যাড করা হলো ডাটার টাইপ ডিফাইন করার জন্য (যাতে লাল দাগ না আসে)
 interface PageQueryData {
   products: {
     nodes: SparePartNode[];
@@ -31,7 +30,7 @@ interface PageQueryData {
 }
 
 // ============================================================================
-// ২. GRAPHQL QUERY (শুধুমাত্র স্পেয়ার পার্টস আনার জন্য)
+// ২. GRAPHQL QUERY
 // ============================================================================
 const GET_SPARE_PARTS = gql`
   query GetSpareParts {
@@ -62,7 +61,7 @@ export default async function SingleClaimPage({ params }: { params: Promise<{ id
   let wpOrder: any = null;
   const cleanOrderNumber = claim.orderNumber.replace('#', '').trim();
 
-  // ১. GraphQL দিয়ে স্পেয়ার পার্টস আনা (<PageQueryData> যুক্ত করায় আর লাল দাগ আসবে না)
+  // ১. GraphQL দিয়ে স্পেয়ার পার্টস আনা
   try {
     const { data } = await getClient().query<PageQueryData>({
       query: GET_SPARE_PARTS,
@@ -73,13 +72,12 @@ export default async function SingleClaimPage({ params }: { params: Promise<{ id
     console.error("Failed to fetch spare parts", error);
   }
 
-  // ২. WooCommerce REST API দিয়ে অর্ডারের ফুল ডিটেইলস আনা (Bulletproof URL Auth Method)
+  // ২. WooCommerce REST API দিয়ে অর্ডারের ফুল ডিটেইলস আনা
   try {
     const wpUrl = process.env.NEXT_PUBLIC_WORDPRESS_URL?.replace(/\/$/, ""); 
     const ck = process.env.WC_CONSUMER_KEY;
     const cs = process.env.WC_CONSUMER_SECRET;
 
-    // Header-এর বদলে সরাসরি URL-এ Key পাঠানো হচ্ছে (Server block করতে পারবে না)
     const apiUrl = `${wpUrl}/wp-json/wc/v3/orders/${cleanOrderNumber}?consumer_key=${ck}&consumer_secret=${cs}`;
 
     const res = await fetch(apiUrl, {
@@ -122,7 +120,6 @@ export default async function SingleClaimPage({ params }: { params: Promise<{ id
               <span className="font-mono bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-[11px] sm:text-[12px]">Order #{claim.orderNumber}</span>
             </h2>
             
-            {/* 🛑 FIX: Made Responsive (Stack on mobile, Grid on desktop) */}
             <div className="p-4 text-[13px] text-[#3c434a] flex flex-col sm:grid sm:grid-cols-2 gap-4 sm:gap-6">
               
               <div className="w-full">
@@ -140,6 +137,14 @@ export default async function SingleClaimPage({ params }: { params: Promise<{ id
                     </span>
                   )}
                 </div>
+              </div>
+
+              {/* 🛑 NEW: Shop Purchased From Field Added Here */}
+              <div className="w-full sm:col-span-2">
+                <p className="text-[#8c8f94] mb-1.5 font-medium">Shop Purchased From</p>
+                <span className="font-semibold inline-flex items-center gap-1.5 bg-gray-100 border border-gray-200 px-3 py-1.5 rounded-full text-[13px] text-gray-800 shadow-sm">
+                  🏪 {claim.shopPurchased || 'GoBike Australia (Online)'}
+                </span>
               </div>
               
               <div className="sm:col-span-2 w-full mt-2 sm:mt-0">
@@ -295,6 +300,7 @@ export default async function SingleClaimPage({ params }: { params: Promise<{ id
             customerSuburb={wpOrder?.shipping?.city || claim.suburb}
             customerPostcode={wpOrder?.shipping?.postcode || claim.postcode}
             customerState={wpOrder?.shipping?.state || claim.state}
+            customerPhone={wpOrder?.billing?.phone || ''}
           />
         </div>
       </div>
