@@ -3,7 +3,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useCart } from '../../../../../context/CartContext';
+import { useCart } from '@/context/CartContext';
 
 interface ProductForCart {
   id: string;

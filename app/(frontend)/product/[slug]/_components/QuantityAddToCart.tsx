@@ -4,8 +4,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCart } from '../../../../../context/CartContext';
-import { useCompare } from '../../../../../context/CompareContext'; // <-- Compare Context যুক্ত করা হলো
+import { useCart } from '@/context/CartContext';
+import { useCompare } from '@/context/CompareContext'; 
 import toast from 'react-hot-toast';
 
 interface ProductForCart {

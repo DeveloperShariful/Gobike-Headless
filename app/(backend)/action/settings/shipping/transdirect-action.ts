@@ -105,7 +105,7 @@ export async function confirmTransdirectBooking(formData: FormData) {
   const receiverSuburb = formData.get('suburb') as string;
   const receiverPostcode = formData.get('postcode') as string;
   const receiverState = formData.get('state') as string || 'NSW'; 
-  const receiverPhone = formData.get('phone') as string || '0000000000'; // ✅ NEW: Get phone from form data
+  const receiverPhone = formData.get('phone') as string || '0000000000'; 
 
   if (!claimId || !tempBookingId || !selectedCourier) return { success: false, message: 'Missing required booking data.' };
 
@@ -115,11 +115,20 @@ export async function confirmTransdirectBooking(formData: FormData) {
 
     if (!claim) throw new Error('Claim not found.');
 
+    // ✅ NEW: Dynamic Order ID Logic for Re-booking
+    let finalOrderId = `${claim.orderNumber}W`;
+    
+    // যদি ডাটাবেসে আগে থেকেই trackingNumber থাকে, তার মানে এটি Re-book হচ্ছে
+    if (claim.trackingNumber) {
+        const randomDigits = Math.floor(1000 + Math.random() * 9000); // 1000 থেকে 9999 এর মাঝে র‍্যান্ডম নাম্বার
+        finalOrderId = `${claim.orderNumber}W-R${randomDigits}`;
+    }
+
     const confirmUrl = provider?.isSandbox ? `https://sandbox.transdirect.com.au/api/orders` : `https://www.transdirect.com.au/api/orders`;
 
     const confirmPayload = {
       transdirect_order_id: parseInt(tempBookingId), 
-      order_id: `${claim.orderNumber}W`,
+      order_id: finalOrderId, // ✅ NEW: Using the dynamic unique Order ID
       goods_summary: `Warranty Part: ${partName}`,
       goods_dump: partName,
       imported_from: 'WooCommerce', 
@@ -133,7 +142,7 @@ export async function confirmTransdirectBooking(formData: FormData) {
       delivery: {
         name: claim.name,
         email: claim.email,
-        phone: receiverPhone, // ✅ NEW: Used real dynamic phone number here
+        phone: receiverPhone, 
         address: receiverAddress || claim.address || "N/A", 
         suburb: receiverSuburb,
         postcode: receiverPostcode,

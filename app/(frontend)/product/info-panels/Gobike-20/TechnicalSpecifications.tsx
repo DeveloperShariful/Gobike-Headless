@@ -1,7 +1,7 @@
 // ফাইল পাথ: app/product/info-panels/Gobike-20/TechnicalSpecifications.tsx
 
 const specs = [
-    { label: 'Age Range', value: '9–16 years' },
+    { label: 'Age Range', value: '8-14 years' },
     { label: 'Max Rider Weight', value: '100 kg' },
     { label: 'Frame', value: 'Durable 6061 aluminium, heat-treated & TIG-welded' },
     { label: 'Net Weight', value: '18 kg (including battery)' },

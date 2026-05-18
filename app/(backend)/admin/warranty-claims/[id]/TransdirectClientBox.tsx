@@ -17,7 +17,7 @@ export default function TransdirectClientBox({
   customerSuburb, 
   customerPostcode, 
   customerState,
-  customerPhone // ✅ NEW PROP
+  customerPhone
 }: { 
   claimId: string, 
   status: string, 
@@ -28,25 +28,31 @@ export default function TransdirectClientBox({
   customerSuburb: string | null, 
   customerPostcode: string | null, 
   customerState: string | null,
-  customerPhone: string | null // ✅ NEW PROP TYPE
+  customerPhone: string | null 
 }) {
   
   const [isOpen, setIsOpen] = useState(false);
   const [selectedPart, setSelectedPart] = useState<any | null>(null);
   
-  // Professional Address & Phone States
+  // ✅ NEW: Custom Part Name State
+  const [customPartName, setCustomPartName] = useState('');
+  
+  // ✅ NEW: Re-book State
+  const [isRebooking, setIsRebooking] = useState(false);
+
+  // Address & Phone States
   const [address, setAddress] = useState(customerAddress || '');
   const [suburb, setSuburb] = useState(customerSuburb || '');
   const [postcode, setPostcode] = useState(customerPostcode || '');
   const [state, setState] = useState(customerState || 'NSW');
-  const [phone, setPhone] = useState(customerPhone || ''); // ✅ NEW STATE
+  const [phone, setPhone] = useState(customerPhone || ''); 
 
   useEffect(() => {
     if (customerAddress) setAddress(customerAddress);
     if (customerSuburb) setSuburb(customerSuburb);
     if (customerPostcode) setPostcode(customerPostcode);
     if (customerState) setState(customerState);
-    if (customerPhone) setPhone(customerPhone); // ✅ NEW SYNC
+    if (customerPhone) setPhone(customerPhone); 
   }, [customerAddress, customerSuburb, customerPostcode, customerState, customerPhone]);
 
   // --- Auto Suggestion States ---
@@ -66,7 +72,6 @@ export default function TransdirectClientBox({
   const [selectedCourier, setSelectedCourier] = useState<string | null>(null);
   const [loadingBooking, setLoadingBooking] = useState(false);
 
-  // Close dropdowns on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) setIsOpen(false);
@@ -76,7 +81,6 @@ export default function TransdirectClientBox({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // --- ADDRESS LOOKUP LOGIC ---
   const handleLocationSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchInput(value); 
@@ -111,7 +115,6 @@ export default function TransdirectClientBox({
     setShowSuggestions(false);
   };
 
-  // --- AUTO FETCH QUOTES LOGIC ---
   const fetchLiveQuotes = async (part: any) => {
     if (!suburb || !postcode) {
       toast.error("Please provide at least Suburb and Postcode to get live rates.");
@@ -124,10 +127,10 @@ export default function TransdirectClientBox({
 
     const formData = new FormData();
     formData.append('claimId', claimId);
-    
     formData.append('suburb', suburb);
     formData.append('postcode', postcode);
 
+    // Dynamic Part Data for API
     const partData = JSON.stringify({ 
       name: part.name, 
       weight: part.weight, 
@@ -142,9 +145,7 @@ export default function TransdirectClientBox({
     if (result.success && result.quotes) {
       setQuotes(result.quotes);
       setTempBookingId(result.tempBookingId || null);
-      if (result.quotes.length > 0) {
-        setSelectedCourier(result.quotes[0].courier); 
-      }
+      if (result.quotes.length > 0) setSelectedCourier(result.quotes[0].courier); 
     } else {
       setApiError(result.message || "Failed to fetch quotes. Please check your settings.");
       toast.error(result.message || "Failed to fetch quotes.");
@@ -156,6 +157,9 @@ export default function TransdirectClientBox({
   const handleProductSelect = (part: any) => {
     setSelectedPart(part);
     setIsOpen(false);
+    if (part.id !== 'other') {
+      setCustomPartName(''); // Clear custom name if actual product is selected
+    }
     fetchLiveQuotes(part); 
   };
 
@@ -164,29 +168,50 @@ export default function TransdirectClientBox({
     else toast.error("Please select a product first.");
   };
 
-  // --- FINAL BOOKING LOGIC ---
   const handleConfirmBooking = async () => {
     if (!selectedCourier || !tempBookingId) return toast.error("Please select a courier.");
-    if (!address || !suburb || !postcode || !phone) return toast.error("Receiver address or phone is incomplete."); // ✅ Validation
+    if (!address || !suburb || !postcode || !phone) return toast.error("Receiver address or phone is incomplete.");
+    
+    // ✅ Custom Name Validation
+    if (selectedPart?.id === 'other' && !customPartName.trim()) {
+      return toast.error("Please enter a name for the custom part.");
+    }
 
     setLoadingBooking(true);
     const formData = new FormData();
+    
+    // ✅ Send custom name if "Other" is selected, otherwise send product name
+    const finalPartName = selectedPart.id === 'other' ? customPartName : selectedPart.name;
+    
     formData.append('claimId', claimId);
-    formData.append('partName', selectedPart.name);
+    formData.append('partName', finalPartName);
     formData.append('tempBookingId', tempBookingId);
     formData.append('selectedCourier', selectedCourier);
-    
     formData.append('address', address);
     formData.append('suburb', suburb);
     formData.append('postcode', postcode);
-    formData.append('phone', phone); // ✅ NEW: Sent to backend
+    formData.append('phone', phone);
 
     const result = await confirmTransdirectBooking(formData);
     
-    if (result.success) toast.success(result.message);
-    else toast.error(result.message);
+    if (result.success) {
+        toast.success(result.message);
+        setIsRebooking(false); // ✅ Hide form and show success message
+    } else {
+        toast.error(result.message);
+    }
     
     setLoadingBooking(false);
+  };
+
+  // ✅ NEW: Predefined "Other" Option Object
+  const OTHER_OPTION = { 
+      id: 'other', 
+      name: 'Other (Custom Package)', 
+      weight: 2, 
+      length: 5, 
+      width: 5, 
+      height: 5 
   };
 
   return (
@@ -197,21 +222,40 @@ export default function TransdirectClientBox({
       
       <div className="p-5 text-[13px] text-[#3c434a]">
         
-        {trackingNumber ? (
+        {trackingNumber && !isRebooking ? (
           <div className="bg-[#f0f6fc] border border-[#c3c4c7] p-6 rounded text-center">
             <div className="w-12 h-12 mx-auto bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-3">
               <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
             </div>
             <p className="font-bold text-[#1d2327] text-[16px] mb-2">Label Created Successfully</p>
             <p className="text-[#50575e] mb-4 text-[14px]">Replacement Part: <strong>{replacementPart}</strong></p>
-            <div className="bg-white border-2 border-dashed border-[#8c8f94] py-3 px-4 inline-block rounded font-mono text-[16px] font-bold text-[#2271b1] tracking-widest shadow-sm">
+            <div className="bg-white border-2 border-dashed border-[#8c8f94] py-3 px-4 inline-block rounded font-mono text-[16px] font-bold text-[#2271b1] tracking-widest shadow-sm mb-6">
               {trackingNumber}
+            </div>
+            
+            {/* ✅ NEW: Re-book Button */}
+            <div>
+                <button 
+                    onClick={() => setIsRebooking(true)} 
+                    className="text-[#2271b1] hover:underline text-[13px] font-semibold flex items-center justify-center gap-1 mx-auto"
+                >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    Create New Label (Re-book)
+                </button>
             </div>
           </div>
         ) : (
           
           <div className="space-y-6">
             
+            {/* 🛑 If Rebooking, show a badge */}
+            {isRebooking && (
+                <div className="bg-orange-50 border border-orange-200 text-orange-800 p-3 rounded text-[12px] font-semibold flex justify-between items-center">
+                    <span>⚠️ You are creating a new label for this claim.</span>
+                    <button onClick={() => setIsRebooking(false)} className="underline hover:text-orange-900">Cancel</button>
+                </div>
+            )}
+
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
               <div className="flex justify-between items-center mb-3 border-b border-gray-200 pb-2">
                 <label className="font-bold text-[#1d2327]">1. Verify Receiver Details</label>
@@ -226,8 +270,6 @@ export default function TransdirectClientBox({
                   <span className="text-[11px] text-gray-500 block mb-1">Street Address</span>
                   <input type="text" value={address} onChange={e=>setAddress(e.target.value)} className="w-full border border-[#8c8f94] rounded px-2.5 py-1.5 outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1]" placeholder="e.g. 52 Bligh Ave" />
                 </div>
-
-                {/* ✅ NEW: Phone Number Input */}
                 <div className="col-span-12 md:col-span-6">
                   <span className="text-[11px] text-gray-500 block mb-1">Phone Number</span>
                   <input type="text" required value={phone} onChange={e=>setPhone(e.target.value)} className="w-full border border-[#8c8f94] rounded px-2.5 py-1.5 outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1]" placeholder="e.g. 0412345678" />
@@ -292,11 +334,24 @@ export default function TransdirectClientBox({
 
                 {isOpen && (
                   <div className="absolute z-50 w-full mt-1 bg-white border border-[#c3c4c7] rounded shadow-lg max-h-[300px] overflow-y-auto">
-                    {spareParts.length === 0 ? (
-                      <div className="p-4 text-gray-500 italic text-center">No products found</div>
-                    ) : (
-                      <ul className="py-1">
-                        {spareParts.map((part) => (
+                    <ul className="py-1">
+                      
+                      {/* ✅ NEW: STATIC "OTHER" OPTION */}
+                      <li 
+                        onClick={() => handleProductSelect(OTHER_OPTION)}
+                        className="px-3 py-2.5 bg-blue-50 hover:bg-blue-100 cursor-pointer flex items-center gap-3 border-b border-gray-200 transition-colors"
+                      >
+                        <div className="w-9 h-9 bg-blue-200 text-blue-700 rounded flex items-center justify-center text-[16px] flex-shrink-0 font-bold">+</div>
+                        <div className="flex flex-col overflow-hidden">
+                            <span className="text-[13px] font-bold text-blue-900 truncate">Other (Custom Package)</span>
+                            <span className="text-[11px] text-blue-700 mt-0.5">Fixed: 2kg • 5x5x5 cm</span>
+                        </div>
+                      </li>
+
+                      {spareParts.length === 0 ? (
+                        <div className="p-4 text-gray-500 italic text-center">No products found</div>
+                      ) : (
+                        spareParts.map((part) => (
                           <li 
                             key={part.id}
                             onClick={() => handleProductSelect(part)}
@@ -308,12 +363,27 @@ export default function TransdirectClientBox({
                                <span className="text-[11px] text-gray-500 mt-0.5">Weight: {part.weight || '0.5'}kg</span>
                             </div>
                           </li>
-                        ))}
-                      </ul>
-                    )}
+                        ))
+                      )}
+                    </ul>
                   </div>
                 )}
               </div>
+
+              {/* ✅ NEW: CUSTOM NAME INPUT FIELD FOR "OTHER" */}
+              {selectedPart?.id === 'other' && (
+                  <div className="mt-3 bg-blue-50 p-3 rounded border border-blue-100 animate-fade-in">
+                      <label className="block text-[11px] font-bold text-blue-800 mb-1">Part Name (for Email & Tracking)</label>
+                      <input 
+                          type="text" 
+                          required
+                          value={customPartName}
+                          onChange={(e) => setCustomPartName(e.target.value)}
+                          placeholder="e.g. Custom Battery Cable" 
+                          className="w-full border border-blue-200 rounded px-2.5 py-1.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-[13px]" 
+                      />
+                  </div>
+              )}
             </div>
 
             <div className="bg-[#f6f7f7] border border-[#c3c4c7] rounded-lg p-4 min-h-[120px] flex flex-col justify-center">
