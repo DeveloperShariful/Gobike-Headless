@@ -516,10 +516,28 @@ function YouTubePlayer({ youtubeId, thumbnailUrl }: YouTubePlayerProps) {
 
 const VideoReviews = () => {
     const sliderRef = useRef<HTMLDivElement>(null);
-    const videoData = [
+    
+    // ১. আপনাদের নিজেদের অফিশিয়াল ভিডিওগুলো (আগের স্লাইডারের জন্য)
+    const officialVideos = [
         { youtubeId: "Fl8jEUxS_LU", thumbnailUrl: "https://i.ytimg.com/vi/Fl8jEUxS_LU/maxresdefault.jpg", title: "Unboxing & First Ride: The GoBike 12 Experience", description: "From first rides to pro-level tricks, our video reviews showcase the real-world performance and unbeatable fun." },
         { youtubeId: "BARebHNa3lY", thumbnailUrl: "https://i.ytimg.com/vi/BARebHNa3lY/maxresdefault.jpg", title: "GoBike 16: From Parks to Trails", description: "A deep-dive review showing the GoBike 16 versatility and power on different terrains." },
         { youtubeId: "CIevuTbyTlY", thumbnailUrl: "https://i.ytimg.com/vi/CIevuTbyTlY/maxresdefault.jpg", title: "Parents Guide: Choosing The Right GoBike", description: "Confused between models? This helpful guide breaks down the features of each GoBike." },
+    ];
+
+    // ২. এক্সপার্ট রিভিউ ভিডিওগুলো (নতুন ২টি ভিডিও)
+    const reviewVideos = [
+        { 
+            youtubeId: "kl4ghALppls", 
+            thumbnailUrl: "https://i.ytimg.com/vi/kl4ghALppls/maxresdefault.jpg", 
+            title: "ADBMagazine Expert Review: GoBike 16 TESTED!", 
+            description: "Watch as ADBMagazine puts the GoBike 16 through the ultimate test in mud, water, rocks, and dust. A truly comprehensive real-world review by motocross experts." 
+        },
+        { 
+            youtubeId: "c0noPYoIPHY", 
+            thumbnailUrl: "https://i.ytimg.com/vi/c0noPYoIPHY/maxresdefault.jpg", 
+            title: "Independent Hands-On Video Review", 
+            description: "See exactly why Australian parents and kids are calling this the best electric balance bike on the market. Watch the full breakdown and performance test." 
+        },
     ];
 
     const scroll = (direction: 'left' | 'right') => {
@@ -532,15 +550,17 @@ const VideoReviews = () => {
     };
 
     return (
-        <section className="py-12 px-2.5 font-sans bg-[#f8f9fa]">
-            <div className="text-center mb-8">
+        <section className="py-12 font-sans bg-[#f8f9fa]">
+            
+            {/* ================= SECTION 1: OFFICIAL VIDEOS (SLIDER) ================= */}
+            <div className="text-center mb-8 px-2.5">
                 <h2 className="text-[32px] font-bold text-[#1a1a1a] mb-3 tracking-tight">See Why Parents & Kids Love The GoBike</h2>
                 <p className="text-lg text-[#1a1a1a] max-w-[800px] mx-auto leading-[1.5]">From first rides to pro-level tricks, our video reviews showcase the real-world performance and unbeatable fun of our kids electric bikes. See them in action!</p>
             </div>
-            <div className="max-w-[1500px] mx-auto px-0.5 relative">
+            <div className="max-w-[1500px] mx-auto px-0.5 relative mb-16">
                 <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-none gap-[30px]" ref={sliderRef}>
-                    {videoData.map((video, index) => (
-                        <div className="flex-none w-[95%] md:w-[48%] snap-start box-border" key={index}>
+                    {officialVideos.map((video, index) => (
+                        <div className="flex-none w-[95%] md:w-[48%] snap-start box-border" key={`official-${index}`}>
                             <YouTubePlayer youtubeId={video.youtubeId} thumbnailUrl={video.thumbnailUrl} />
                             <div className="mt-6 text-center">
                                 <h3 className="text-[22px] font-bold text-[#1a1a1a] mb-1.5">{video.title}</h3>
@@ -552,6 +572,39 @@ const VideoReviews = () => {
                 <button onClick={() => scroll('left')} className="absolute top-[40%] -translate-y-1/2 -left-[5px] bg-black/60 text-white border-none rounded-full w-[45px] h-[45px] text-xl cursor-pointer z-10 transition-colors hover:bg-black/90 flex items-center justify-center">&#10094;</button>
                 <button onClick={() => scroll('right')} className="absolute top-[40%] -translate-y-1/2 -right-[5px] bg-black/60 text-white border-none rounded-full w-[45px] h-[45px] text-xl cursor-pointer z-10 transition-colors hover:bg-black/90 flex items-center justify-center">&#10095;</button>
             </div>
+
+            {/* ================= SECTION 2: TRUST & SEO BANNER ================= */}
+            <div className="bg-black text-white py-12 px-4 text-center my-12 border-y-4 border-red-600">
+                <div className="max-w-[900px] mx-auto">
+                    <span className="text-red-500 font-bold tracking-[2px] uppercase text-sm mb-2 block">Independent Testing</span>
+                    <h2 className="text-[28px] md:text-[36px] font-black mb-4 leading-tight">
+                        Don't Just Take Our Word For It.
+                    </h2>
+                    <p className="text-base md:text-lg text-gray-300 leading-[1.6] mb-0">
+                        Choosing the right electric balance bike is a big decision. That's why we handed over our bikes to independent Australian reviewers and motocross experts, like the team at <strong>ADBMagazine</strong>. Watch them put the GoBike through rigorous real-world testing—mud, water, rocks, and dust—to prove its durability and safety.
+                    </p>
+                </div>
+            </div>
+
+            {/* ================= SECTION 3: EXPERT REVIEWS (GRID) ================= */}
+            <div className="max-w-[1500px] mx-auto px-4 mt-12 pb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    {reviewVideos.map((video, index) => (
+                        <div key={`review-${index}`} className="flex flex-col relative group">
+                            {/* Expert Review Badge */}
+                            <div className="absolute top-4 left-4 bg-red-600 text-white text-[11px] font-black uppercase tracking-widest px-3 py-1.5 rounded-sm z-10 shadow-md">
+                                Expert Review
+                            </div>
+                            <YouTubePlayer youtubeId={video.youtubeId} thumbnailUrl={video.thumbnailUrl} />
+                            <div className="mt-6 text-center md:text-left">
+                                <h3 className="text-[22px] font-bold text-[#1a1a1a] mb-2 leading-tight">{video.title}</h3>
+                                <p className="text-base text-[#4a5568] m-0 leading-[1.6]">{video.description}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
         </section>
     );
 }
