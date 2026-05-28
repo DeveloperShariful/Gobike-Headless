@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, ExpressCheckoutElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
   ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) 
@@ -31,7 +32,7 @@ interface ShippingRate {
 interface ExpressCheckoutsProps {
   total: number;
   onOrderPlace: (paymentData: { 
-    transaction_id: string; 
+    transaction_id?: string; 
     shippingAddress?: Partial<ShippingFormData>;
     paymentMethodId?: string; 
   }) => Promise<{ orderId: number; orderKey: string } | void | null>;
@@ -43,50 +44,70 @@ interface ExpressCheckoutsProps {
   appliedCoupons: any[];
 }
 
-const CheckoutForm = ({ onOrderPlace, clientSecret }: { onOrderPlace: ExpressCheckoutsProps['onOrderPlace'], clientSecret: string }) => {
+const CheckoutForm = ({ onOrderPlace, clientSecret, cartItems, customerInfo, selectedShipping, shippingRates, appliedCoupons }: ExpressCheckoutsProps & { clientSecret: string }) => {
   const stripe = useStripe();
   const elements = useElements();
+  const router = useRouter();
 
   const onConfirm = async () => {
     if (!stripe || !elements) {
-      toast.error("Stripe.js has not loaded yet.");
+      toast.error("Payment system has not loaded yet. Please try again.");
       return;
     }
 
-    const { error, paymentIntent } = await stripe.confirmPayment({
-      elements,
-      clientSecret,
-      confirmParams: {
-        return_url: `${window.location.origin}/order-success`,
-      },
-      redirect: 'if_required',
-    });
+    toast.loading('Processing express checkout...', { id: 'express-checkout' });
 
-    if (error) {
-      toast.error(error.message || 'An unexpected error occurred.');
-    } else if (paymentIntent?.status === 'succeeded') {
-      toast.success('Payment Successful!');
-
-      const stripeAddress = paymentIntent.shipping;
-      const names = stripeAddress?.name?.split(' ') || [];
-      const shippingDetails = {
-        firstName: names[0] || '',
-        lastName: names.slice(1).join(' ') || '',
-        address1: stripeAddress?.address?.line1 || '',
-        city: stripeAddress?.address?.city || '',
-        state: stripeAddress?.address?.state || '',
-        postcode: stripeAddress?.address?.postal_code || '',
-        email: paymentIntent.receipt_email || '', 
-      };
-      
-      await onOrderPlace({ 
-        transaction_id: paymentIntent.id,
-        shippingAddress: shippingDetails,
+    try {
+      const orderDetails = await onOrderPlace({ 
         paymentMethodId: 'stripe'
       });
 
-    } else if (paymentIntent) {
-      const errorMessage = paymentIntent.last_payment_error?.message || 'Payment failed. Please try another method.';
+      if (!orderDetails || !orderDetails.orderId || !orderDetails.orderKey) {
+        throw new Error("Could not create an order. Please try again or use another payment method.");
+      }
+
+      const selectedRate = shippingRates.find(rate => rate.id === selectedShipping);
+      const shippingMetadata = {
+          shipping_method_id: selectedShipping || '',
+          shipping_method_title: selectedRate?.label || 'Standard Shipping',
+          shipping_cost: selectedRate?.cost || '0'
+      };
+
+      const paymentIntentId = clientSecret.split('_secret_')[0];
+      
+      await fetch('/api/stripe/update-payment-intent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+              paymentIntentId: paymentIntentId,
+              orderId: orderDetails.orderId,
+              customerInfo: customerInfo, 
+              cartItems: cartItems, 
+              metadata: shippingMetadata,
+              appliedCoupons: appliedCoupons
+          }),
+      });
+
+      const returnUrl = `${window.location.origin}/order-confirmation?order_id=${orderDetails.orderId}&key=${orderDetails.orderKey}`;
+
+      const { error } = await stripe.confirmPayment({
+        elements,
+        clientSecret,
+        confirmParams: {
+          return_url: returnUrl,
+        },
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Payment failed or was canceled.');
+      }
+
+    } catch (error: unknown) {
+      toast.dismiss('express-checkout');
+      let errorMessage = "An unexpected error occurred.";
+      if (error instanceof Error) {
+          errorMessage = error.message;
+      }
       toast.error(errorMessage);
     }
   };
@@ -94,22 +115,13 @@ const CheckoutForm = ({ onOrderPlace, clientSecret }: { onOrderPlace: ExpressChe
   return <ExpressCheckoutElement onConfirm={onConfirm} />;
 }
 
-export default function ExpressCheckouts({ 
-  total, 
-  onOrderPlace, 
-  isShippingSelected,
-  cartItems,
-  customerInfo,
-  selectedShipping,
-  shippingRates,
-  appliedCoupons 
-}: ExpressCheckoutsProps) {
+const ExpressCheckoutsComponent = (props: ExpressCheckoutsProps) => {
+  const { total, selectedShipping, shippingRates, cartItems, customerInfo, appliedCoupons, isShippingSelected } = props;
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
   const [remountKey, setRemountKey] = useState(0);
-  const selectedRate = shippingRates.find(rate => rate.id === selectedShipping);
 
-  // ★★★ নতুন লাইন: ইনফিনিট লুপ ঠেকানোর জন্য Array কে String করে নেওয়া হলো ★★★
+  const selectedRate = shippingRates.find(rate => rate.id === selectedShipping);
   const couponsDependency = JSON.stringify(appliedCoupons || []);
 
   useEffect(() => {
@@ -124,7 +136,7 @@ export default function ExpressCheckouts({
 
       if (!paymentIntentId) {
         try {
-          const res = await fetch('/api/create-payment-intent', {
+          const res = await fetch('/api/stripe/create-payment-intent', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
@@ -143,11 +155,10 @@ export default function ExpressCheckouts({
           }
         } catch (error) {
           console.error("Failed to create Express Payment Intent:", error);
-          toast.error("Could not initialize Express Checkout.");
         }
       } else {
         try {
-          await fetch('/api/update-payment-intent', {
+          await fetch('/api/stripe/update-payment-intent', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
@@ -168,7 +179,6 @@ export default function ExpressCheckouts({
 
     managePaymentIntent();
 
-  // ★★★ পরিবর্তন: appliedCoupons এর বদলে couponsDependency ব্যবহার করা হলো ★★★
   }, [total, paymentIntentId, selectedShipping, cartItems.length, couponsDependency]); 
 
   if (!clientSecret || !stripePromise) {
@@ -192,14 +202,24 @@ export default function ExpressCheckouts({
     <div className="w-full relative">
       {!isShippingSelected && (
         <div
-          onClick={() => toast.error('Please select a shipping option first.')}
+          onClick={() => toast.error('Please select a shipping option first to use Express Checkout.')}
           className="absolute top-0 left-0 w-full h-full z-10 cursor-not-allowed"
         />
       )}
       <Elements key={remountKey} options={options as any} stripe={stripePromise}>
-        <CheckoutForm onOrderPlace={onOrderPlace} clientSecret={clientSecret} />
+        <CheckoutForm {...props} clientSecret={clientSecret} />
       </Elements>
       <div className="text-center text-[#6b7280] font-medium text-sm mt-2.5">— OR —</div>
     </div>
   );
-}
+};
+
+const ExpressCheckouts = React.memo(ExpressCheckoutsComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.total === nextProps.total &&
+    prevProps.selectedShipping === nextProps.selectedShipping &&
+    prevProps.cartItems.length === nextProps.cartItems.length
+  );
+});
+
+export default ExpressCheckouts;

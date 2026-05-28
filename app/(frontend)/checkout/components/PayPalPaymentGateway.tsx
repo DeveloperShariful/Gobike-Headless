@@ -1,4 +1,4 @@
-//app/checkout/components/PaypalPaymentGateway.tsx
+// app/checkout/components/PaypalPaymentGateway.tsx
 
 'use client';
 
@@ -19,9 +19,9 @@ interface PayPalGatewayProps {
   appliedCoupons: any[];
 }
 
-export default function PayPalPaymentGateway({ 
+const PayPalPaymentGatewayComponent = ({ 
     total, isPlacingOrder, onPlaceOrder, isShippingSelected, cartItems, customerInfo, shippingInfo, selectedShipping, shippingRates, appliedCoupons 
-}: PayPalGatewayProps) {
+}: PayPalGatewayProps) => {
   
   const wcOrderIdRef = useRef<number | null>(null);
   const wcOrderKeyRef = useRef<string | null>(null);
@@ -32,7 +32,6 @@ export default function PayPalPaymentGateway({
         disabled={isPlacingOrder || total <= 0 || !isShippingSelected}
         forceReRender={[total]}
         
-        // ১. পেমেন্ট উইন্ডো ওপেন হওয়ার আগেই ব্যাকএন্ডে অর্ডার তৈরি
         createOrder={async () => {
           if (!isShippingSelected) {
             toast.error("Please select a shipping method first.");
@@ -67,7 +66,6 @@ export default function PayPalPaymentGateway({
           }
         }}
         
-        // ২. পেমেন্ট করার পর ব্যাকএন্ড দিয়ে কনফার্মেশন
         onApprove={async (data) => {
           toast.loading("Verifying payment...", { id: 'paypal-capture' });
           try {
@@ -107,4 +105,14 @@ export default function PayPalPaymentGateway({
         }}
       />
   );
-}
+};
+
+// React.memo দিয়ে ক্যাশ করা হলো
+const PayPalPaymentGateway = React.memo(PayPalPaymentGatewayComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.total === nextProps.total &&
+    prevProps.isShippingSelected === nextProps.isShippingSelected
+  );
+});
+
+export default PayPalPaymentGateway;

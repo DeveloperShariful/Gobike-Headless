@@ -6,6 +6,21 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import toast from 'react-hot-toast';
 
+// ★★★ PRO TRICK: Stripe-এর টাইপ ফাইলে মিসিং থাকা Zip ফাংশনটিকে আমরা এখানে ডিফাইন করে দিচ্ছি ★★★
+declare module '@stripe/stripe-js' {
+  interface Stripe {
+    confirmZipPayment(
+      clientSecret: string,
+      options?: {
+        payment_method?: {
+          billing_details?: any;
+        };
+        return_url?: string;
+      }
+    ): Promise<{ paymentIntent?: any; error?: any }>;
+  }
+}
+
 interface CustomerInfo {
   firstName?: string;
   lastName?: string;
@@ -58,7 +73,7 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
       if (isProcessing || !stripe || !elements) return;
     
       setIsProcessing(true);
-      toast.loading('Processing payment...');
+      toast.loading('Processing secure payment...', { id: 'stripe-payment' });
 
       const billingDetails = {
           name: `${customerInfo.firstName || ''} ${customerInfo.lastName || ''}`,
@@ -80,184 +95,124 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
           shipping_cost: selectedRate?.cost || '0'
       };
 
-      if (selectedPaymentMethod === 'stripe' && clientSecret) {
-         try {
-             const paymentIntentId = clientSecret.split('_secret_')[0];
-             await fetch('/api/update-payment-intent', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    paymentIntentId: paymentIntentId,
-                    amount: total,
-                    customerInfo: customerInfo, 
-                    shippingInfo: shippingInfo || customerInfo, 
-                    cartItems: cartItems, 
-                    metadata: shippingMetadata,
-                    appliedCoupons: appliedCoupons
-                }),
-            });
-         } catch (err) {
-             console.error("Failed to sync metadata with Stripe:", err);
-         }
-      }
-
-      const isStandaloneRedirect = selectedPaymentMethod === 'stripe_klarna' || selectedPaymentMethod === 'stripe_afterpay_clearpay';
-      const isRedirectFromElement = selectedPaymentMethod === 'stripe' && (internalStripeMethod === 'klarna' || internalStripeMethod === 'afterpay_clearpay');
+      const isStandaloneRedirect = selectedPaymentMethod === 'stripe_klarna' || selectedPaymentMethod === 'stripe_afterpay_clearpay' || selectedPaymentMethod === 'stripe_zip';
+      const isRedirectFromElement = selectedPaymentMethod === 'stripe' && (internalStripeMethod === 'klarna' || internalStripeMethod === 'afterpay_clearpay' || internalStripeMethod === 'zip');
       const isRedirectFlow = isStandaloneRedirect || isRedirectFromElement;
 
-      if (isRedirectFlow) {
-        try {
+      try {
+          const resolvedPaymentMethodId = isStandaloneRedirect 
+              ? selectedPaymentMethod 
+              : (selectedPaymentMethod === 'stripe' && internalStripeMethod === 'zip') 
+                  ? 'stripe_zip' 
+                  : selectedPaymentMethod;
+
           const orderDetails = await onPlaceOrder({ 
-            redirect_needed: true,
-            is_embedded_redirect: isRedirectFromElement 
+              redirect_needed: isRedirectFlow,
+              is_embedded_redirect: isRedirectFromElement,
+              paymentMethodId: resolvedPaymentMethodId
           });
 
           if (!orderDetails || !orderDetails.orderId || !orderDetails.orderKey) {
-            throw new Error("Could not create a pending order.");
+              throw new Error("Could not create a pending order. Please try again.");
           }
 
-          const paymentMethodType = isStandaloneRedirect ? selectedPaymentMethod.replace('stripe_', '') : internalStripeMethod;
+          if (isRedirectFlow) {
+              const paymentMethodType = isStandaloneRedirect ? selectedPaymentMethod.replace('stripe_', '') : internalStripeMethod;
+              
+              const res = await fetch('/api/stripe/create-payment-intent', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                      amount: Math.round(total * 100),
+                      payment_method_types: [paymentMethodType],
+                      metadata: { order_id: orderDetails.orderId, ...shippingMetadata },
+                      orderId: orderDetails.orderId,
+                      customerInfo: customerInfo, 
+                      shippingInfo: shippingInfo, 
+                      cartItems: cartItems,
+                      appliedCoupons: appliedCoupons
+                  }),
+              });
+              const { clientSecret: redirectClientSecret, error: piError } = await res.json();
+              if (piError) { throw new Error(piError.message || "Could not create payment intent."); }
+
+              const returnUrl = `${window.location.origin}/order-confirmation?order_id=${orderDetails.orderId}&key=${orderDetails.orderKey}`;
+              let confirmationResult;
+
+              // ★★★ এখানে কোনো as any নেই, একদম ফ্রেশ কোড ★★★
+              if (paymentMethodType === 'klarna') {
+                  confirmationResult = await stripe.confirmKlarnaPayment(redirectClientSecret, {
+                      payment_method: { billing_details: billingDetails },
+                      return_url: returnUrl,
+                  });
+              } else if (paymentMethodType === 'afterpay_clearpay') {
+                  confirmationResult = await stripe.confirmAfterpayClearpayPayment(redirectClientSecret, {
+                      payment_method: { billing_details: billingDetails },
+                      return_url: returnUrl,
+                  });
+              } else if (paymentMethodType === 'zip') {
+                  confirmationResult = await stripe.confirmZipPayment(redirectClientSecret, {
+                      payment_method: { billing_details: billingDetails },
+                      return_url: returnUrl,
+                  });
+              }
+              
+              if (confirmationResult?.error) {
+                  throw new Error(confirmationResult.error.message);
+              }
+          } 
           
-          const res = await fetch('/api/create-payment-intent', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              amount: Math.round(total * 100),
-              payment_method_types: [paymentMethodType],
-              metadata: { order_id: orderDetails.orderId, ...shippingMetadata },
-              orderId: orderDetails.orderId,
-              customerInfo: customerInfo, 
-              shippingInfo: shippingInfo, 
-              cartItems: cartItems,
-              appliedCoupons: appliedCoupons
-            }),
-          });
-          const { clientSecret: redirectClientSecret, error: piError } = await res.json();
-          if (piError) { throw new Error(piError.message || "Could not create payment intent."); }
+          else if (selectedPaymentMethod === 'stripe') {
+              if (!clientSecret) {
+                  throw new Error("Could not initialize payment. Please try again.");
+              }
 
-          const returnUrl = `${window.location.origin}/order-confirmation?order_id=${orderDetails.orderId}&key=${orderDetails.orderKey}`;
-          let confirmationResult;
+              const { error: submitError } = await elements.submit();
+              if (submitError) {
+                  throw new Error(submitError.message || "Please check your payment details.");
+              }
 
-          if (paymentMethodType === 'klarna') {
-            confirmationResult = await stripe.confirmKlarnaPayment(redirectClientSecret, {
-              payment_method: { billing_details: billingDetails },
-              return_url: returnUrl,
-            });
-          } else if (paymentMethodType === 'afterpay_clearpay') {
-            confirmationResult = await stripe.confirmAfterpayClearpayPayment(redirectClientSecret, {
-              payment_method: { billing_details: billingDetails },
-              return_url: returnUrl,
-            });
+              const paymentIntentId = clientSecret.split('_secret_')[0];
+              await fetch('/api/stripe/update-payment-intent', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                      paymentIntentId: paymentIntentId,
+                      amount: total,
+                      orderId: orderDetails.orderId,
+                      customerInfo: customerInfo, 
+                      shippingInfo: shippingInfo || customerInfo, 
+                      cartItems: cartItems, 
+                      metadata: shippingMetadata,
+                      appliedCoupons: appliedCoupons
+                  }),
+              });
+
+              const returnUrl = `${window.location.origin}/order-confirmation?order_id=${orderDetails.orderId}&key=${orderDetails.orderKey}`;
+
+              const { error } = await stripe.confirmPayment({
+                  elements,
+                  clientSecret,
+                  confirmParams: {
+                      return_url: returnUrl,
+                  },
+              });
+
+              if (error) {
+                  throw new Error(error.message || "Payment failed or was declined.");
+              }
+          } else {
+              throw new Error("This payment method is not configured correctly.");
           }
 
-          if (confirmationResult?.error) {
-            throw new Error(confirmationResult.error.message);
-          }
-          
-        } catch (error: unknown) {
-          toast.dismiss();
-  
-          let errorMessage = "An unexpected error occurred.";
-
+      } catch (error: unknown) {
+          toast.dismiss('stripe-payment');
+          let errorMessage = "An unexpected error occurred during checkout.";
           if (error instanceof Error) {
-            errorMessage = error.message;
+              errorMessage = error.message;
           }
-  
           toast.error(errorMessage);
           setIsProcessing(false);
-        }
-      } 
-      
-      else if (selectedPaymentMethod === 'stripe') {
-        if (!clientSecret) {
-          toast.dismiss();
-          toast.error("Could not initialize payment. Please try again.");
-          setIsProcessing(false);
-          return;
-        }
-
-        const { error: submitError } = await elements.submit();
-        if (submitError) {
-          toast.dismiss();
-          toast.error(submitError.message || "Please check your payment details.");
-          setIsProcessing(false);
-          return;
-        }
-
-        if (internalStripeMethod === 'zip') {
-            try {
-                const orderDetails = await onPlaceOrder({ 
-                    redirect_needed: true,
-                    is_embedded_redirect: true,
-                    paymentMethodId: 'zip' 
-                });
-
-                if (!orderDetails || !orderDetails.orderId || !orderDetails.orderKey) {
-                    throw new Error("Could not create order before redirection.");
-                }
-
-                const paymentIntentId = clientSecret.split('_secret_')[0];
-                
-                await fetch('/api/update-payment-intent', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        paymentIntentId: paymentIntentId,
-                        orderId: orderDetails.orderId,
-                        customerInfo: customerInfo,
-                        shippingInfo: shippingInfo,
-                        cartItems: cartItems,
-                        metadata: shippingMetadata,
-                        appliedCoupons: appliedCoupons
-                    })
-                });
-
-                const { error } = await stripe.confirmPayment({
-                    elements,
-                    clientSecret,
-                    confirmParams: {
-                        return_url: `${window.location.origin}/order-confirmation?order_id=${orderDetails.orderId}&key=${orderDetails.orderKey}`,
-                    },
-                });
-
-                if (error) {
-                    toast.dismiss();
-                    toast.error(error.message || "Payment failed");
-                    setIsProcessing(false);
-                }
-
-            } catch (err) {
-                toast.dismiss();
-                toast.error(err instanceof Error ? err.message : "Failed to process Zip payment.");
-                setIsProcessing(false);
-            }
-        }
-        
-        else {
-            const { error, paymentIntent } = await stripe.confirmPayment({
-              elements,
-              clientSecret,
-              confirmParams: {
-                return_url: `${window.location.origin}/order-success`,
-              },
-              redirect: 'if_required',
-            });
-            
-            toast.dismiss();
-            if (error) {
-              toast.error(error.message || "An unexpected error occurred.");
-            } else if (paymentIntent?.status === 'succeeded') {
-              toast.success('Payment confirmed!');
-              await onPlaceOrder({ transaction_id: paymentIntent.id, paymentMethodId: 'stripe' });
-            }
-            setIsProcessing(false);
-        }
-      }
-      
-      else {
-        toast.dismiss();
-        toast.error("This payment method is not configured correctly.");
-        setIsProcessing(false);
       }
     };
 
@@ -295,6 +250,18 @@ const StripeForm = forwardRef<HTMLFormElement, StripePaymentGatewayProps & { cli
         );
       }
 
+      if (selectedPaymentMethod === 'stripe_zip') {
+        return (
+          <div className="flex items-center gap-[15px] p-[15px] border border-[#e0e0e0] rounded-[5px] bg-[#f9f9f9]">
+            <Image src="https://gobikes.au/wp-content/uploads/2026/05/Zip-Pay-Logo.webp" alt="Zip Pay" width={60} height={20} unoptimized/>
+            <div className="flex flex-col gap-[5px] text-sm text-[#333]">
+              <span>Own it now, pay later with <strong>Zip Pay</strong>.</span>
+              <small className="text-xs text-[#777]">After submission, you will be redirected to securely complete next steps.</small>
+            </div>
+          </div>
+        );
+      }
+
       return null;
     };
 
@@ -311,13 +278,12 @@ const StripePaymentGateway = forwardRef<HTMLFormElement, StripePaymentGatewayPro
     );
     const[clientSecret, setClientSecret] = useState<string>('');
     
-    // ★★★ নতুন লাইন: ইনফিনিট লুপ ঠেকানোর জন্য Array কে String করে নেওয়া হলো ★★★
     const couponsDependency = JSON.stringify(props.appliedCoupons || []);
 
     useEffect(() => {
         if (props.selectedPaymentMethod === 'stripe' && props.total > 0) {
             if (clientSecret) return;
-            fetch('/api/create-payment-intent', {
+            fetch('/api/stripe/create-payment-intent', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
@@ -334,7 +300,6 @@ const StripePaymentGateway = forwardRef<HTMLFormElement, StripePaymentGatewayPro
                 }
             });
         }
-    // ★★★ পরিবর্তন: props.appliedCoupons এর বদলে couponsDependency ব্যবহার করা হলো ★★★
     }, [props.total, props.selectedPaymentMethod, clientSecret, couponsDependency]);
 
     if (!stripePromise) {

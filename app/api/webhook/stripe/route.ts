@@ -5,14 +5,17 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { wooCommerceRequest } from '@/lib/woocommerce';
 
-export const maxDuration = 60; 
+export const maxDuration = 60; // Vercel Timeout Extension (Optional but helpful)
 
+// Stripe Initialized
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-01-27.acacia" as any,
   typescript: true,
 });
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+
+// Helper function to delay execution (if needed for DB sync)
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function POST(request: Request) {
@@ -23,164 +26,72 @@ export async function POST(request: Request) {
   let event: Stripe.Event;
 
   try {
+    // 1. Verify the Webhook Signature
     event = stripe.webhooks.constructEvent(body, sig, endpointSecret);
   } catch (err: any) {
-    console.error(`Webhook Signature Verification Failed: ${err.message}`);
+    console.error(`❌ [Stripe Webhook Error] Signature Verification Failed: ${err.message}`);
     return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
   }
 
+  // 2. Handle the 'payment_intent.succeeded' event
   if (event.type === 'payment_intent.succeeded') {
     const paymentIntent = event.data.object as Stripe.PaymentIntent;
-    const initialMetadata = paymentIntent.metadata;
+    const metadata = paymentIntent.metadata;
 
-    console.log(`💰 Payment succeeded for PI: ${paymentIntent.id}`);
+    console.log(`💰 [Stripe Webhook] Payment Succeeded for PI: ${paymentIntent.id}`);
 
     try {
-      if (initialMetadata.order_id) {
-          console.log(`✅ Order #${initialMetadata.order_id} already exists (handled by Frontend instantly). Updating status...`);
-          
-          await wooCommerceRequest(`orders/${initialMetadata.order_id}`, 'PUT', {
-              status: 'processing',
-              set_paid: true,
-              transaction_id: paymentIntent.id
-          });
-          
-          return NextResponse.json({ received: true, message: "Order updated instantly" });
+      const orderId = metadata.order_id;
+
+      if (!orderId) {
+          console.warn(`⚠️ [Stripe Webhook] No Order ID found in metadata for PI: ${paymentIntent.id}. This is highly unusual for the new architecture.`);
+          // (Optionally) You could search WooCommerce by Transaction ID here, but in the new flow, Metadata should always have it.
+          return NextResponse.json({ received: true, message: "No Order ID in metadata. Webhook ignoring." });
       }
 
-      console.warn(`⏳ No Order ID found immediately. Waiting 9 seconds for frontend to finish...`);
-      
-      await sleep(9000);
+      console.log(`🔍 [Stripe Webhook] Verifying status for Order #${orderId}...`);
 
-      console.log(`🔄 Re-fetching Payment Intent data from Stripe...`);
-      const freshPaymentIntent = await stripe.paymentIntents.retrieve(paymentIntent.id);
-      const freshMetadata = freshPaymentIntent.metadata;
+      // 3. Fetch current order status from WooCommerce
+      const currentOrder = await wooCommerceRequest<any>(`orders/${orderId}`, "GET");
 
-      if (freshMetadata.order_id) {
-          console.log(`✅ Order #${freshMetadata.order_id} found after delay (Frontend won). Updating status...`);
-          
-          await wooCommerceRequest(`orders/${freshMetadata.order_id}`, 'PUT', {
-              status: 'processing',
-              set_paid: true,
-              transaction_id: paymentIntent.id
-          });
-          
-          return NextResponse.json({ received: true, message: "Order updated after delay" });
+      if (!currentOrder) {
+          console.error(`❌ [Stripe Webhook] Order #${orderId} not found in WooCommerce!`);
+          return NextResponse.json({ received: true, error: "Order not found in WC" });
       }
 
-      console.log(`🔍 Checking WooCommerce for any existing order with transaction ID: ${paymentIntent.id}...`);
-      // ★★★ পরিবর্তন: 10 এর জায়গায় 30 করা হলো সেফটির জন্য ★★★
-      const recentOrders = await wooCommerceRequest<any[]>("orders", "GET", { per_page: 30, orderby: 'date', order: 'desc' });
-      
-      const existingOrder = recentOrders.find((o: any) => 
-        o.transaction_id === paymentIntent.id || 
-        (o.meta_data && o.meta_data.some((m: any) => m.key === 'stripe_payment_intent' && m.value === paymentIntent.id))
-      );
-
-      if (existingOrder) {
-          console.log(`✅ Order #${existingOrder.id} found in WooCommerce DB! (Frontend was slow but successful). Updating status...`);
-          
-          await wooCommerceRequest(`orders/${existingOrder.id}`, 'PUT', {
-              status: 'processing',
-              set_paid: true,
-              transaction_id: paymentIntent.id
-          });
-
-          await stripe.paymentIntents.update(paymentIntent.id, {
-              metadata: { order_id: existingOrder.id.toString() },
-              description: `Order #${existingOrder.id} for GOBIKE`
-          });
-
-          return NextResponse.json({ received: true, message: "Order found in DB and updated" });
+      // 4. Check if Frontend already processed it
+      if (currentOrder.status === 'processing' || currentOrder.status === 'completed') {
+          console.log(`✅ [Stripe Webhook] Order #${orderId} is already marked as ${currentOrder.status} (Frontend was faster).`);
+          return NextResponse.json({ received: true, message: "Already processed by frontend" });
       }
 
-      console.warn(`⚠️ Frontend officially failed and no order found in DB. Creating fallback order via Webhook...`);
+      // 5. The Safety Net: Frontend failed, Webhook steps in
+      console.warn(`⏳ [Stripe Webhook] Frontend missed the capture for Order #${orderId}. Webhook is capturing now...`);
 
-      if (!freshMetadata.cart_items_json || !freshMetadata.billing_json) {
-          throw new Error("Missing necessary metadata to create fallback order.");
-      }
+      // We wait 3 seconds just to make absolutely sure the frontend isn't currently mid-update to avoid DB locking
+      await sleep(3000); 
 
-      // ★★★ নতুন: Webhook ক্র্যাশ ঠেকানোর জন্য Safe JSON Parsing ★★★
-      const safeParseJSON = (jsonString: string, fallbackResult: any) => {
-          try {
-              return JSON.parse(jsonString);
-          } catch (e) {
-              console.error("⚠️ JSON Parse Warning (String might be truncated):", jsonString);
-              return fallbackResult;
-          }
+      // 6. Update Order Status to Processing
+      const orderUpdateData = {
+          status: 'processing',
+          set_paid: true,
+          transaction_id: paymentIntent.id,
+          meta_data: [
+              { key: '_stripe_capture_time', value: new Date().toISOString() },
+              { key: '_webhook_rescued', value: 'yes' } // Marker for you to know Webhook did the job
+          ]
       };
 
-      const cartItems = safeParseJSON(freshMetadata.cart_items_json, []);
-      const billingInfo = safeParseJSON(freshMetadata.billing_json, {});
-      const shippingInfo = freshMetadata.shipping_json ? safeParseJSON(freshMetadata.shipping_json, billingInfo) : billingInfo;
-      const couponLines = freshMetadata.applied_coupons_json ? safeParseJSON(freshMetadata.applied_coupons_json, []) : [];
+      await wooCommerceRequest(`orders/${orderId}`, 'PUT', orderUpdateData);
 
-      const shippingMethodId = freshMetadata.shipping_method_id || 'flat_rate';
-      const shippingMethodTitle = freshMetadata.shipping_method_title || 'Standard Shipping';
-      const shippingCost = freshMetadata.shipping_cost || '0';
-
-      const orderData = {
-        payment_method: 'stripe',
-        payment_method_title: 'Credit Card (Stripe Fallback)',
-        set_paid: true,
-        transaction_id: paymentIntent.id,
-        status: 'processing',
-        billing: {
-            first_name: billingInfo.firstName,
-            last_name: billingInfo.lastName,
-            address_1: billingInfo.address1,
-            city: billingInfo.city,
-            state: billingInfo.state,
-            postcode: billingInfo.postcode,
-            country: 'AU',
-            email: billingInfo.email || freshMetadata.customer_email,
-            phone: billingInfo.phone,
-        },
-        shipping: {
-            first_name: shippingInfo.firstName,
-            last_name: shippingInfo.lastName,
-            address_1: shippingInfo.address1,
-            city: shippingInfo.city,
-            state: shippingInfo.state,
-            postcode: shippingInfo.postcode,
-            country: 'AU',
-        },
-        line_items: cartItems.map((item: any) => ({
-            product_id: item.product_id,
-            quantity: item.quantity,
-            variation_id: item.variation_id || 0
-        })),
-        shipping_lines:[
-            {
-                method_id: shippingMethodId,
-                method_title: shippingMethodTitle,
-                total: shippingCost.toString()
-            }
-        ],
-        coupon_lines: couponLines,
-        meta_data:[
-            { key: '_is_webhook_created', value: 'yes' }, 
-            { key: 'stripe_payment_intent', value: paymentIntent.id }
-        ]
-      };
-
-      const newOrder = await wooCommerceRequest<any>("orders", "POST", orderData);
-
-      console.log(`🎉 Fallback Order Created Successfully: #${newOrder.id}`);
-      
-      await stripe.paymentIntents.update(paymentIntent.id, {
-          metadata: {
-              order_id: newOrder.id.toString(),
-              is_fallback: 'true'
-          },
-          description: `Order #${newOrder.id} (Created via Webhook)`
-      });
+      console.log(`🎉 [Stripe Webhook] Rescue Successful! Order #${orderId} updated to processing via Webhook.`);
 
     } catch (error: any) {
-      console.error("❌ Failed to process webhook order:", error.message);
-      return NextResponse.json({ error: "Failed to process order" }, { status: 200 });
+      console.error("❌ [Stripe Webhook Critical Error]:", error.message);
+      return NextResponse.json({ error: "Failed to process webhook" }, { status: 500 });
     }
   }
 
+  // Return a 200 response to acknowledge receipt of the event
   return NextResponse.json({ received: true });
 }

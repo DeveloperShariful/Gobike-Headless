@@ -1,4 +1,4 @@
-// File: app/api/update-payment-intent/route.ts
+// File: app/api/stripe/create-payment-intent/route.ts
 
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
@@ -10,25 +10,29 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
     // ★★★ পরিবর্তন: appliedCoupons রিসিভ করা হলো ★★★
-    const { paymentIntentId, amount, orderId, cartItems, customerInfo, shippingInfo, metadata: incomingMetadata, appliedCoupons } = body;
+    const { amount, payment_method_types, metadata: incomingMetadata, orderId, cartItems, customerInfo, shippingInfo, appliedCoupons } = await request.json();
 
-    if (!paymentIntentId) {
-      return NextResponse.json({ error: 'Missing Payment Intent ID.' }, { status: 400 });
+    if (!amount || amount < 1) {
+      return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
     }
 
-    const updateData: Stripe.PaymentIntentUpdateParams = {};
+    const intentOptions: Stripe.PaymentIntentCreateParams = {
+      amount,
+      currency: 'aud',
+    };
 
-    if (amount && typeof amount === 'number' && amount > 0) {
-      updateData.amount = Math.round(amount * 100);
+    if (payment_method_types) {
+      intentOptions.payment_method_types = payment_method_types;
+    } else {
+      intentOptions.automatic_payment_methods = { enabled: true };
     }
     
     const metadata: Record<string, string> = { ...incomingMetadata };
 
     if (orderId) {
+      intentOptions.description = `Order #${orderId} for GOBIKE`;
       metadata.order_id = orderId.toString();
-      updateData.description = `Order #${orderId} for GOBIKE`; 
     }
 
     if (customerInfo) {
@@ -40,12 +44,13 @@ export async function POST(request: Request) {
     if (shippingInfo) {
         metadata.shipping_json = JSON.stringify(shippingInfo).substring(0, 499);
     }
-    
+
     if (cartItems && Array.isArray(cartItems)) {
         const simplifiedCart = cartItems.map((item: any) => ({
             product_id: item.databaseId || item.id,
             quantity: item.quantity,
-            variation_id: item.variationId || 0 
+            variation_id: item.variationId || 0,
+            price: item.price
         }));
         metadata.cart_items_json = JSON.stringify(simplifiedCart).substring(0, 499);
     }
@@ -57,20 +62,16 @@ export async function POST(request: Request) {
     }
 
     if (Object.keys(metadata).length > 0) {
-        updateData.metadata = metadata;
+      intentOptions.metadata = metadata;
     }
 
-    if (Object.keys(updateData).length === 0) {
-      return NextResponse.json({ message: 'No valid data to update.' });
-    }
+    const paymentIntent = await stripe.paymentIntents.create(intentOptions);
     
-    await stripe.paymentIntents.update(paymentIntentId, updateData);
-    
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ clientSecret: paymentIntent.client_secret });
 
-  } catch (error: unknown) {
-    console.error("[UPDATE_PAYMENT_INTENT_ERROR]:", error);
-    const message = error instanceof Error ? error.message : "Internal server error.";
-    return NextResponse.json({ error: message }, { status: 500 });
+  } catch (error: unknown) { 
+    console.error("[CREATE_PAYMENT_INTENT_ERROR]:", error);
+    const errorMessage = error instanceof Error ? error.message : "An internal server error occurred.";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

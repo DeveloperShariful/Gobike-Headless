@@ -9,7 +9,7 @@ import StripePaymentGateway from './StripePaymentGateway';
 import PayPalMessage from './PayPalMessage';
 import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 
-interface PaymentGateway { id: string; title: string; description: string; }
+interface PaymentGateway { id: string; title: string; description: string; enabled?: boolean; }
 interface CustomerInfo { firstName?: string; lastName?: string; email?: string; phone?: string; address1?: string; city?: string; state?: string; postcode?: string; }
 export interface ShippingFormData { firstName: string; lastName: string; address1: string; city: string; state: string; postcode: string; email: string; phone: string; }
 interface ShippingRate { id: string; label: string; cost: string; }
@@ -27,7 +27,6 @@ interface PaymentMethodsProps {
   shippingInfo?: CustomerInfo;
   selectedShipping: string;
   shippingRates: ShippingRate[];
-  // ★★★ নতুন প্রপস ★★★
   appliedCoupons: any[];
 }
 
@@ -35,7 +34,7 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
   const { 
     gateways, selectedPaymentMethod, onPaymentMethodChange, total, onPlaceOrder, 
     isPlacingOrder, isShippingSelected, customerInfo, cartItems, shippingInfo, 
-    selectedShipping, shippingRates, appliedCoupons // ★★★ রিসিভ করা হলো ★★★
+    selectedShipping, shippingRates, appliedCoupons 
   } = props;
 
   const stripeFormRef = useRef<HTMLFormElement>(null);
@@ -52,14 +51,11 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
     if (id.includes('ppcp-gateway')) return <Image src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal" width={80} height={20} className="h-6 w-auto" unoptimized />;
     if (id.includes('klarna')) return <Image src="https://x.klarnacdn.net/payment-method/assets/badges/generic/klarna.svg" alt="Klarna" width={50} height={20} className="h-6 w-auto" />;
     if (id.includes('afterpay')) return <Image src="https://static.afterpay.com/integration/logo-afterpay-colour.svg" alt="Afterpay" width={80} height={20} className="h-6 w-auto" unoptimized />;
-    if (id.includes('stripe')) return (
-      <span className="flex items-center gap-1">
-        <Image src="https://gobikes.au/wp-content/uploads/2026/05/Credit-Card-Icons.webp" alt="Visa" width={300} height={200} className="h-7 w-auto rounded-[5px] md:h-[28px]" style={{ width: 'auto' }} />
-        {/*<Image src="https://js.stripe.com/v3/fingerprinted/img/mastercard-4d8844094130711885b5e41b28c9848f.svg" alt="Mastercard" width={30} height={20} className="h-5 w-auto rounded-[2px] md:h-[25px]" style={{ width: 'auto' }} />
-        <Image src="https://www.americanexpress.com/content/dam/amex/us/merchant/supplies-uplift/product/images/Amex_Bluebox-Logo.png" alt="American Express" width={30} height={20} className="h-5 w-auto rounded-[2px] md:h-[25px]" style={{ width: 'auto' }} unoptimized />
-        */}
-      </span>
-    );
+    
+    // ★★★ Zip Pay এর লোগো অ্যাড করা হলো ★★★
+    if (id.includes('zip')) return <Image src="https://gobikes.au/wp-content/uploads/2026/05/Zip-Pay-Logo.webp" alt="Zip Pay" width={50} height={20} className="h-6 w-auto" unoptimized />;
+    
+    if (id.includes('stripe')) return (<span className="flex items-center gap-1"><Image src="https://gobikes.au/wp-content/uploads/2026/05/Credit-Card-Icons.webp" alt="Visa" width={300} height={200} className="h-7 w-auto rounded-[5px] md:h-[28px]" style={{ width: 'auto' }} /></span>);
     return null;
   };
 
@@ -72,11 +68,27 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
   };
 
   const isPayPalSelected = selectedPaymentMethod.includes('ppcp-gateway');
+  
+  // ১. API থেকে আসা ডেটা ফিল্টার করা
   const availableGateways = gateways.filter(gateway => {
     if (gateway.id === 'stripe_link') return false;
-    if (gateway.id.includes('afterpay_clearpay') && total > 2000) return false;
+    if ((gateway.id.includes('afterpay_clearpay') || gateway.id.includes('klarna')) && total > 2000) return false;
     return true;
   });
+
+  // ২. ★★★ জোর করে (Forcefully) Zip Pay অ্যাড করা ★★★
+  const hasStripe = availableGateways.some(g => g.id === 'stripe');
+  const hasZip = availableGateways.some(g => g.id === 'stripe_zip');
+
+  // যদি Stripe কার্ড অপশন থাকে কিন্তু Zip না থাকে, তবে ম্যানুয়ালি Zip ঢুকিয়ে দিচ্ছি
+  if (hasStripe && !hasZip) {
+      availableGateways.push({
+          id: 'stripe_zip',
+          title: 'Zip Pay',
+          description: 'Own it now, pay later with Zip Pay.',
+          enabled: true
+      });
+  }
 
   return (
     <PayPalScriptProvider options={initialOptions}>
@@ -109,6 +121,8 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
                 {getGatewayIcon(gateway.id)}
               </div>
             </div>
+            
+            {/* যেহেতু 'stripe_zip'-এর ভেতরে 'stripe' শব্দটি আছে, তাই এটি অটোমেটিক StripePaymentGateway কে লোড করবে */}
             {selectedPaymentMethod === gateway.id && gateway.id.includes('stripe') && (
               <div className="p-[10px_5px_5px_5px] bg-[#f9f9f9] border-t border-[#e0e0e0]">
                 <StripePaymentGateway 
@@ -121,7 +135,7 @@ export default function PaymentMethods(props: PaymentMethodsProps) {
                     shippingInfo={shippingInfo}
                     selectedShipping={selectedShipping}
                     shippingRates={shippingRates}
-                    appliedCoupons={appliedCoupons} // ★★★ পাঠানো হলো ★★★
+                    appliedCoupons={appliedCoupons} 
                 />
               </div>
             )}

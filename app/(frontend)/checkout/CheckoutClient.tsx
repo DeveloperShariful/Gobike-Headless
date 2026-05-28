@@ -29,34 +29,12 @@ interface ShippingRate { id: string; label: string; cost: string; }
 interface AppliedCoupon { code: string; }
 interface CartData { subtotal: string; total: string; shippingTotal: string; discountTotal: string; appliedCoupons: AppliedCoupon[] | null; availableShippingMethods?: { rates: ShippingRate[] }[] | null }
 interface PaymentGateway { id: string; title: string; description: string; }
-interface CheckoutMutationResult {
-  checkout: {
-    result: 'success' | 'failure';
-    order: {
-      databaseId: number;
-      orderKey: string;
-    } | null;
-  } | null;
-}
+
 const GET_CHECKOUT_DATA = gql` query GetCheckoutData { cart { subtotal(format: FORMATTED) total(format: FORMATTED) shippingTotal(format: FORMATTED) discountTotal(format: FORMATTED) appliedCoupons { code } availableShippingMethods { rates { id label cost } } } } `;
 const APPLY_COUPON_MUTATION = gql` mutation ApplyCoupon($input: ApplyCouponInput!) { applyCoupon(input: $input) { cart { total subtotal discountTotal appliedCoupons { code } } } } `;
 const REMOVE_COUPON_MUTATION = gql` mutation RemoveCoupons($input: RemoveCouponsInput!) { removeCoupons(input: $input) { cart { total subtotal discountTotal appliedCoupons { code } } } } `;
 const UPDATE_CUSTOMER_MUTATION = gql`mutation UpdateCustomerForCheckout($input: UpdateCustomerInput!) { updateCustomer(input: $input) { customer { id } } }`;
 const UPDATE_SHIPPING_METHOD_MUTATION = gql`mutation UpdateShippingMethod($input: UpdateShippingMethodInput!) { updateShippingMethod(input: $input) { cart { total } } }`;
-
-const CHECKOUT_MUTATION = gql`
-  mutation Checkout($input: CheckoutInput!) {
-    checkout(input: $input) {
-      result
-      redirect
-      order {
-        databaseId
-        orderKey
-        status
-      }
-    }
-  }
-`;
 
 type State = { 
   customerInfo: Partial<ShippingFormData>; 
@@ -164,8 +142,12 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
   useEffect(() => { shippingInfoRef.current = shippingInfo; }, [shippingInfo]);
 
   const refetchCartData = useCallback(async () => { dispatch({ type: 'SET_LOADING', key: 'cart', payload: true }); try { const { data } = await client.query<{ cart: CartData }>({ query: GET_CHECKOUT_DATA, fetchPolicy: 'network-only' }); if (data?.cart) { dispatch({ type: 'SET_CHECKOUT_DATA', payload: { cart: data.cart } }); } } catch (err) {console.error("Error updating customer address:", err); toast.error('Could not refresh cart data.'); } finally { dispatch({ type: 'SET_LOADING', key: 'cart', payload: false }); } }, []);
+  
   useEffect(() => { if (!isCartContextLoading && cartItems.length === 0 && !orderPlacementInProgress) router.push('/cart'); else refetchCartData(); }, [isCartContextLoading, cartItems.length, router, refetchCartData, orderPlacementInProgress]);
-  const handleAddressChange = useCallback(async (address: Partial<ShippingFormData>) => { dispatch({ type: 'SET_CUSTOMER_INFO', payload: address });
+  
+  // ★★★ আপডেটেড: Billing Address Function ★★★
+  const handleAddressChange = useCallback(async (address: Partial<ShippingFormData>) => { 
+    dispatch({ type: 'SET_CUSTOMER_INFO', payload: address });
     
     if (!addressInputStarted) { 
         dispatch({ type: 'SET_ADDRESS_INPUT_STARTED', payload: true });
@@ -175,7 +157,15 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
     const updatedShipping = shipToDifferentAddress 
         ? shippingInfoRef.current 
         : updatedBilling;
-    if (updatedBilling.city && updatedBilling.postcode && updatedBilling.state) { 
+
+    // চেক করা হচ্ছে আসলেই City, Postcode বা State চেঞ্জ হয়েছে কিনা
+    const isShippingFieldChanged = 
+        (address.city !== undefined && address.city !== customerInfoRef.current.city) ||
+        (address.postcode !== undefined && address.postcode !== customerInfoRef.current.postcode) ||
+        (address.state !== undefined && address.state !== customerInfoRef.current.state);
+
+    // শুধুমাত্র যদি shipping ফিল্ড চেঞ্জ হয় এবং সবগুলো ডেটা থাকে, তবেই API কল হবে
+    if (isShippingFieldChanged && updatedBilling.city && updatedBilling.postcode && updatedBilling.state) { 
         dispatch({ type: 'SET_LOADING', key: 'shipping', payload: true }); 
         try { 
             await client.mutate({ 
@@ -196,15 +186,27 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
         } 
     } 
   }, [addressInputStarted, refetchCartData, shipToDifferentAddress]);
+
   const handleApplyCoupon = async (couponCode: string) => { if (cartData?.appliedCoupons && cartData.appliedCoupons.length > 0) { toast.error("Only one coupon can be applied per order."); return; } dispatch({ type: 'SET_LOADING', key: 'applyingCoupon', payload: true }); toast.loading('Applying coupon...'); try { await client.mutate({ mutation: APPLY_COUPON_MUTATION, variables: { input: { code: couponCode } } }); await refetchCartData(); toast.dismiss(); toast.success('Coupon applied!'); } catch (error) { toast.dismiss(); toast.error(getErrorMessage(error)); } finally { dispatch({ type: 'SET_LOADING', key: 'applyingCoupon', payload: false }); } };
+  
   const handleRemoveCoupon = async (couponCode: string) => { if (loading.removingCoupon) return; dispatch({ type: 'SET_LOADING', key: 'removingCoupon', payload: true }); toast.loading('Removing coupon...'); try { await client.mutate({ mutation: REMOVE_COUPON_MUTATION, variables: { input: { codes: [couponCode] } } }); await refetchCartData(); toast.dismiss(); toast.success('Coupon removed.'); } catch (error) { toast.dismiss(); toast.error(getErrorMessage(error)); } finally { dispatch({ type: 'SET_LOADING', key: 'removingCoupon', payload: false }); } };
+  
   const handleShippingSelect = (rateId: string) => {  dispatch({ type: 'SET_SELECTED_SHIPPING', payload: rateId }); const selectedRate = shippingRates.find(rate => rate.id === rateId); if (cartData && selectedRate) { const subtotal = parseFloat(cartData.subtotal.replace(/[^0-9.]/g, '')) || 0; const discount = parseFloat(cartData.discountTotal.replace(/[^0-9.]/g, '')) || 0; const shippingCost = parseFloat(selectedRate.cost) || 0; const newTotal = (subtotal - discount) + shippingCost; dispatch({ type: 'UPDATE_TOTALS', payload: { shippingTotal: `$${shippingCost.toFixed(2)}`, total: `$${newTotal.toFixed(2)}` } }); } client.mutate({ mutation: UPDATE_SHIPPING_METHOD_MUTATION, variables: { input: { shippingMethods: [rateId] } }, }).catch(err => { console.error("Failed to sync shipping method with server:", err); toast.error("Could not save shipping preference."); }); };
-  const handleShippingAddressChange = useCallback(async (address: Partial<ShippingFormData>) => { dispatch({ type: 'SET_SHIPPING_INFO', payload: address });
+  
+  // ★★★ আপডেটেড: Shipping Address Function ★★★
+  const handleShippingAddressChange = useCallback(async (address: Partial<ShippingFormData>) => { 
+    dispatch({ type: 'SET_SHIPPING_INFO', payload: address });
 
     const updatedShipping = { ...shippingInfoRef.current, ...address };
     const currentBilling = customerInfoRef.current;
 
-    if (updatedShipping.city && updatedShipping.postcode && updatedShipping.state) {
+    // চেক করা হচ্ছে আসলেই City, Postcode বা State চেঞ্জ হয়েছে কিনা
+    const isShippingFieldChanged = 
+        (address.city !== undefined && address.city !== shippingInfoRef.current.city) ||
+        (address.postcode !== undefined && address.postcode !== shippingInfoRef.current.postcode) ||
+        (address.state !== undefined && address.state !== shippingInfoRef.current.state);
+
+    if (isShippingFieldChanged && updatedShipping.city && updatedShipping.postcode && updatedShipping.state) {
         dispatch({ type: 'SET_LOADING', key: 'shipping', payload: true });
         try {
             await client.mutate({
@@ -279,8 +281,6 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
     dispatch({ type: 'SET_LOADING', key: 'order', payload: true });
     setOrderPlacementInProgress(true);
 
-    const isStandaloneRedirect = selectedPaymentMethod === 'stripe_klarna' || selectedPaymentMethod === 'stripe_afterpay_clearpay';
-    const isEmbeddedRedirect = paymentData?.is_embedded_redirect === true;
     const affiliateId = Cookies.get('solid_affiliate_id');
     const visitId = Cookies.get('solid_affiliate_visit_id');
     const affiliateMetaData = [];
@@ -291,91 +291,11 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
         affiliateMetaData.push({ key: 'solid_affiliate_visit_id', value: visitId });
     }
 
-    if (paymentData?.redirect_needed && (isStandaloneRedirect || isEmbeddedRedirect)) {
-        try {
-            if (!cartData) {
-                throw new Error("Cart data is not available.");
-            }
-
-            const billingDetails = customerInfoRef.current;
-            const shippingDetails = shipToDifferentAddress ? shippingInfoRef.current : billingDetails;
-            const selectedRate = shippingRates.find(rate => rate.id === selectedShipping);
-            if (!selectedRate) { throw new Error("Selected shipping rate not found."); }
-
-            const getPaymentMethodTitle = (methodId: string): string => {
-              if (methodId.includes('klarna')) return 'Klarna';
-              if (methodId.includes('afterpay_clearpay')) return 'Afterpay';
-              if (methodId.includes('zip')) return 'Zip Pay';
-              return 'Redirect Payment';
-            };
-
-            const orderPayload = {
-              payment_method: selectedPaymentMethod,
-              payment_method_title: getPaymentMethodTitle(selectedPaymentMethod),
-              set_paid: false,
-              billing: {
-                first_name: billingDetails.firstName,
-                last_name: billingDetails.lastName,
-                address_1: billingDetails.address1,
-                city: billingDetails.city,
-                state: billingDetails.state,
-                postcode: billingDetails.postcode,
-                country: 'AU',
-                email: billingDetails.email,
-                phone: billingDetails.phone,
-              },
-              shipping: {
-                first_name: shippingDetails.firstName,
-                last_name: shippingDetails.lastName,
-                address_1: shippingDetails.address1,
-                city: shippingDetails.city,
-                state: shippingDetails.state,
-                postcode: shippingDetails.postcode,
-                country: 'AU',
-              },
-              line_items: cartItems.map(item => ({
-                product_id: item.databaseId,
-                quantity: item.quantity,
-              })),
-              shipping_lines: [{
-                  method_id: selectedRate.id,
-                  method_title: selectedRate.label,
-                  total: (parseFloat(selectedRate.cost) || 0).toString(),
-              }],
-              coupon_lines: cartData.appliedCoupons?.map(coupon => ({ code: coupon.code })) || [],
-              customer_note: orderNotes,
-              meta_data: affiliateMetaData
-            };
-
-            const response = await fetch('/api/create-order', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(orderPayload),
-            });
-
-            if (!response.ok) {
-              const errorData = await response.json();
-              throw new Error(errorData.message || 'Failed to create order via REST API.');
-            }
-            
-            const newOrder = await response.json();
-            
-            if (newOrder.id && newOrder.order_key) {
-                return { orderId: newOrder.id, orderKey: newOrder.order_key };
-            } else {
-                throw new Error('Order created, but required details are missing.');
-            }
-
-        } catch (error) {
-            toast.dismiss();
-            toast.error(getErrorMessage(error));
-            dispatch({ type: 'SET_LOADING', key: 'order', payload: false });
-            return null;
+    try {
+        if (!cartData) {
+            throw new Error("Cart data is not available.");
         }
-    }
-    
-    else {
-      try {
+
         const billingDetails = paymentData?.shippingAddress && paymentData.shippingAddress.address1
           ? {
               firstName: paymentData.shippingAddress.firstName || '',
@@ -390,77 +310,44 @@ function CheckoutClientComponent({ paymentGateways }: { paymentGateways: Payment
           : customerInfoRef.current;
         
         const shippingDetails = shipToDifferentAddress ? shippingInfoRef.current : billingDetails;
-        const mutationInput = {
-          clientMutationId: `checkout-${Date.now()}`,
-          billing: billingDetails,
-          shipping: shippingDetails,
-          paymentMethod: paymentData?.paymentMethodId || selectedPaymentMethod,
-          shippingMethod: selectedShipping,
-          customerNote: orderNotes,
-          transactionId: paymentData?.transaction_id || '',
-          isPaid: !!paymentData?.transaction_id,
-          metaData: affiliateMetaData
+
+        const orderPayload = {
+            cartItems: cartItems,
+            customerInfo: billingDetails,
+            shippingInfo: shippingDetails,
+            selectedShipping,
+            shippingRates,
+            appliedCoupons: cartData.appliedCoupons || [],
+            orderNotes,
+            selectedPaymentMethod: paymentData?.paymentMethodId || selectedPaymentMethod,
+            affiliateMetaData
         };
-    
-        const { data } = await client.mutate<CheckoutMutationResult>({
-            mutation: CHECKOUT_MUTATION,
-            variables: { input: mutationInput },
+
+        const response = await fetch('/api/stripe/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderPayload),
         });
-        
-        const checkoutData = data?.checkout;
-        const result = {
-            success: checkoutData?.result === 'success',
-            order: {
-                id: checkoutData?.order?.databaseId,
-                orderKey: checkoutData?.order?.orderKey,
-            },
-            message: checkoutData?.result !== 'success' ? 'Failed to place order.' : undefined
-        };
-        
-        if (result.success && result.order?.id) {
-            toast.dismiss();
-            toast.success('Order placed successfully!');
-            if (mutationInput.transactionId) {
-              const queryResponse = mutationInput.transactionId.startsWith('pi_')
-                ? null
-                : await client.query<
-                    { order: { transactionId: string | null } | null }
-                  >({ 
-                    query: gql`query GetOrder($id: ID!) { order(id: $id, idType: DATABASE_ID) { transactionId } }`,
-                    variables: { id: result.order.id }
-                  });
-              
-              const paymentIntentId = mutationInput.transactionId.startsWith('pi_')
-                ? mutationInput.transactionId
-                : queryResponse?.data?.order?.transactionId;
 
-              if (paymentIntentId && paymentIntentId.startsWith('pi_')) {
-                fetch('/api/update-payment-intent', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    paymentIntentId: paymentIntentId,
-                    orderId: result.order.id,
-                  }),
-                }).catch(err => console.error("Failed to update payment intent description:", err));
-              }
-            }
+        const newOrder = await response.json();
 
-            await router.push(`/order-success?order_id=${result.order.id}&key=${result.order.orderKey}`);
-
-            if (typeof clearCart === 'function') await clearCart();
-        } else {
-            toast.dismiss();
-            toast.error(result.message || 'Failed to process order after payment.');
-            dispatch({ type: 'SET_LOADING', key: 'order', payload: false });
+        if (!response.ok || !newOrder.success) {
+            throw new Error(newOrder.error || 'Failed to create draft order before payment.');
         }
-      } catch (error) {
+        
+        // এখানে পেমেন্ট করার আগেই Order ID এবং Order Key রিটার্ন করা হচ্ছে
+        // যাতে Stripe PaymentGateway বা ExpressCheckout পেমেন্ট কনফার্ম করতে পারে
+        return { orderId: newOrder.wcOrderId, orderKey: newOrder.wcOrderKey };
+
+    } catch (error) {
         toast.dismiss();
         toast.error(getErrorMessage(error));
         dispatch({ type: 'SET_LOADING', key: 'order', payload: false });
-      }
+        setOrderPlacementInProgress(false);
+        return null;
     }
   };
+
   const total = cartData?.total ? parseFloat(cartData.total.replace(/[^0-9.]/g, '')) : 0;
   const isShippingSelected = !!selectedShipping;
   if (loading.cart && !cartData) { return ( <div className="flex justify-center items-center min-h-[50vh] text-2xl"><h1 className="text-gray-700">Checkout</h1></div> ); }
