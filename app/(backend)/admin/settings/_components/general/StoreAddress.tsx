@@ -1,6 +1,6 @@
 //app/(backend)/admin/settings/_components/general/StoreAddress.tsx
 
-import { getCountryStateOptions } from "@/app/(backend)/action/settings/general/location-helpers";
+import { getCountryStateOptions } from "@/app/actions/backend/settings/general/location-helpers";
 import { ComponentProps } from "../../../../types";
 
 export default function StoreAddress({ data, updateNestedData }: Omit<ComponentProps, 'handleChange'>) {

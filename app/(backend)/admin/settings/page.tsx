@@ -4,9 +4,9 @@ import { Prisma } from '@prisma/client'; // 🛑 Prisma-এর রিয়েল �
 import SettingsClient, { EmailPageData } from './_components/SettingsClient';
 import { ShippingProvider, GeneralSettingsData, EmailLog, EmailConfiguration, EmailTemplate } from '../../types';
 
-import { getEmailConfiguration } from '@/app/(backend)/action/settings/emails/email-config';
-import { getEmailTemplates } from '@/app/(backend)/action/settings/emails/email-templates';
-import { getEmailLogs } from '@/app/(backend)/action/settings/emails/email-logs';
+import { getEmailConfiguration } from '@/app/actions/backend/settings/emails/email-config';
+import { getEmailTemplates } from '@/app/actions/backend/settings/emails/email-templates';
+import { getEmailLogs } from '@/app/actions/backend/settings/emails/email-logs';
 
 export const dynamic = 'force-dynamic';
 

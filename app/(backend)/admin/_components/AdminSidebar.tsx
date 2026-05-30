@@ -11,6 +11,7 @@ export default function AdminSidebar({ isOpen, closeSidebar }: { isOpen: boolean
 
   const menuItems = [
     { name: 'Dashboard', path: '/admin', icon: <MdDashboard className="w-[18px] h-[18px]" /> },
+    { name: 'media', path: '/admin/media', icon: <MdPeople className="w-[18px] h-[18px]" /> },
     { name: 'Warranty Claims', path: '/admin/warranty-claims', icon: <MdBuild className="w-[18px] h-[18px]" /> },
     { name: 'Users', path: '/admin/users', icon: <MdPeople className="w-[18px] h-[18px]" /> },
     { name: 'Settings', path: '/admin/settings', icon: <MdSettings className="w-[18px] h-[18px]" /> },

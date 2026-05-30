@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { Role } from '@prisma/client';
 
-import { createUser, updateUser } from '@/app/(backend)/action/users/user-actions';
+import { createUser, updateUser } from '@/app/actions/backend/users/user-actions';
 
 export default function UserFormClient({ initialData }: { initialData: any }) {
   const router = useRouter();

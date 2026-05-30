@@ -1,4 +1,4 @@
-// File: app/(backend)/action/settings/email/send-test-email.ts
+// File: //app/actions/backend/settings/email/send-test-email.ts
 
 "use server";
 

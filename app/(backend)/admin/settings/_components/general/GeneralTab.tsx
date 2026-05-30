@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { updateGeneralSettings } from '@/app/(backend)/action/settings/general/general';
+import { updateGeneralSettings } from '@/app/actions/backend/settings/general/general';
 
 // 🛑 types.ts থেকে রিয়েল টাইপ ইম্পোর্ট করা হলো
 import { GeneralSettingsData } from '../../../../types';

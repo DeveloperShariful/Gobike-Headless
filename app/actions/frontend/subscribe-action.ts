@@ -1,4 +1,4 @@
-//app/(frontend)/action/subscription/subscribe-action.ts
+// app/action/frontend/action/subscription/subscribe-action.ts
 
 'use server';
 

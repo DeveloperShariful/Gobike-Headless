@@ -2,7 +2,7 @@
 title: "Huddy Sends the GoBike 20 Huge at the Track"
 date: "2025-01-15"
 category: "Customer Videos"
-video_url: "https://gobikes.au/wp-content/uploads/2026/05/GOBIKE-12-Inch-Stacyc.mp4"
+video_url: "https://rgy4iw8lybyokbyt.public.blob.vercel-storage.com/GOBIKE%2012%20Inch%20Stacyc-ZKH1ocS31zTFZHsG0ldzMIBXuteNyR.mp4"
 thumbnail: "https://gobikes.au/wp-content/uploads/2026/05/Screenshot-2026-05-27-005304.png"
 original_caption: "Huddy absolutely sending it this weekend! 🚀🔥 Nothing beats seeing the progression. #GoBike #KidsEbike"
 excerpt: "Watch 6-year-old Huddy tear up the track on the GoBike 20-inch electric dirt bike. Discover why this is the ultimate Stacyc alternative."

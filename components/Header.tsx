@@ -53,7 +53,6 @@ const navItems: NavItem[] = [
     subItems: [
       { path: '/electric-bike-parts/battery', label: 'Electric Bike Batteries' },
       { path: '/electric-bike-parts/tyre-tube', label: 'Electric Bike Tyres and Tube' },
-
     ]
   },
   { path: '/apparel', label: 'Apparel' },
@@ -61,7 +60,15 @@ const navItems: NavItem[] = [
   { path: '/about', label: 'About' },
   { path: '/contact', label: 'Contact' },
   { path: '/faq', label: 'FAQ' },
-  { path: '/blog', label: 'Blog' },
+  // ★★★ NEW UPDATE: Hub & Blog Grouped Together ★★★
+  { 
+    path: '/kids-ebike-hub', 
+    label: 'Hub & Blog',
+    subItems: [
+      { path: '/kids-ebike-hub', label: 'The GoBike Hub', tag: 'Videos & News' },
+      { path: '/blog', label: 'Official Blog', tag: 'Guides & Tips' },
+    ]
+  },
 ];
 
 export default function Header() {
@@ -215,8 +222,8 @@ export default function Header() {
                 onClick={() => setIsSearchOpen(true)} 
                 aria-label="Open Search Bar"
             >
-              <IoSearch size={22} aria-hidden="true" />
               <span className="text-sm font-medium">Search</span>
+              <IoSearch size={22} aria-hidden="true" />
             </button>
             
             <div className="relative" ref={dropdownRef}>

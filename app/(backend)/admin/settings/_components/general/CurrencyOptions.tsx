@@ -1,7 +1,7 @@
 //app/(backend)/admin/settings/_components/general/CurrencyOptions.tsx
 
 import { useState, useEffect } from "react";
-import { getAllCurrencies } from "@/app/(backend)/action/settings/general/location-helpers";
+import { getAllCurrencies } from "@/app/actions/backend/settings/general/location-helpers";
 import { ComponentProps } from "../../../../types"; 
 
 export default function CurrencyOptions({ data, updateNestedData }: Omit<ComponentProps, 'handleChange'>) {

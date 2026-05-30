@@ -1,4 +1,4 @@
-// File: app/(backend)/action/settings/email/email-logs.ts
+// File: //app/actions/backend/settings/email/email-logs.ts
 
 "use server";
 

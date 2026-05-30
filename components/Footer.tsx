@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Script from 'next/script'; 
-import { subscribeNewsletter } from '@/app/(frontend)/action/subscribe-action';
+import { subscribeNewsletter } from '@/app/actions/frontend/subscribe-action';
 
 export default function Footer() {
   const [email, setEmail] = useState('');

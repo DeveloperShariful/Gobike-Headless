@@ -3,7 +3,7 @@ title: "Huge News: The GoBike 16 is Officially Back in Stock!"
 date: "2025-01-20"
 category: "News"
 #video_url: "https://gobikes.au/wp-content/uploads/2025/01/gobike-16-restock.mp4"
-thumbnail: "https://gobikes.au/wp-content/uploads/2026/05/Gobike-All-Bike-Restock.jpg"
+thumbnail: "https://rgy4iw8lybyokbyt.public.blob.vercel-storage.com/kids%20electric%20bike-NM7njL9rGmzUkaVcM5GHvbUmVUAnoh.webp"
 original_caption: "🚨 THEY ARE BACK! The highly requested GoBike 16 is finally back in stock in all colors. Grab yours before they sell out again! #GoBike #KidsEbike #Restock"
 excerpt: "Great news for Aussie parents! The best-selling GoBike 16-inch electric balance bike is back in stock. Find out why it's the ultimate choice for your 5-7 year old."
 tags: ["kids electric bike", "GoBike 16", "electric balance bike Australia", "kids ebike Australia"]

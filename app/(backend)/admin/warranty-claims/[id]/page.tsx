@@ -3,7 +3,7 @@
 import { db } from '@/lib/prisma';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { updateClaimStatus } from '@/app/(backend)/action/warranty/claim-action';
+import { updateClaimStatus } from '@/app/actions/backend/warranty/claim-action';
 import TransdirectClientBox from './TransdirectClientBox';
 import { getClient } from '@/lib/apollo-rsc-client'; 
 import { gql } from '@apollo/client';

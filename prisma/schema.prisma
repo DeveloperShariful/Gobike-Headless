@@ -59,6 +59,13 @@ enum LogCategory {
   EMAIL
 }
 
+enum MediaType {
+  IMAGE
+  VIDEO
+  DOCUMENT
+  OTHER
+}
+
 // ==========================================
 // 2. USER & AUTH MODELS
 // ==========================================
@@ -548,14 +555,60 @@ model StoreSettings {
   dimensionUnit  String              @default("cm")
   logo           String?
   favicon        String?
-  // logoMediaId    String?
-  // logoMedia      Media?              @relation("StoreLogo", fields: [logoMediaId], references: [id])
-  // faviconMediaId String?
-  // faviconMedia   Media?              @relation("StoreFavicon", fields: [faviconMediaId], references:[id])
+  logoMediaId    String?
+  logoMedia      Media?              @relation("StoreLogo", fields: [logoMediaId], references: [id])
+  faviconMediaId String?
+  faviconMedia   Media?              @relation("StoreFavicon", fields: [faviconMediaId], references:[id])
   socialLinks    Json?
   smtpConfig     Json?
   maintenance    Boolean             @default(false)
   affiliateConfig Json?
   mlmConfig       Json?
   updatedAt      DateTime            @default(now()) @updatedAt
+}
+
+model MediaFolder {
+  id        String        @id @default(uuid())
+  name      String
+  parentId  String?
+  parent    MediaFolder?  @relation("FolderToFolder", fields: [parentId], references: [id], onDelete: SetNull)
+  children  MediaFolder[] @relation("FolderToFolder")
+  files     Media[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([parentId])
+}
+
+model Media {
+  id             String        @id @default(uuid())
+  url            String        // Vercel Blob থেকে পাওয়া ডাইরেক্ট লিংক
+  pathname       String        // Vercel Blob থেকে পাওয়া পাথনেম (ফাইল ডিলিট করার জন্য এটি মাস্ট লাগবে)
+  type           MediaType     @default(IMAGE)
+  filename       String        // ফাইলের নাম
+  originalName   String?       // ইউজারের পিসিতে ফাইলের যে নাম ছিল
+  mimeType       String        // যেমন: 'image/png' বা 'video/mp4' (ভিডিও নাকি ইমেজ চেনার জন্য)
+  size           Int           // ফাইলের সাইজ (বাইটসে)
+  
+  width          Int?          // ইমেজের চওড়া
+  height         Int?          // ইমেজের উচ্চতা
+  altText        String?       // SEO এর জন্য (WordPress এর মতো)
+  caption        String?       // ইমেজের ক্যাপশন
+  description    String?       // বিস্তারিত বিবরণ
+  
+  uploadedBy     String?       // কোন এডমিন আপলোড করেছে তার ID
+  
+  folderId       String?
+  folder         MediaFolder?  @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  
+  source         String        @default("GENERAL") 
+  storeLogos     StoreSettings[] @relation("StoreLogo")
+  storeFavicons  StoreSettings[] @relation("StoreFavicon")
+  //users          User[]
+
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  
+  @@index([type])
+  @@index([createdAt(sort: Desc)])
 }

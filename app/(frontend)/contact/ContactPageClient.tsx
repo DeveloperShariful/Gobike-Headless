@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import Link from 'next/link';
 // 🛑 NEW: Import the server action
-import { submitContactForm } from '@/app/(frontend)/action/contact-action';
+import { submitContactForm } from '@/app/actions/frontend/contact-action';
 
 export default function ContactPageClient() {
   const [formData, setFormData] = useState({

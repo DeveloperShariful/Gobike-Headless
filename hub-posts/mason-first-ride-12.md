@@ -2,7 +2,7 @@
 title: "Mason's First Ever Ride on the GoBike 16"
 date: "2025-01-18"
 category: "Customer Videos"
-video_url: "https://gobikes.au/wp-content/uploads/2026/05/The-best-kids-ebike-is-gobike-australia.mp4"
+video_url: "https://rgy4iw8lybyokbyt.public.blob.vercel-storage.com/The%20best%20kids%20ebike%20is%20gobike%20australia-j8UZiczGN89x8FVQrsU1MiT0zqycUO.mp4"
 thumbnail: "https://gobikes.au/wp-content/uploads/2026/05/Screenshot-2026-05-27-013411.png"
 original_caption: "Just look at that smile! 🥺 6-year-old Mason mastering his balance on day ONE. So proud of this little ripper! ⚡️ #GoBikeFam #BalanceBike"
 excerpt: "Watch 3-year-old Mason take his very first ride on the GoBike 12-inch electric balance bike. Discover how easy it is for toddlers to build confidence on two wheels."

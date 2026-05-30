@@ -1,4 +1,4 @@
-// app/(frontend)/action/warranty-action.ts
+// app/actions/frontend/action/warranty-action.ts
 
 'use server';
 
@@ -13,6 +13,14 @@ type ClaimData = {
   description: string;
   mediaUrl?: string;
   customAddress?: string; 
+  // NEW: Receives full media objects from frontend
+  mediaDetails?: Array<{
+    url: string;
+    pathname: string;
+    filename: string;
+    mimeType: string;
+    size: number;
+  }>;
 };
 
 export async function submitWarrantyClaim(data: ClaimData) {
@@ -30,9 +38,6 @@ export async function submitWarrantyClaim(data: ClaimData) {
     const cleanOrderNumber = data.orderNumber.replace('#', '').trim();
 
     try {
-      // =================================================================
-      // WOOCOMMERCE REST API CALL (Super Fast & Secure)
-      // =================================================================
       const wpUrl = process.env.NEXT_PUBLIC_WORDPRESS_URL;
       const ck = process.env.WC_CONSUMER_KEY;
       const cs = process.env.WC_CONSUMER_SECRET;
@@ -66,15 +71,14 @@ export async function submitWarrantyClaim(data: ClaimData) {
           wpState = orderData.shipping?.state || '';
           wpPostcode = orderData.shipping?.postcode || '';
         } else {
-          console.log(`Email mismatch for order ${cleanOrderNumber}. Expected ${orderEmail}, got ${inputEmail}`);
+          console.log(`Email mismatch for order ${cleanOrderNumber}`);
         }
-      } else {
-         console.log(`Order ${cleanOrderNumber} not found via REST API.`);
       }
     } catch (error) {
-      console.error("WooCommerce REST API error during claim submission:", error);
+      console.error("WooCommerce REST API error:", error);
     }
 
+    // 1. Create Warranty Claim Entry
     const newClaim = await db.warrantyClaim.create({
       data: {
         name: data.name,
@@ -93,11 +97,34 @@ export async function submitWarrantyClaim(data: ClaimData) {
       },
     });
 
-    // =================================================================
-    // 🛑 EMAIL NOTIFICATION LOGIC (Background Process)
-    // =================================================================
+    // 2. NEW: Save files into the Central Media Library
+    if (data.mediaDetails && data.mediaDetails.length > 0) {
+      const mediaDataToInsert = data.mediaDetails.map(media => {
+        let type: 'IMAGE' | 'VIDEO' | 'DOCUMENT' | 'OTHER' = 'OTHER';
+        if (media.mimeType.startsWith('image/')) type = 'IMAGE';
+        else if (media.mimeType.startsWith('video/')) type = 'VIDEO';
+        else if (media.mimeType.includes('pdf')) type = 'DOCUMENT';
+
+        return {
+          url: media.url,
+          pathname: media.pathname,
+          filename: media.filename,
+          originalName: media.filename,
+          mimeType: media.mimeType,
+          size: media.size,
+          type: type,
+          source: 'WARRANTY' // Marks it as coming from Warranty Form!
+        };
+      });
+
+      // Insert all media objects at once
+      await db.media.createMany({
+        data: mediaDataToInsert,
+      });
+    }
+
+    // 3. Email Notification Logic
     try {
-        // 1. Send Email to Customer
         await sendNotification({
             trigger: "WARRANTY_CLAIM_CUSTOMER",
             recipient: data.email,
@@ -108,7 +135,6 @@ export async function submitWarrantyClaim(data: ClaimData) {
             }
         });
 
-        // 2. Send Email to Admin
         await sendNotification({
             trigger: "WARRANTY_CLAIM_ADMIN",
             recipient: "", 

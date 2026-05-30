@@ -4,8 +4,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { getEmailLogs } from "@/app/(backend)/action/settings/emails/email-logs";
-import { getEmailTemplates } from "@/app/(backend)/action/settings/emails/email-templates"; 
+import { getEmailLogs } from "@/app/actions/backend/settings/emails/email-logs";
+import { getEmailTemplates } from "@/app/actions/backend/settings/emails/email-templates"; 
 
 // 🛑 types.ts থেকে রিয়েল টাইপ ইম্পোর্ট
 import { EmailTemplate, EmailLog } from "../../../../types";

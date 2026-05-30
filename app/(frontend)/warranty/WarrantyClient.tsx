@@ -5,13 +5,25 @@
 import { useState, useRef } from 'react';
 import { upload } from '@vercel/blob/client'; 
 import Breadcrumbs from '@/components/Breadcrumbs';
-import { submitWarrantyClaim } from '../action/warranty-action';
+import { submitWarrantyClaim } from '@/app/actions/frontend/warranty-action'; // Ensure correct path
+
+// NEW: Media Type Definition
+type UploadedMedia = {
+  url: string;
+  pathname: string;
+  filename: string;
+  mimeType: string;
+  size: number;
+};
 
 export default function WarrantyClient() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0); 
-  const [uploadedMediaUrls, setUploadedMediaUrls] = useState<string[]>([]); 
+  
+  // NEW: Store full media objects instead of just string URLs
+  const [uploadedMedia, setUploadedMedia] = useState<UploadedMedia[]>([]); 
+  
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   
@@ -37,7 +49,7 @@ export default function WarrantyClient() {
     setUploadProgress(0);
     setErrorMessage('');
     
-    let newUploadedUrls: string[] = [];
+    let newUploadedFiles: UploadedMedia[] = [];
     const totalFiles = files.length;
     let completedFiles = 0;
 
@@ -54,11 +66,19 @@ export default function WarrantyClient() {
           },
         });
         
-        newUploadedUrls.push(blob.url);
+        // NEW: Capture full details for the Media Library
+        newUploadedFiles.push({
+          url: blob.url,
+          pathname: blob.pathname || file.name,
+          filename: file.name,
+          mimeType: file.type,
+          size: file.size,
+        });
+        
         completedFiles++;
       }
       
-      setUploadedMediaUrls((prevUrls) => [...prevUrls, ...newUploadedUrls]);
+      setUploadedMedia((prev) => [...prev, ...newUploadedFiles]);
       setUploadProgress(100);
       
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -73,7 +93,7 @@ export default function WarrantyClient() {
   };
 
   const removeMedia = (indexToRemove: number) => {
-    setUploadedMediaUrls(urls => urls.filter((_, index) => index !== indexToRemove));
+    setUploadedMedia(files => files.filter((_, index) => index !== indexToRemove));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -81,7 +101,7 @@ export default function WarrantyClient() {
     if (isUploading) {
       return alert("Please wait for files to finish uploading.");
     }
-    if (uploadedMediaUrls.length === 0) {
+    if (uploadedMedia.length === 0) {
       return alert("Please upload at least one video or image.");
     }
 
@@ -90,15 +110,22 @@ export default function WarrantyClient() {
     setSuccessMessage('');
 
     try {
-      const mediaUrlString = uploadedMediaUrls.join(', ');
-      const result = await submitWarrantyClaim({ ...formData, mediaUrl: mediaUrlString });
+      // Create comma-separated string for WarrantyClaim table
+      const mediaUrlString = uploadedMedia.map(m => m.url).join(', ');
+      
+      // Pass both string (for old logic) and array (for Media Library)
+      const result = await submitWarrantyClaim({ 
+        ...formData, 
+        mediaUrl: mediaUrlString,
+        mediaDetails: uploadedMedia // NEW: Pass the full objects to backend
+      });
 
       if (!result.success) throw new Error(result.message);
 
       setSuccessMessage('Your warranty claim has been submitted successfully! Our technical team will review your video and contact you shortly.');
       
       setFormData({ name: '', orderNumber: '', shopPurchased: 'GoBike Australia', email: '', description: '' });
-      setUploadedMediaUrls([]);
+      setUploadedMedia([]);
       setUploadProgress(0);
 
     } catch (error: any) {
@@ -108,6 +135,8 @@ export default function WarrantyClient() {
     }
   };
 
+  // ... (REST OF THE UI REMAINS EXACTLY THE SAME)
+  
   return (
     <div className="bg-[#f8fafc] min-h-screen font-sans text-gray-800 pb-20">
       <Breadcrumbs pageTitle="Warranty Claim" />
@@ -266,13 +295,13 @@ export default function WarrantyClient() {
                     )}
                   </div>
 
-                  {uploadedMediaUrls.length > 0 && !isUploading && (
+                  {uploadedMedia.length > 0 && !isUploading && (
                     <div className="mt-4 p-4 border border-green-200 bg-green-50 rounded-xl">
-                      <p className="text-[13px] font-bold text-green-700 mb-3">✓ {uploadedMediaUrls.length} File(s) Ready to Submit:</p>
+                      <p className="text-[13px] font-bold text-green-700 mb-3">✓ {uploadedMedia.length} File(s) Ready to Submit:</p>
                       <ul className="space-y-2">
-                        {uploadedMediaUrls.map((url, idx) => (
+                        {uploadedMedia.map((media, idx) => (
                           <li key={idx} className="flex justify-between items-center bg-white p-3 rounded-lg border border-green-100 text-sm shadow-sm">
-                            <a href={url} target="_blank" className="text-blue-600 hover:underline font-medium truncate max-w-[70%]">File {idx + 1} - View</a>
+                            <a href={media.url} target="_blank" className="text-blue-600 hover:underline font-medium truncate max-w-[70%]">{media.filename} - View</a>
                             <button type="button" onClick={() => removeMedia(idx)} className="text-red-500 hover:text-white hover:bg-red-500 font-bold px-3 py-1 rounded transition-colors text-xs">Remove</button>
                           </li>
                         ))}
@@ -286,7 +315,7 @@ export default function WarrantyClient() {
                   <textarea name="description" required rows={4} value={formData.description} onChange={handleInputChange} placeholder="Please describe exactly what happened..." className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none resize-none transition-all"></textarea>
                 </div>
 
-                <button type="submit" disabled={isSubmitting || isUploading || uploadedMediaUrls.length === 0} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl disabled:opacity-70 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5">
+                <button type="submit" disabled={isSubmitting || isUploading || uploadedMedia.length === 0} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl disabled:opacity-70 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5">
                   {isSubmitting ? 'Submitting Claim...' : 'Submit Warranty Claim'}
                 </button>
               </form>

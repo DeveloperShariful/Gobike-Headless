@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { updateClaimStatus, bulkUpdateClaimStatus, deleteClaimPermanently, bulkDeleteClaimsPermanently } from '../../../action/warranty/claim-action';
+import { updateClaimStatus, bulkUpdateClaimStatus, deleteClaimPermanently, bulkDeleteClaimsPermanently } from '../../../../actions/backend/warranty/claim-action';
 import Pagination from './Pagination'; 
 
 export default function WarrantyTableClient({ claims, currentFilter, totalItems, itemsPerPage }: { claims: any[], currentFilter: string, totalItems: number, itemsPerPage: number }) {

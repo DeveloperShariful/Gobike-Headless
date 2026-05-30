@@ -1,4 +1,4 @@
-//app/(backend)/action/warranty/claim-action.ts
+//app/actions/backend/action/warranty/claim-action.ts
 
 'use server';
 

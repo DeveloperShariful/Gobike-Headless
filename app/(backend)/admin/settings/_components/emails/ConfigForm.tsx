@@ -4,8 +4,8 @@
 
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { saveEmailConfiguration } from "@/app/(backend)/action/settings/emails/email-config";
-import { sendTestEmail } from "@/app/(backend)/action/settings/emails/send-test-email";
+import { saveEmailConfiguration } from "@/app/actions/backend/settings/emails/email-config";
+import { sendTestEmail } from "@/app/actions/backend/settings/emails/send-test-email";
 
 // 🛑 NEW: Vercel Blob Upload ইম্পোর্ট করা হলো
 import { upload } from '@vercel/blob/client';

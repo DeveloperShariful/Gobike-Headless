@@ -1,4 +1,4 @@
-// File: app/(backend)/actions/settings/email/email-config.ts
+// File: app/actions/backend/settings/email/email-config.ts
 
 "use server";
 

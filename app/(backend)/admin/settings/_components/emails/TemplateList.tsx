@@ -4,7 +4,7 @@
 
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { syncEmailTemplates } from "@/app/(backend)/action/settings/emails/email-templates";
+import { syncEmailTemplates } from "@/app/actions/backend/settings/emails/email-templates";
 import { EmailTemplate } from "../../../../types";
 import TemplateEditModal from "./TemplateEditModal"; 
 

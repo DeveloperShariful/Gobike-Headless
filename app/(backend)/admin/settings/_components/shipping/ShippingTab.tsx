@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { saveShippingProviderSettings } from '@/app/(backend)/action/settings/shipping/shipping';
+import { saveShippingProviderSettings } from '@/app/actions/backend/settings/shipping/shipping';
 import { ShippingProvider } from '../../../../types';
 
 export default function ShippingTab({ initialShipping }: { initialShipping: ShippingProvider | null }) {

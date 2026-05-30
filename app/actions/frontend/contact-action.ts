@@ -1,4 +1,4 @@
-// app/(frontend)/action/contact-action.ts
+// app/action/frontend/action/contact-action.ts
 
 'use server';
 

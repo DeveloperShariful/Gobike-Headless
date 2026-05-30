@@ -6,7 +6,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { Role } from '@prisma/client';
-import { deleteUser, bulkDeleteUsers, bulkChangeRole, sendPasswordReset } from '@/app/(backend)/action/users/user-actions';
+import { deleteUser, bulkDeleteUsers, bulkChangeRole, sendPasswordReset } from '@/app/actions/backend/users/user-actions';
 import Pagination from '@/app/(backend)/admin/warranty-claims/_components/Pagination'; 
 
 export default function UserTableClient({ 

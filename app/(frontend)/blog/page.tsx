@@ -5,7 +5,7 @@ import path from 'path';
 import matter from 'gray-matter';
 import Link from 'next/link';
 import Image from 'next/image';
-import Breadcrumbs from '../../../components/Breadcrumbs';
+import Breadcrumbs from '@/components/Breadcrumbs';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
