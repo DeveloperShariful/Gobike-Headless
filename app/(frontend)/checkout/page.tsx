@@ -1,4 +1,4 @@
-//app/checkout/page.tsx
+//app/(frontend)/checkout/page.tsx
 
 import CheckoutClient from './CheckoutClient';
 

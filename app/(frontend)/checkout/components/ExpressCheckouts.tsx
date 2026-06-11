@@ -1,4 +1,4 @@
-// app/checkout/components/ExpressCheckouts.tsx
+// app/(frontend)/checkout/components/ExpressCheckouts.tsx
 
 'use client';
 

@@ -1,4 +1,4 @@
-// File: app/checkout/components/StripePaymentGateway.tsx
+// File: app/(frontend)/checkout/components/StripePaymentGateway.tsx
 
 import React, { useState, forwardRef, useEffect } from 'react';
 import Image from 'next/image';

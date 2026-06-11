@@ -1,4 +1,4 @@
-// app/checkout/components/PaymentMethods.tsx
+// app/(frontend)/checkout/components/PaymentMethods.tsx
 
 'use client';
 import Image from 'next/image';

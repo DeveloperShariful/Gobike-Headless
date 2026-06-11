@@ -1,4 +1,4 @@
-// app/checkout/components/PaypalPaymentGateway.tsx
+// app/(frontend)/checkout/components/PaypalPaymentGateway.tsx
 
 'use client';
 

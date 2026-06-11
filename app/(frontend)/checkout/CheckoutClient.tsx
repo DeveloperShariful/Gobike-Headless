@@ -1,14 +1,14 @@
-//app/checkout/CheckoutClient.tsx
+//app/(frontend)/checkout/CheckoutClient.tsx
 
 'use client';
 
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { useEffect, useCallback, useReducer, useRef, useState } from 'react';
-import { useCart } from '../../../context/CartContext';
+import { useCart } from '@/context/CartContext';
 import { useRouter } from 'next/navigation';
 import { gql } from '@apollo/client';
-import client from '../../../lib/apolloClient';
+import client from '@/lib/apolloClient';
 import toast from 'react-hot-toast';
 import Cookies from 'js-cookie'; 
 import OrderNotes from './components/OrderNotes';

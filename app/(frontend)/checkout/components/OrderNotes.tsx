@@ -1,4 +1,4 @@
-// app/checkout/components/OrderNotes.tsx
+// app/(frontend)/checkout/components/OrderNotes.tsx
 'use client';
 
 interface OrderNotesProps { notes: string; onNotesChange: (notes: string) => void; }

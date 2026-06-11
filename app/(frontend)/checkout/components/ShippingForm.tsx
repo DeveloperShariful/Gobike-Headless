@@ -1,4 +1,4 @@
-//app/checkout/components/ShippingForm.tsx
+//app/(frontend)/checkout/components/ShippingForm.tsx
 
 'use client';
 

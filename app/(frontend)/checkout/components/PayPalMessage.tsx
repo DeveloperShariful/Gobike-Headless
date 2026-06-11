@@ -1,4 +1,4 @@
-//app/checkout/components/PaypalMessage.tsx
+//app/(frontend)/checkout/components/PaypalMessage.tsx
 
 'use client';
 import React from 'react';

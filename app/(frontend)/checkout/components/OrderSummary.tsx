@@ -1,4 +1,4 @@
-//app/checkout/components/OrderSummary.tsx
+//app/(frontend)/checkout/components/OrderSummary.tsx
 
 'use client';
 
