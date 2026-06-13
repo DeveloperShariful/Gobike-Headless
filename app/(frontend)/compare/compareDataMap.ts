@@ -1,4 +1,4 @@
-//lib/compareDataMap.ts
+//app/(frontend)/compare//compareDataMap.ts
 
 export interface StaticSpecs {
     ageRange?: string;

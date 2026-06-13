@@ -112,8 +112,6 @@ export default async function SingleClaimPage({ params }: { params: Promise<{ id
         {/* --- LEFT COLUMN --- */}
         <div className="lg:col-span-2 space-y-6">
           
-          <div className="lg:col-span-2 space-y-6">
-          
           <div className="bg-white border border-[#c3c4c7] shadow-sm rounded-sm">
             <h2 className="px-4 py-3 border-b border-[#c3c4c7] text-[13px] sm:text-[14px] font-semibold text-[#1d2327] bg-[#f6f7f7] flex justify-between items-center">
               <span>Submitted Claim Details</span>
@@ -139,13 +137,31 @@ export default async function SingleClaimPage({ params }: { params: Promise<{ id
                 </div>
               </div>
 
-              {/* 🛑 NEW: Shop Purchased From Field Added Here */}
+              {/* Shop Purchased From Field */}
               <div className="w-full sm:col-span-2">
                 <p className="text-[#8c8f94] mb-1.5 font-medium">Shop Purchased From</p>
                 <span className="font-semibold inline-flex items-center gap-1.5 bg-gray-100 border border-gray-200 px-3 py-1.5 rounded-full text-[13px] text-gray-800 shadow-sm">
                   🏪 {claim.shopPurchased || 'GoBike Australia (Online)'}
                 </span>
               </div>
+
+              {/* 📦 NEW: Customer Submitted Address (Manual Shop Purchase-এর জন্য) */}
+              {claim.address && (
+                <div className="sm:col-span-2 w-full border-t border-[#f0f0f1] pt-4 mt-2">
+                  <p className="text-[#8c8f94] mb-2 font-semibold uppercase tracking-wider text-[11px]">Submitted Shipping Address</p>
+                  <div className="p-3.5 bg-gray-50 border border-dashed border-[#c3c4c7] rounded text-[13px] text-[#3c434a] space-y-1.5">
+                    <p><strong>Street Address:</strong> {claim.address}</p>
+                    <p><strong>Suburb / City:</strong> {claim.suburb}</p>
+                    <p><strong>State & Postcode:</strong> {claim.state} {claim.postcode}</p>
+                    {claim.phone && (
+                      <p>
+                        <strong>Phone: </strong> 
+                        <a href={`tel:${claim.phone}`} className="text-[#2271b1] hover:underline font-semibold">{claim.phone}</a>
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
               
               <div className="sm:col-span-2 w-full mt-2 sm:mt-0">
                 <p className="text-[#8c8f94] mb-1 font-medium">Issue Description</p>
@@ -155,7 +171,6 @@ export default async function SingleClaimPage({ params }: { params: Promise<{ id
               </div>
 
             </div>
-          </div>
           </div>
 
           <div className="bg-white border border-[#c3c4c7] shadow-sm">
@@ -300,7 +315,7 @@ export default async function SingleClaimPage({ params }: { params: Promise<{ id
             customerSuburb={wpOrder?.shipping?.city || claim.suburb}
             customerPostcode={wpOrder?.shipping?.postcode || claim.postcode}
             customerState={wpOrder?.shipping?.state || claim.state}
-            customerPhone={wpOrder?.billing?.phone || ''}
+            customerPhone={wpOrder?.billing?.phone || claim.phone}
           />
         </div>
       </div>

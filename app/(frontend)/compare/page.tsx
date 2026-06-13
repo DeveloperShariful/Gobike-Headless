@@ -8,7 +8,7 @@ import client from '@/lib/apolloClient';
 import { useCompare } from '@/context/CompareContext';
 import { useCart } from '@/context/CartContext';
 import Breadcrumbs from '@/components/Breadcrumbs';
-import { compareSpecsMap, staticSpecLabels, StaticSpecs } from '@/lib/compareDataMap';
+import { compareSpecsMap, staticSpecLabels, StaticSpecs } from '@/app/(frontend)/compare/compareDataMap';
 
 export interface Attribute { name: string; options: string[]; }
 export interface CompareProduct {
