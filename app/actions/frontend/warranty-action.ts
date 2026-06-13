@@ -1,7 +1,5 @@
 // app/actions/frontend/action/warranty-action.ts
 
-// app/actions/frontend/action/warranty-action.ts
-
 'use server';
 
 import { db } from '@/lib/prisma';
@@ -67,7 +65,7 @@ export async function submitWarrantyClaim(data: ClaimData) {
     let wpName = '';
     let wpEmail = '';
 
-    // ── GoBike Online: WooCommerce থেকে address verify করো ──
+    // ── GoBike Online: WooCommerce থেকে order verify করো ──
     if (isGoBikeOnline && cleanOrderNumber) {
       try {
         const wpUrl = process.env.NEXT_PUBLIC_WORDPRESS_URL;
@@ -84,30 +82,39 @@ export async function submitWarrantyClaim(data: ClaimData) {
           }
         );
 
-        if (res.ok) {
-          const orderData = await res.json();
-          const orderEmail = orderData.billing?.email?.toLowerCase() || '';
-          const inputEmail = data.email.toLowerCase();
+        // 🛑 অর্ডার নম্বর সিস্টেমে না থাকলে সাবমিশন এখানে আটকে দেওয়া হবে
+        if (!res.ok) {
+          return { 
+            success: false, 
+            message: 'Invalid order number. This order does not exist in our store.' 
+          };
+        }
 
-          if (orderEmail === inputEmail) {
-            wpPhone   = orderData.billing?.phone || '';
-            wpName    = `${orderData.billing?.first_name || ''} ${orderData.billing?.last_name || ''}`.trim();
-            wpEmail   = orderData.billing?.email || '';
-            const addr1 = orderData.shipping?.address_1 || '';
-            const addr2 = orderData.shipping?.address_2 || '';
-            wpAddress = `${addr1} ${addr2}`.trim();
-            wpSuburb  = orderData.shipping?.city || '';
-            wpState   = orderData.shipping?.state || '';
-            wpPostcode = orderData.shipping?.postcode || '';
-          } else {
-            console.log(`Email mismatch for order ${cleanOrderNumber}`);
-            // email mismatch হলেও claim save করি, admin দেখবে
-          }
+        const orderData = await res.json();
+        const orderEmail = orderData.billing?.email?.toLowerCase() || '';
+        const inputEmail = data.email.toLowerCase();
+
+        // ইমেইল মিললে আমরা WooCommerce থেকে অ্যাড্রেস অটো-ফিল করব
+        if (orderEmail === inputEmail) {
+          wpPhone   = orderData.billing?.phone || '';
+          wpName    = `${orderData.billing?.first_name || ''} ${orderData.billing?.last_name || ''}`.trim();
+          wpEmail   = orderData.billing?.email || '';
+          const addr1 = orderData.shipping?.address_1 || '';
+          const addr2 = orderData.shipping?.address_2 || '';
+          wpAddress = `${addr1} ${addr2}`.trim();
+          wpSuburb  = orderData.shipping?.city || '';
+          wpState   = orderData.shipping?.state || '';
+          wpPostcode = orderData.shipping?.postcode || '';
         } else {
-          console.error(`WooCommerce order ${cleanOrderNumber} not found. Status: ${res.status}`);
+          console.log(`Email mismatch for order ${cleanOrderNumber}. Claim will be submitted for manual review.`);
+          // ইমেইল না মিললেও ক্লাইম সাবমিট করতে দেওয়া হচ্ছে (স্ট্রিক্ট করা হয়নি)
         }
       } catch (error) {
         console.error('WooCommerce REST API error:', error);
+        return { 
+          success: false, 
+          message: 'Unable to verify order number due to a connection issue. Please try again.' 
+        };
       }
     }
 
